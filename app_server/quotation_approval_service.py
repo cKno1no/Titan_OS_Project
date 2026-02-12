@@ -1,0 +1,464 @@
+from flask import current_app
+from datetime import datetime
+from db_manager import DBManager, safe_float
+import config
+import math
+
+class QuotationApprovalService:
+    """Xử lý toàn bộ logic nghiệp vụ liên quan đến phê duyệt báo giá."""
+    
+    def __init__(self, db_manager: DBManager):
+        self.db = db_manager
+
+    # --- HÀM HELPER MỚI CHO SỰ CỐ NHÂN GIÁ TRỊ ---
+    def safe_numeric(self, value):
+        """Đảm bảo giá trị là số thập phân an toàn, không có lỗi định dạng."""
+        try:
+            # Nếu giá trị bị nhân 100000, chúng ta phải chia nó ở đây
+            val = safe_float(value)
+            # Kiểm tra lỗi nhân 100,000 lần
+            if val > 1000000 and val % 100000 == 0:
+                return val / 100000
+            return val
+        except:
+            return 0.0
+
+    def is_user_admin(self, user_code):
+        """Kiểm tra xem user_code có vai trò Admin hay không."""
+        # SỬA LỖI: Thay 'config.ROLE_ADMIN' bằng dấu '?' và truyền giá trị vào tuple tham số
+        query = f"""
+            SELECT 1 
+            FROM {config.TEN_BANG_NGUOI_DUNG}
+            WHERE USERCODE = ? AND Role = ?
+        """
+        # Truyền user_code và config.ROLE_ADMIN vào hàm get_data
+        return bool(self.db.get_data(query, (user_code, config.ROLE_ADMIN)))
+
+    
+    def get_quotes_for_approval(self, user_code, date_from, date_to):
+        """
+        Phiên bản tối ưu: Sử dụng Stored Procedure và loại bỏ query trong vòng lặp.
+        """
+        is_admin = self.is_user_admin(user_code)
+        
+        # 1. Gọi SP (Thay vì Query f-string dài dòng)
+        # SP trả về luôn danh sách ApproverList trong 1 cột
+        try:
+            quotes = self.db.execute_sp_multi(
+                'sp_GetQuotesForApproval_Optimized', 
+                (user_code, date_from, date_to, is_admin)
+            )
+            # execute_sp_multi trả về list of lists, lấy element đầu tiên
+            quotes = quotes[0] if quotes else []
+        except Exception as e:
+            current_app.logger.error(f"Lỗi gọi SP Approval: {e}")
+            return []
+
+        if not quotes: return []
+
+        results = []
+        for quote in quotes:
+            # Gán EmployeeID vào trường EmployeeID để HTML đọc NGUOILAM
+            quote['EmployeeID'] = quote.get('EmployeeID')
+
+            # Logic Check Cost Override
+            if quote.get('NeedsCostOverride') == 1 and quote.get('HasCostOverrideData') != 1:
+                quote['ApprovalResult'] = {
+                    'Passed': False, 
+                    'Reason': 'PENDING: Thiếu Giá QD. Cần Bổ sung!',
+                    'ApproverRequired': user_code,
+                    'ApproverDisplay': user_code,
+                    'ApprovalRatio': 0
+                }
+                quote['CanOpenCostOverride'] = True
+                results.append(quote)
+                continue
+
+            quote['CanOpenCostOverride'] = quote.get('NeedsCostOverride') == 1 and quote.get('HasCostOverrideData') == 1
+            
+            # Gọi hàm check logic (Đã được tối ưu bên dưới)
+            results.append(self._check_approval_criteria(quote, user_code))
+            
+        return results
+
+    def _check_approval_criteria(self, quote, current_user_code):
+        """Kiểm tra các quy tắc nghiệp vụ (tính tỷ số duyệt, xác định người duyệt cuối)."""
+        
+        # Khởi tạo trạng thái mặc định
+        approval_status = {'Passed': True, 'Reason': 'OK', 'ApproverRequired': current_user_code, 'ApproverDisplay': 'TỰ DUYỆT (SELF)', 'ApprovalRatio': 0}
+        quote['ApprovalResult'] = approval_status
+        
+        total_sale = safe_float(quote.get('TotalSaleAmount'))
+        total_cost = safe_float(quote.get('TotalCost'))
+        customer_class = quote.get('CustomerClass')
+        sale_amount = safe_float(quote.get('SaleAmount')) 
+        
+        # --- 1. TÍNH TOÁN TỶ SỐ DUYỆT (ƯU TIÊN) ---
+        ratio = 0
+        required_ratio = 0
+        ratio_passed = True # Cờ tạm để theo dõi tỷ số có đạt không
+
+        if total_cost > 0 and total_sale > 0:
+            ratio = 30 + 100 * (total_sale / total_cost)
+            approval_status['ApprovalRatio'] = min(9999, round(ratio))
+            
+            if customer_class == 'M':
+                required_ratio = config.RATIO_REQ_CLASS_M
+            elif customer_class == 'T':
+                required_ratio = config.RATIO_REQ_CLASS_T
+                
+            if required_ratio > 0 and ratio < required_ratio:
+                approval_status['Passed'] = False
+                approval_status['Reason'] = f'PENDING: Tỷ số ({round(ratio)}) < Y/C ({required_ratio}).'
+                approval_status['NeedsOverride'] = True
+                ratio_passed = False
+            
+        elif total_cost == 0 or total_sale == 0:
+            # Lỗi dữ liệu tài chính nghiêm trọng -> Chặn luôn
+            approval_status['Reason'] = 'FAILED: Không tính được Tỷ số Duyệt (Sale/Cost = 0).'
+            approval_status['Passed'] = False
+            ratio_passed = False
+            # Không return ngay ở đây để code có thể check tiếp các điều kiện khác nếu cần, 
+            # nhưng trong trường hợp này Cost=0 thì cũng không làm gì được nữa.
+            return quote
+
+
+        # --- 2. KIỂM TRA THÔNG TIN HÀNH CHÍNH (NVKD) ---
+        # Kiểm tra sau khi đã tính tỷ số
+        if not quote.get('SalesManID'):
+            approval_status['Passed'] = False
+            # Nếu tỷ số đã fail, ta nối thêm lý do. Nếu tỷ số OK, ta ghi lý do thiếu NVKD.
+            if not ratio_passed:
+                approval_status['Reason'] += " (VÀ Thiếu NVKD)"
+            else:
+                approval_status['Reason'] = 'FAILED: Thiếu NVKD (Cần cập nhật).'
+        
+
+        # --- 3. XÁC ĐỊNH NGƯỜI DUYỆT (Quyết định hành động cuối cùng) ---
+        # Mới: (Dùng chung limit với SO hoặc bạn tạo biến riêng LIMIT_APPROVE_QUOTE)
+        if sale_amount >= config.LIMIT_AUTO_APPROVE_SO:
+            
+            approver_data = self.db.get_data(f"SELECT Approver FROM {config.ERP_APPROVER_MASTER} WHERE VoucherTypeID = ?", (quote.get('VoucherTypeID'),))
+            
+            approvers = [d['Approver'] for d in approver_data] if approver_data else []
+            approvers_str = ", ".join(approvers)
+            
+            if not approvers:
+                approvers = [config.ROLE_ADMIN]
+                approvers_str = config.ROLE_ADMIN
+            
+            approval_status['ApproverDisplay'] = approvers_str
+            approval_status['ApproverRequired'] = approvers_str 
+            
+            is_current_user_approver = current_user_code in approvers 
+
+            if not approval_status['Passed']:
+                # Nếu đã Fail (do Tỷ số hoặc do thiếu NVKD) -> Giữ nguyên Reason cũ hoặc bổ sung
+                pass 
+            
+            elif not is_current_user_approver:
+                 # Nếu mọi thứ OK nhưng người dùng không phải người duyệt bắt buộc
+                 approval_status['Passed'] = False
+                 approval_status['Reason'] = f"PENDING: Chờ {approvers_str}."
+            
+        else: # sale_amount < 20000000.0: Tự duyệt
+             pass
+
+        quote['ApprovalResult'] = approval_status
+        return quote
+
+    def get_quote_details(self, quote_id):
+        """Truy vấn chi tiết mặt hàng cho Panel Detail (giữ nguyên logic ban đầu)."""
+        
+        detail_query = f"""
+            SELECT
+                T1.InventoryID AS MaHang, T1.QuoQuantity AS SoLuong, T1.UnitPrice AS DonGia,
+                T1.ConvertedAmount AS ThanhTien, T1.Notes,
+                ISNULL(T1.InventoryCommonName, T2.InventoryName) AS TenHang,  
+                T2.SalePrice01 AS DonGiaQuyDinh, T2.Recievedprice AS GiaMuaQuyDinh
+
+            FROM {config.ERP_QUOTE_DETAILS} AS T1 
+            LEFT JOIN {config.ERP_ITEM_PRICING} AS T2 ON T1.InventoryID = T2.InventoryID 
+            
+            WHERE T1.QuotationID = ?
+            ORDER BY T1.Orders
+        """
+        
+        try:
+            details = self.db.get_data(detail_query, (quote_id,))
+        except Exception as e:
+            current_app.logger.error(f"LỖI SQL Chi tiết BG {quote_id}: {e}")
+            return []
+            
+        if not details: return []
+        
+        for detail in details:
+            detail['SoLuong'] = f"{safe_float(detail.get('SoLuong')):.0f}"
+            detail['DonGia'] = f"{safe_float(detail.get('DonGia')):,.0f}"
+            detail['DonGiaQuyDinh'] = f"{safe_float(detail.get('DonGiaQuyDinh')):,.0f}"
+            detail['ThanhTien'] = f"{safe_float(detail.get('ThanhTien')):,.0f}"
+            
+        return details
+
+    def get_quote_cost_override_details(self, quotation_id):
+        """
+        Truy vấn chi tiết mặt hàng cho Form bổ sung Cost.
+        Áp dụng hàm safe_numeric để xử lý lỗi giá trị bị nhân 100,000 lần.
+        """
+        query = f"""
+            SELECT
+                T3.TransactionID,
+                T3.QuotationID,
+                T2.QuotationNo,
+                T3.InventoryID,
+                ISNULL(T3.InventoryCommonName, T5.InventoryName) AS InventoryName,
+                T3.QuoQuantity,  -- Lấy giá trị thô
+                T3.UnitPrice,    -- Lấy giá trị thô
+                T5.Recievedprice, 
+                T5.SalePrice01,   
+                T6.Cost,          
+                T6.NOTE           
+            FROM {config.ERP_QUOTES} AS T2 
+            INNER JOIN {config.ERP_QUOTE_DETAILS} AS T3 ON T2.QuotationID = T3.QuotationID 
+            LEFT JOIN {config.ERP_ITEM_PRICING} AS T5 ON T3.InventoryID = T5.InventoryID 
+            LEFT JOIN {config.BOSUNG_CHAOGIA_TABLE} AS T6 ON T3.TransactionID = T6.TransactionID 
+            WHERE 
+                T2.QuotationID = ?
+                AND (
+                    T6.TransactionID IS NOT NULL OR 
+                    T5.SalePrice01 IS NULL OR T5.SalePrice01 <= 1 OR 
+                    T5.Recievedprice IS NULL OR T5.Recievedprice <= 2  
+                )
+            ORDER BY T3.Orders
+        """
+        data = self.db.get_data(query, (quotation_id,))
+        
+        # FIX: Áp dụng clean data
+        for item in data:
+            item['QuoQuantity'] = self.safe_numeric(item.get('QuoQuantity'))
+            item['UnitPrice'] = self.safe_numeric(item.get('UnitPrice'))
+            
+        return data
+
+    def upsert_cost_override(self, quote_id, updates, user_code):
+        """
+        Xóa các bản ghi Cost Override cũ và INSERT dữ liệu mới trong một Transaction.
+        """
+        db = self.db
+        conn = None
+        
+        transaction_ids = [u['transaction_id'] for u in updates]
+        placeholders = ', '.join(['?' for _ in transaction_ids]) 
+        
+        delete_query = f"""
+            DELETE FROM {config.BOSUNG_CHAOGIA_TABLE} 
+            WHERE TransactionID IN ({placeholders})
+        """
+        
+        insert_base = f"""
+            INSERT INTO {config.BOSUNG_CHAOGIA_TABLE} 
+            (TransactionID, Cost, NOTE, CREATEUSER, CREATEDATE) 
+            VALUES (?, ?, ?, ?, GETDATE())
+        """
+        
+        insert_params = []
+        for u in updates:
+            # Chuyển đổi dữ liệu thành dạng tuple
+            insert_params.append((
+                u['transaction_id'], 
+                u['cost'], 
+                u['note'], 
+                user_code
+            ))
+            
+        try:
+            conn = db.get_transaction_connection()
+            cursor = conn.cursor()
+
+            # 1. Xóa dữ liệu cũ (Sử dụng execute_query_in_transaction)
+            if transaction_ids:
+                 db.execute_query_in_transaction(conn, delete_query, transaction_ids)
+            
+            # 2. Thực hiện batch INSERT (executemany)
+            # Dùng cursor trực tiếp trên conn để thực hiện executemany
+            cursor.executemany(insert_base, insert_params)
+            
+            # 3. COMMIT
+            db.commit(conn) 
+            return {"success": True, "message": "Bổ sung Cost thành công. Tỷ số duyệt sẽ được tính lại."}
+        
+        except Exception as e:
+            if conn:
+                db.rollback(conn) 
+            # Đảm bảo bạn thấy LỖI này trong Console/Log file
+            current_app.logger.error(f"LỖI UPSERT COST OVERRIDE (CRITICAL): {e}")
+            return {"success": False, "message": f"Lỗi hệ thống khi lưu Cost Override: {str(e)}"}
+        finally:
+            if conn:
+                conn.close()
+    
+    def approve_quotation(self, quotation_no, quotation_id, object_id, employee_id, approval_ratio, current_user):
+        """
+        Thực hiện phê duyệt Chào Giá (Cập nhật ERP: Status = 1) 
+        và lưu log vào bảng DUYETCT + OT6000 trong cùng một Transaction.
+        """
+        db = self.db
+        conn = None
+        
+        try:
+            conn = db.get_transaction_connection()
+            
+            # 1. Lấy thông tin cần thiết từ ERP (Bổ sung CreateUserID)
+            query_get_data = f"""
+                SELECT T1.SaleAmount AS QuotationAmount, T1.QuotationDate, T1.CreateUserID
+                FROM {config.ERP_QUOTES} AS T1 -- OT2101
+                WHERE T1.QuotationID = ? 
+            """
+            data_detail = db.get_data(query_get_data, (quotation_id,)) 
+            
+            if not data_detail:
+                raise Exception(f"Không tìm thấy dữ liệu Chào Giá {quotation_no} trong ERP.")
+            
+            detail = data_detail[0]
+            sale_amount = safe_float(detail.get('QuotationAmount'))
+            quotation_date = detail.get('QuotationDate')
+            create_user_id = detail.get('CreateUserID') # Lấy người tạo phiếu để ghi vào OT6000
+
+            # 2. Thực hiện phê duyệt trong ERP (Update Status = 1)
+            update_query_erp = f"""
+                UPDATE {config.ERP_QUOTES} -- OT2101
+                SET OrderStatus = 1 
+                WHERE QuotationNo = ?
+            """
+            db.execute_query_in_transaction(conn, update_query_erp, (quotation_no,)) 
+            
+            # 3. Lưu log vào bảng DUYETCT (Logic cũ)
+            insert_query_log = f"""
+                INSERT INTO DUYETCT ( 
+                    MACT, NGayCT, TySoDuyetCT, NGUOILAM, Tonggiatri, 
+                    MasoCT, MaKH, NguoiDuyet, Ngayduyet, TINHTRANG
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), 0)
+            """
+            params_duyetct = (
+                quotation_no, quotation_date, approval_ratio, employee_id, 
+                sale_amount, quotation_id, object_id, current_user
+            )
+
+            db.execute_query_in_transaction(conn, insert_query_log, params_duyetct)
+
+            # 4. [MỚI] Lưu log vào bảng OT6000 (Lịch sử duyệt hệ thống)
+            # Tạo ApproveID duy nhất: UserCode + Thời gian
+            approve_id = f"{current_user}{datetime.now().strftime('%Y%m%d%H%M%S')}"
+            
+            insert_query_ot6000 = f"""
+                INSERT INTO [OMEGA_STDD].[dbo].[OT6000]
+                (ApproveID, SOrderID, Approver, LevelApprove, Approvedate, 
+                 CreateUserID, Createdate, LastModifyUserID, LastModifyDate, 
+                 StypeID, Notes, ApproveStatus)
+                VALUES (?, ?, ?, 1, GETDATE(), ?, GETDATE(), ?, GETDATE(), 'QO', '', 1)
+            """
+            
+            params_ot6000 = (
+                approve_id, quotation_id, current_user, 
+                create_user_id, current_user
+            )
+            
+            db.execute_query_in_transaction(conn, insert_query_ot6000, params_ot6000)
+            
+            # 5. COMMIT - Hoàn tất giao dịch
+            db.commit(conn) 
+
+            return {"success": True, "message": f"Chào giá {quotation_no} đã duyệt thành công và lưu log (DUYETCT & OT6000)."}
+
+        except Exception as e:
+            # FIX: BỎ ROLLBACK THEO YÊU CẦU VÀ RE-RAISE ĐỂ HIỂN THỊ LỖI THÔ TRÊN TERMINAL
+            raise e
+        finally:
+            if conn:
+                conn.close()
+    # CRM STDD/quotation_approval_service.py
+# ... (thêm vào cuối class QuotationApprovalService) ...
+
+    def update_quote_salesman(self, quotation_id, new_salesman_id):
+        """
+        Cập nhật SalesManID (NVKD) cho một Chào giá (OT2101) dựa trên QuotationID.
+        """
+        db = self.db
+        
+        # Cập nhật bảng OT2101 (Bảng Header của Chào giá)
+        update_query = f"""
+            UPDATE {config.ERP_QUOTES} 
+            SET SalesManID = ? 
+            WHERE QuotationID = ?
+        """
+        
+        try:
+            # Sử dụng execute_non_query (tự động commit)
+            if db.execute_non_query(update_query, (new_salesman_id, quotation_id)):
+                return {"success": True, "message": "Cập nhật NVKD thành công."}
+            else:
+                return {"success": False, "message": "Lệnh UPDATE không thực thi."}
+                
+        except Exception as e:
+            current_app.logger.error(f"LỖI UPDATE SALESMAN (SERVICE): {e}")
+            return {"success": False, "message": f"Lỗi hệ thống: {str(e)}"}
+
+    def get_quote_refresh_data(self, quote_id, user_code):
+        """
+        [NEW] Hàm rút gọn để lấy dữ liệu làm mới giao diện sau khi đổi NVKD.
+        Chỉ trả về: Tên NVKD mới & Trạng thái duyệt mới (Passed/Reason).
+        """
+        # 1. Truy vấn lại thông tin cơ bản của báo giá (đủ để chạy check_criteria)
+        # Lưu ý: Cần lấy lại TotalSale, TotalCost để tính toán
+        query = f"""
+            SELECT 
+                T1.QuotationID, T1.SalesManID, T1.SaleAmount, T1.VoucherTypeID,
+                ISNULL(T2.O05ID, 'N/A') AS CustomerClass,
+                ISNULL(T7.SHORTNAME, 'N/A') AS NVKDName,
+                
+                -- Tính lại tổng (để chạy logic duyệt)
+                SUM(T4.ConvertedAmount) AS TotalSaleAmount, 
+                SUM(T4.QuoQuantity * COALESCE(T8.Cost, T5.Recievedprice, 0)) AS TotalCost,
+
+                -- Check cờ Cost Override
+                MIN(CASE WHEN (T5.SalePrice01 <= 1 OR T5.Recievedprice <= 2) THEN 1 ELSE 0 END) AS NeedsCostOverride,
+                MAX(CASE WHEN T8.Cost > 0 THEN 1 ELSE 0 END) AS HasCostOverrideData
+
+            FROM {config.ERP_QUOTES} AS T1
+            LEFT JOIN {config.ERP_IT1202} AS T2 ON T1.ObjectID = T2.ObjectID
+            LEFT JOIN {config.TEN_BANG_NGUOI_DUNG} AS T7 ON T1.SalesManID = T7.USERCODE
+            LEFT JOIN {config.ERP_QUOTE_DETAILS} AS T4 ON T1.QuotationID = T4.QuotationID 
+            LEFT JOIN {config.ERP_ITEM_PRICING} AS T5 ON T4.InventoryID = T5.InventoryID 
+            LEFT JOIN {config.BOSUNG_CHAOGIA_TABLE} AS T8 ON T4.TransactionID = T8.TransactionID
+
+            WHERE T1.QuotationID = ? 
+            GROUP BY T1.QuotationID, T1.SalesManID, T1.SaleAmount, T1.VoucherTypeID, T2.O05ID, T7.SHORTNAME
+        """
+        
+        data = self.db.get_data(query, (quote_id,))
+        if not data:
+            return {'NewSalesmanName': 'N/A', 'NewStatus': False, 'AnalysisMsg': 'Không tìm thấy dữ liệu.'}
+
+        quote_data = data[0]
+
+        # 2. Chạy lại logic kiểm tra duyệt
+        # Hàm _check_approval_criteria cần 'SalesManID', 'TotalSaleAmount'... đã có trong quote_data
+        
+        # Xử lý logic Cost Override trước (giống hàm get_quotes_for_approval)
+        if quote_data.get('NeedsCostOverride') == 1 and quote_data.get('HasCostOverrideData') != 1:
+            return {
+                'NewSalesmanName': quote_data['NVKDName'],
+                'NewStatus': False,
+                'AnalysisMsg': 'PENDING: Thiếu Giá QD. Cần Bổ sung!'
+            }
+
+        # Gọi hàm check chính
+        result_quote = self._check_approval_criteria(quote_data, user_code)
+        approval_result = result_quote.get('ApprovalResult', {})
+
+        return {
+            'NewSalesmanName': quote_data['NVKDName'],
+            'NewStatus': approval_result.get('Passed', False),
+            'AnalysisMsg': approval_result.get('Reason', '')
+        }

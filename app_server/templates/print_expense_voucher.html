@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu Đề Nghị Thanh Toán - {{ req.RequestID }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        :root { --primary: #4318FF; --text-dark: #2B3674; --secondary: #A3AED0; --border-color: #E0E5F2; }
+        body { background-color: #F4F7FE; font-family: 'Inter', sans-serif; color: var(--text-dark); -webkit-print-color-adjust: exact; }
+
+        .voucher-page {
+            background: white; width: 210mm; min-height: 297mm; margin: 30px auto;
+            padding: 50px 60px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 20px;
+        }
+
+        .company-name { font-size: 1.1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        .voucher-title { font-size: 2rem; font-weight: 800; text-align: center; text-transform: uppercase; margin-top: 20px; }
+        .voucher-id { text-align: center; color: var(--secondary); margin-bottom: 40px; font-size: 0.9rem; }
+
+        .info-group { margin-bottom: 20px; }
+        .label-custom { font-size: 0.8rem; color: var(--secondary); text-transform: uppercase; font-weight: 600; display: block; }
+        .value-custom { font-size: 1.1rem; font-weight: 600; border-bottom: 1px dashed var(--border-color); padding-bottom: 5px; width: 100%; display: block; }
+
+        .money-box {
+            background-color: #F4F7FE; border-radius: 16px; padding: 20px; text-align: center;
+            border: 1px dashed var(--primary); margin: 30px 0;
+        }
+        .money-amount { font-size: 2rem; font-weight: 800; color: var(--primary); display: block; }
+        .money-text { font-style: italic; font-weight: 500; margin-top: 5px; display: block; }
+
+        .stamp-box {
+            border: 3px solid #05CD99; color: #05CD99; font-weight: 800; text-transform: uppercase;
+            padding: 10px 20px; border-radius: 10px; transform: rotate(-10deg); font-size: 1.2rem;
+            text-align: center; display: inline-block; margin-bottom: 10px;
+        }
+
+        #qrcode { position: absolute; top: 50px; right: 60px; }
+
+        @media print {
+            body { background: none; } .voucher-page { box-shadow: none; margin: 0; width: 100%; border-radius: 0; }
+            .no-print { display: none !important; }
+            .money-box { background: none !important; border: 2px solid #000; }
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center my-4 no-print">
+        <button onclick="window.print()" class="btn btn-primary fw-bold px-4 rounded-pill">🖨 IN PHIẾU</button>
+        <button onclick="window.close()" class="btn btn-light border fw-bold px-4 rounded-pill ms-2">ĐÓNG</button>
+    </div>
+
+    <div class="voucher-page">
+        <div id="qrcode"></div>
+        <div class="company-name">CÔNG TY TNHH STD&D</div>
+        
+        <div class="voucher-title">GIẤY ĐỀ NGHỊ THANH TOÁN</div>
+        <div class="voucher-id">
+            Mã phiếu: <strong>{{ req.RequestID }}</strong><br>
+            Ngày {{ req.RequestDate | format_date }}
+        </div>
+
+        <div class="row">
+            <div class="col-6"><div class="info-group"><span class="label-custom">Người đề nghị</span><span class="value-custom">{{ req.RequesterName }}</span></div></div>
+            <div class="col-6"><div class="info-group"><span class="label-custom">Bộ phận</span><span class="value-custom">{{ req.RequesterDept or '...' }}</span></div></div>
+            <div class="col-12"><div class="info-group"><span class="label-custom">Đối tượng thụ hưởng</span><span class="value-custom">{{ req.ObjectID or '...................................' }}</span></div></div>
+            <div class="col-12"><div class="info-group"><span class="label-custom">Lý do chi</span><span class="value-custom">{{ req.BudgetName }} ({{ req.BudgetCode }}) - {{ req.Reason }}</span></div></div>
+        </div>
+
+        <div class="money-box">
+            <span class="label-custom mb-1">SỐ TIỀN ĐỀ NGHỊ</span>
+            <span class="money-amount">{{ req.Amount | format_number }} VNĐ</span>
+            <span class="money-text">(Viết bằng chữ: ...................................................................................)</span>
+        </div>
+
+        <div class="row text-center mt-5">
+            <div class="col-4">
+                <div class="fw-bold mb-5">Người đề nghị</div>
+                <div class="fw-bold mt-4">{{ req.RequesterName }}</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold mb-5">Kế toán trưởng</div>
+            </div>
+            <div class="col-4">
+                <div class="fw-bold mb-3">Giám đốc / Người duyệt</div>
+                <div class="stamp-box">
+                    APPROVED<br><span style="font-size:0.7rem; display:block; margin-top:2px;">{{ req.ApprovalDate | format_date }}</span>
+                </div>
+                <div class="fw-bold">{{ req.ApproverName }}</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var verifyUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '') + "/verify/request/" + "{{ req.RequestID }}";
+        new QRCode(document.getElementById("qrcode"), { text: verifyUrl, width: 80, height: 80 });
+    </script>
+</body>
+</html>

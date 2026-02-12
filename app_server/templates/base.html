@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}Titan OS{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/dt-1.11.5/datatables.min.css"/>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&family=Fredoka:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        /* CSS Variables & Global Styles */
+        :root {
+            --primary: #4318FF; --primary-dark: #2A0EBB; --primary-light: #F4F7FE;
+            --secondary: #A3AED0; --text-dark: #2B3674; --danger: #E31A1A;
+            --success: #05CD99; --warning: #FFB547; --info: #33CCFF;
+            --bg-color: #F4F7FE; --card-bg: #FFFFFF; --input-bg: #F4F7FE; --border-color: #E0E5F2;
+            --card-radius: 20px; --shadow-sm: 0 4px 10px rgba(112, 144, 176, 0.08);
+            --shadow-md: 0px 18px 40px rgba(112, 144, 176, 0.12);
+            --bg-image: none; --font-main: 'Inter', sans-serif; --font-header: 'Inter', sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --primary: #7551FF; --primary-dark: #5A3BC4; --primary-light: #1B254B;
+            --secondary: #A3AED0; --text-dark: #E3E8EF; --danger: #FF5B5B;
+            --bg-color: #0B1437; --card-bg: #111C44; --input-bg: #1B254B; --border-color: #2B3674;
+        }
+        [data-theme="fantasy"] {
+            --primary: #E91E63; --primary-dark: #C2185B; --primary-light: rgba(255, 255, 255, 0.2);
+            --text-dark: #FFFFFF; --secondary: #E0E0E0; --bg-color: #2d1b4e;
+            --card-bg: rgba(255, 255, 255, 0.15); --input-bg: rgba(0, 0, 0, 0.3); --border-color: rgba(255, 255, 255, 0.2);
+            --bg-image: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5980?auto=format&fit=crop&w=1920&q=80');
+        }
+        [data-theme="adorable"] {
+            --primary: #FF6B81; --primary-dark: #FF4757; --primary-light: #FFECEE;
+            --secondary: #747D8C; --text-dark: #2F3542; --bg-color: #FDF2F5;
+            --card-bg: #FFFFFF; --input-bg: #F8F9FA; --border-color: #F1F2F6;
+            --font-main: 'Quicksand', sans-serif; --font-header: 'Fredoka', sans-serif;
+            --bg-image: radial-gradient(#FFD1D6 15%, transparent 16%), radial-gradient(#FFD1D6 15%, transparent 16%);
+        }
+
+        body { font-family: var(--font-main); background-color: var(--bg-color); color: var(--text-dark); background-image: var(--bg-image); background-size: cover; background-attachment: fixed; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+        .container-fluid { max-width: 1600px; padding: 30px 20px; }
+        .main-card { background: var(--card-bg); border-radius: var(--card-radius); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); margin-bottom: 25px; overflow: hidden; }
+        .btn { border-radius: 14px; font-weight: 600; padding: 10px 20px; }
+        .form-control, .form-select { border: 1px solid transparent; background-color: var(--input-bg); border-radius: 12px; color: var(--text-dark); }
+        .form-control:focus { background-color: var(--card-bg); border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 24, 255, 0.2); color: var(--text-dark); }
+        .round-glow-popup { border-radius: 50% !important; width: 380px !important; height: 380px !important; padding: 0 !important; background: radial-gradient(circle, #ffffff 30%, #fff8e1 100%) !important; border: 4px solid #FFD700 !important; animation: orbGlow 2s infinite alternate ease-in-out; }
+        @keyframes orbGlow { 0% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); transform: scale(1); } 100% { box-shadow: 0 0 80px rgba(255, 215, 0, 1); transform: scale(1.02); } }
+        @media (max-width: 768px) { .container-fluid { padding: 15px 10px; } }
+    </style>
+    
+
+    <script>
+        // 1. NHẬN CẤU HÌNH TỪ BACKEND (Python -> JS)
+        // Sử dụng default để tránh lỗi nếu biến chưa được truyền
+        const APP_CONFIG = {
+            DIVISOR: {{ config.DIVISOR_VIEW | default(1000000) }}, 
+            LOCALE: 'vi-VN',
+            CURRENCY_SUFFIX: ' tr',
+            DATE_FMT: 'DD/MM/YYYY' 
+        };
+
+        // 2. BỘ CÔNG CỤ FORMATTER DÙNG CHUNG (GLOBAL)
+        window.TitanUtils = {
+            // Format tiền tệ chuẩn KPI (Chia triệu, thêm đuôi)
+            // Dùng cho AlpineJS: x-text="TitanUtils.formatCurrency(item.value)"
+            formatCurrency: function(val) {
+                if (val === undefined || val === null || val === '') return '0';
+                let num = parseFloat(val);
+                if (isNaN(num)) return '0';
+
+                // Chia cho hằng số (1.000.000)
+                let reducedVal = num / APP_CONFIG.DIVISOR;
+
+                // Format số
+                let formatted = new Intl.NumberFormat(APP_CONFIG.LOCALE, { 
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 1 
+                }).format(reducedVal);
+
+                return formatted + APP_CONFIG.CURRENCY_SUFFIX;
+            },
+
+            // Format số lượng / tiền nguyên bản (Chỉ thêm dấu phẩy)
+            formatNumber: function(val) {
+                if (val === undefined || val === null) return '0';
+                return new Intl.NumberFormat(APP_CONFIG.LOCALE).format(val);
+            },
+
+            // Format ngày tháng (Giả sử input là string YYYY-MM-DD hoặc ISO)
+            formatDate: function(dateStr) {
+                if (!dateStr) return '';
+                try {
+                    const d = new Date(dateStr);
+                    return d.toLocaleDateString(APP_CONFIG.LOCALE); // Ra dd/mm/yyyy
+                } catch (e) { return dateStr; }
+            }
+        };
+        
+        // Alias ngắn gọn để dùng trong Alpine (nếu muốn)
+        window.fmtMoney = window.TitanUtils.formatCurrency;
+        window.fmtNum = window.TitanUtils.formatNumber;
+    </script>
+</head>
+<body x-data="globalApp()" x-init="initApp()" :data-theme="theme">
+
+    <div class="container-fluid">
+        {% block header %}
+        <div class="page-header d-flex justify-content-between align-items-center mb-4" x-data="mailboxWidget()">
+            <div>
+                <h1 class="page-title fw-bold m-0" style="font-size: 1.8rem; color: var(--text-dark);">
+                    {% block page_title %}Titan OS{% endblock %}
+                </h1>
+                <p class="small mb-0" style="color: var(--secondary);">
+                    {% block page_sub %}{% endblock %}
+                </p>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-sm shadow-sm position-relative" type="button" 
+                            id="mailboxDropdown" data-bs-toggle="dropdown" aria-expanded="false" 
+                            @click="loadMailbox()"
+                            style="background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-dark);">
+                        <i class="fas fa-envelope fs-6"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light"
+                              x-show="unreadCount > 0"
+                              x-text="unreadCount > 9 ? '9+' : unreadCount"
+                              style="display: none;">
+                        </span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0" aria-labelledby="mailboxDropdown" 
+                         style="width: 320px; border-radius: 12px; background-color: var(--card-bg); max-height: 500px; overflow-y: auto; z-index: 1050;">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="border-color: var(--border-color) !important;">
+                            <h6 class="m-0 fw-bold d-flex align-items-center" style="color: var(--text-dark);">
+                                <i class="fas fa-gift me-2 text-primary"></i>Hòm thư
+                            </h6>
+                            <button class="btn btn-sm btn-link text-muted p-0" @click.stop="loadMailbox()" title="Làm mới">
+                                <i class="fas fa-sync-alt" :class="{'fa-spin': loading}"></i>
+                            </button>
+                        </div>
+                        <div id="mailbox-list">
+                            <div x-show="loading" class="text-center py-4 text-muted small"><span class="spinner-border spinner-border-sm" role="status"></span> Đang tải...</div>
+                            <div x-show="!loading && mails.length === 0" class="text-center text-muted py-4 opacity-50"><i class="fas fa-inbox fa-3x mb-2"></i><p class="small m-0">Hòm thư trống</p></div>
+                            <template x-for="mail in mails" :key="mail.MailID || mail.id">
+                                <div class="p-3 border-bottom position-relative" :class="mail.IsClaimed ? 'bg-light opacity-75' : 'bg-white'">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="fw-bold mb-0 text-truncate pe-2" :class="mail.IsClaimed ? 'text-secondary' : 'text-primary'" style="max-width: 200px;">
+                                            <i class="fas" :class="getIcon(mail)"></i> <span x-text="mail.Title || mail.title || 'Thông báo'"></span>
+                                        </h6>
+                                        <small class="text-muted" style="font-size: 0.7rem;" x-text="formatDate(mail.CreatedTime)"></small>
+                                    </div>
+                                    <div class="text-muted small mb-2" style="font-size: 0.8rem; line-height: 1.4;" x-html="mail.Content || mail.content"></div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="fw-bold small">
+                                            <span x-show="mail.Total_XP > 0" class="me-2 text-info" x-text="'+' + mail.Total_XP + ' XP'"></span>
+                                            <span x-show="mail.Total_Coins > 0" class="text-warning" x-text="'+' + mail.Total_Coins + ' Coins'"></span>
+                                        </div>
+                                        <div x-show="!mail.IsClaimed">
+                                            <button class="btn btn-sm btn-primary px-3 fw-bold rounded-pill" style="font-size: 0.75rem;" @click="claimReward(mail)" :disabled="mail.processing">
+                                                <i class="fas fa-gift me-1"></i> <span x-text="mail.processing ? '...' : 'Nhận'"></span>
+                                            </button>
+                                        </div>
+                                        <div x-show="mail.IsClaimed"><span class="text-success small fw-bold"><i class="fas fa-check-circle me-1"></i>Đã nhận</span></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-sm shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" 
+                            style="background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-dark);">
+                        <i class="fas fa-palette me-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 12px; background-color: var(--card-bg);">
+                        <li><a class="dropdown-item py-2" href="#" @click.prevent="setTheme('light')"><i class="fas fa-sun me-2 text-warning"></i> Business</a></li>
+                        {% if user_context.role == 'ADMIN' or user_context.can('THEME_DARK') %}
+                        <li><a class="dropdown-item py-2" href="#" @click.prevent="setTheme('dark')"><i class="fas fa-moon me-2 text-primary"></i> Night Owl</a></li>
+                        {% endif %}
+                        {% if user_context.role == 'ADMIN' or user_context.can('THEME_FANTASY') %}
+                        <li><a class="dropdown-item py-2" href="#" @click.prevent="setTheme('fantasy')"><i class="fas fa-magic me-2 text-danger"></i> Fantasy</a></li>
+                        {% endif %}
+                        {% if user_context.role == 'ADMIN' or user_context.can('THEME_ADORABLE') %}
+                        <li><a class="dropdown-item py-2" href="#" @click.prevent="setTheme('adorable')"><i class="fas fa-heart me-2 text-danger"></i> Adorable</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                {% block header_actions %}
+                <a href="/" class="btn btn-back"><i class="fas fa-home me-2"></i>Portal</a>
+                {% endblock %}
+            </div>
+        </div>
+        {% endblock %}
+
+        {% include 'components/_sidebar.html' %}
+        {% include 'components/_flash_messages.html' %}
+        {% block content %}{% endblock %}
+    </div>
+
+    {% include 'components/_chatbot_widget.html' %}
+    <div id="watermark-user-id" data-user="{{ user_context.usercode if user_context else 'GUEST' }}" style="display:none;"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function globalApp() {
+            return {
+                theme: localStorage.getItem('titan_theme') || 'light',
+                initApp() { this.setTheme(this.theme, false); },
+                setTheme(themeName, saveToDb = true) {
+                    this.theme = themeName;
+                    localStorage.setItem('titan_theme', themeName);
+                    if (saveToDb) {
+                        fetch('/api/user/set_theme', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ theme: themeName }) }).catch(console.error);
+                    }
+                }
+            }
+        }
+
+        // Logic Mailbox
+        function mailboxWidget() {
+            return {
+                mails: [], unreadCount: 0, loading: false,
+                init() { this.fetchMails(true); },
+                fetchMails(badgeOnly = false) {
+                    if (!badgeOnly) this.loading = true;
+                    fetch('/api/mailbox').then(r => r.json()).then(data => {
+                        this.mails = data.map(m => ({ ...m, processing: false }));
+                        
+                        // [FIX] Badge đỏ chỉ đếm những thư CHƯA ĐỌC hoặc CHƯA NHẬN QUÀ
+                        // Nếu sếp muốn thông báo Challenge cũng hiện đỏ, sếp cần thêm cột IsRead vào DB
+                        // Hiện tại tạm thời đếm IsClaimed=0 (với thư có quà) hoặc thư mới trong ngày
+                        
+                        this.unreadCount = data.filter(m => !m.IsClaimed).length;
+                        
+                        this.loading = false;
+                    }).catch(() => this.loading = false);
+                },
+                loadMailbox() { this.fetchMails(false); },
+                getIcon(mail) { if (mail.Total_Coins > 0) return 'fa-coins text-warning'; if (mail.Total_XP > 0) return 'fa-star text-info'; return 'fa-envelope'; },
+                formatDate(dateStr) { if (!dateStr) return 'Vừa xong'; try { return new Date(dateStr).toLocaleString('vi-VN'); } catch { return dateStr; } },
+                claimReward(mail) {
+                    mail.processing = true;
+                    fetch('/api/mailbox/claim', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({mail_id: mail.MailID || mail.id}) })
+                    .then(r => r.json()).then(data => {
+                        mail.processing = false;
+                        if(data.success) {
+                            mail.IsClaimed = true; this.unreadCount = Math.max(0, this.unreadCount - 1);
+                            this.handleEffects(data);
+                        } else { Swal.fire({ icon: 'error', title: 'Oops...', text: data.msg }); }
+                    });
+                },
+                handleEffects(data) {
+                    if (typeof fireFireworks === 'function') fireFireworks();
+                    if (data.level_up) {
+                        Swal.fire({
+                            html: `<div class="level-up-content"><div style="font-size: 1.2rem; color: #E65100; font-weight: 700;">Level Up!</div><div style="font-size: 6rem; font-weight: 900; color: #4318FF;">${data.new_level}</div><div class="badge rounded-pill bg-warning text-dark px-4 py-2 mt-3"><i class="fas fa-coins me-2"></i>+${data.coins_earned} Coins</div></div>`,
+                            customClass: { popup: 'round-glow-popup', confirmButton: 'btn btn-primary rounded-pill px-4 fw-bold mt-3 shadow-lg' },
+                            backdrop: `rgba(11, 20, 55, 0.8) url("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXBpeGcwanhwNDA2d3Ntd2VlazNqZm00c3JhaWRtemN0YmpuMTIwNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9qKNE5R7PE7VZjJ4La/giphy.gif") left top no-repeat`,
+                            timer: 5000, timerProgressBar: true
+                        });
+                    } else {
+                        const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                        Toast.fire({ icon: 'success', title: 'Đã nhận quà thành công!' });
+                    }
+                }
+            }
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

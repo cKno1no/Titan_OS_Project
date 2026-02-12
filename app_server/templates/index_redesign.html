@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Hệ Thống Quản Trị - Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ======================================= */
+    /* 1. BACKGROUND RANDOM SETUP */
+    /* ======================================= */
+    .index-bg-image {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+        background-position: center; background-size: cover; background-repeat: no-repeat;
+        filter: blur(10px); transform: scale(1.1);
+    }
+    .index-bg-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+        background-color: rgba(15, 23, 42, 0.6); 
+    }
+
+    /* ======================================= */
+    /* 2. LAYOUT & CONTENT WRAPPER */
+    /* ======================================= */
+    :root { --glass-bg: rgba(255, 255, 255, 0.85); }
+    [data-theme="dark"] { --glass-bg: rgba(11, 20, 55, 0.85); }
+    [data-theme="fantasy"], [data-theme="adorable"] { --glass-bg: var(--card-bg); }
+
+    .content-wrapper {
+        position: relative; z-index: 1; padding: 40px 30px; max-width: 900px;
+        margin: 5vh auto; background-color: var(--glass-bg); border-radius: 24px;
+        backdrop-filter: blur(10px); box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    h1.portal-title {
+        font-weight: 900; font-size: 2.5rem; color: var(--text-dark); 
+        border-bottom: 2px solid var(--border-color); padding-bottom: 15px; margin-bottom: 30px;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    /* ======================================= */
+    /* 3. MENU STYLES */
+    /* ======================================= */
+    .accordion-button {
+        font-weight: 700; font-size: 1.15rem; color: var(--text-dark) !important;
+        background-color: var(--card-bg) !important; border: 1px solid var(--border-color);
+        box-shadow: none; padding: 1.2rem 1.5rem;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: var(--input-bg) !important; color: var(--primary) !important;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .accordion-item { border: none; margin-bottom: 15px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); background: transparent; }
+
+    .menu-link {
+        display: flex; align-items: center; padding: 15px 1.5rem; text-decoration: none;
+        color: var(--text-dark); transition: all 0.2s; border-left: 4px solid transparent;
+        font-weight: 500; background: var(--card-bg); border-bottom: 1px solid var(--border-color);
+    }
+    .menu-link:hover {
+        background-color: var(--input-bg); color: var(--primary);
+        border-left: 4px solid var(--primary); padding-left: 2rem;
+    }
+    .menu-link i { font-size: 1.2rem; width: 40px; color: var(--secondary); transition: color 0.2s; }
+
+    .module-crm i { color: #34A853; } .module-kpi i { color: #DB4437; } .module-ceq i { color: #F4B400; }      
+    .module-title-crm { color: #34A853; } .module-title-kpi { color: #DB4437; } .module-title-ceq { color: #F4B400; }
+    
+    .menu-link.planned { color: var(--secondary); opacity: 0.6; cursor: not-allowed; background-color: var(--input-bg); }
+    
+    .page-header { display: none !important; }
+    .container-fluid { padding: 0 !important; } 
+    
+    @media (max-width: 768px) {
+        .content-wrapper { margin: 0; border-radius: 0; height: 100vh; overflow-y: auto; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div id="random-bg-image" class="index-bg-image"></div>
+    <div class="index-bg-overlay"></div>
+
+    <div class="content-wrapper">
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <div class="logo-box"></div>
+            <div class="d-flex gap-2">
+                {% if user_context.role == 'ADMIN' %}
+                <a href="/user_management" class="btn btn-sm btn-danger shadow-sm fw-bold">
+                    <i class="fas fa-users-cog me-2"></i>Quản trị
+                </a>
+                {% endif %}
+
+                {% if user_context.can('VIEW_PROFILE') %}
+                <a href="/profile" class="btn btn-sm btn-primary shadow-sm fw-bold">
+                    <i class="fas fa-id-card me-2"></i>Hồ sơ cá nhân
+                </a>
+                {% endif %}
+
+                <a href="/logout" class="btn btn-sm btn-light border shadow-sm" style="background: var(--card-bg); color: var(--text-dark);">
+                    <i class="fas fa-sign-out-alt me-2"></i>Thoát
+                </a>
+            </div>
+        </header>
+
+        <h1 class="portal-title text-center"><i class="fas fa-sitemap me-3"></i> PORTAL ĐIỀU HÀNH</h1>
+        
+        <p class="text-center mb-5" style="color: var(--text-dark); font-size: 1.1rem;">
+            Chào mừng, <strong style="color: var(--primary);">{{ user_context.shortname }}</strong> ({{ user_context.usercode }}) 
+            - Bộ phận: <span class="badge bg-secondary">{{ user_context.bo_phan }}</span>
+        </p>
+
+        <div class="accordion" id="mainAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingCRM">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCRM">
+                        <i class="fas fa-users me-3 module-title-crm"></i> CUSTOMER RELATIONSHIP MANAGEMENT
+                    </button>
+                </h2>
+                <div id="collapseCRM" class="accordion-collapse collapse show" data-bs-parent="#mainAccordion">
+                    <div class="accordion-body p-0">
+                        <a href="/dashboard" class="menu-link module-crm" target="_blank"><i class="fas fa-file-invoice me-3"></i> Dashboard Báo cáo & Lịch sử</a>
+                        <a href="/nhaplieu" class="menu-link module-crm" target="_blank"><i class="fas fa-plus-circle me-3"></i> Lập Báo cáo Hiện diện Khách hàng</a>
+                        <a href="/task_dashboard" class="menu-link module-crm" target="_blank"><i class="fas fa-tasks me-3"></i> Quản lý Đầu việc & Giao việc</a>
+                        <a href="/delivery_dashboard" class="menu-link module-crm" target="_blank"><i class="fas fa-shipping-fast me-3"></i> Hoạch định & Thực thi giao vận</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingKPI">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKPI">
+                        <i class="fas fa-chart-bar me-3 module-title-kpi"></i> KEY PERFORMANCE INDICATOR
+                    </button>
+                </h2>
+                <div id="collapseKPI" class="accordion-collapse collapse" data-bs-parent="#mainAccordion">
+                    <div class="accordion-body p-0">
+                        <a href="/quote_approval" class="menu-link module-kpi" target="_blank"><i class="fas fa-certificate me-3"></i> Theo dõi & Phê duyệt Báo giá</a>
+                        <a href="/sales/sales_lookup" class="menu-link module-kpi" target="_blank"><i class="fas fa-search-dollar me-3"></i> Tra cứu Giá & Tồn kho</a>
+                        <a href="/realtime_dashboard" class="menu-link module-kpi" target="_blank"><i class="fas fa-tachometer-alt me-3"></i> Chỉ số kinh doanh - Realtime</a>
+                        <a href="/quote_input_table" class="menu-link module-kpi" target="_blank"><i class="fas fa-bullseye me-3"></i> Bám sát & Hành động</a>
+                        <a href="/budget/dashboard" class="menu-link module-kpi" target="_blank"><i class="fas fa-wallet me-3"></i> Ngân sách & Chi tiêu</a>
+                        {% if user_context.can('CREATE_COMMISSION') %}
+                        <a href="/commission/request" class="menu-link module-kpi" target="_blank">
+                            <i class="fas fa-percent me-3"></i> Đề nghị Bảo hành
+                        </a>
+                        {% endif %}
+                        <a href="/ar_aging" class="menu-link module-kpi" target="_blank"><i class="fas fa-wallet me-3"></i> Nhắc nợ & Thu tiền (AR)</a>
+                    </div>
+                </div>
+            </div>
+
+            {% if user_context.role|upper in ['ADMIN', 'GM'] or 'KTTC' in user_context.bo_phan %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingCEQ">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCEQ">
+                        <i class="fas fa-chart-pie me-3 module-title-ceq"></i> CAPITAL EFFICIENCY (CEQ)
+                    </button>
+                </h2>
+                <div id="collapseCEQ" class="accordion-collapse collapse" data-bs-parent="#mainAccordion">
+                    <div class="accordion-body p-0">
+                        <a href="/inventory_aging" class="menu-link module-ceq" target="_blank"><i class="fas fa-warehouse me-3"></i> Phân tích Tuổi hàng Tồn kho</a>
+                        <a href="/sales/total_replenishment" class="menu-link module-ceq" target="_blank"><i class="fas fa-boxes me-3"></i> Dự báo Tồn kho Tổng thể</a>
+                        <a href="/ap_aging" class="menu-link module-ceq" target="_blank"><i class="fas fa-file-invoice-dollar me-3"></i> Quản lý Nợ phải trả (AP Aging)</a>
+                        <a href="/sales/profit_analysis" class="menu-link module-ceq" target="_blank"><i class="fas fa-chart-line me-3"></i> Lãi biên đơn hàng và khách hàng</a>
+                        <a href="/analysis/comparison" class="menu-link module-ceq" target="_blank"><i class="fas fa-balance-scale me-3"></i> Hiệu quả KD qua các kỳ</a>
+                        <a href="/budget/report/ytd" class="menu-link module-ceq" target="_blank"><i class="fas fa-chart-area me-3"></i> Ngân sách vs Thực chi</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- RANDOM BACKGROUND ---
+        const bgContainer = document.getElementById('random-bg-image');
+        if (bgContainer) {
+            const randomImageUrl = "https://picsum.photos/1920/1080?" + new Date().getTime();
+            const img = new Image();
+            img.onload = function() { bgContainer.style.backgroundImage = `url('${randomImageUrl}')`; bgContainer.style.opacity = 1; };
+            img.src = randomImageUrl;
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Dự báo Tồn kho Tổng thể | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* MAIN PANELS */
+    .master-panel, .detail-panel { 
+        height: 75vh; display: flex; flex-direction: column; 
+        background: var(--card-bg); border-radius: 16px;
+        box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid var(--border-color);
+    }
+    .master-table-container, .detail-table-container { flex-grow: 1; overflow-y: auto; }
+
+    .card-header-custom {
+        padding: 20px 25px; border-bottom: 1px solid var(--border-color);
+        background-color: var(--card-bg);
+        display: flex; justify-content: space-between; align-items: center;
+        font-weight: 700; font-size: 1.1rem; color: var(--text-dark);
+    }
+    .card-header-custom i { color: var(--primary); margin-right: 10px; }
+
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .data-table th { 
+        background-color: var(--input-bg) !important; color: var(--secondary) !important;
+        padding: 15px 10px; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;
+        border-bottom: 2px solid var(--border-color); position: sticky; top: 0; z-index: 5;
+        text-align: center;
+    }
+    .data-table td { 
+        padding: 12px 10px; border-bottom: 1px solid var(--border-color); 
+        font-size: 0.9rem; color: var(--text-dark); vertical-align: middle;
+    }
+    .data-table tbody tr:hover { background-color: var(--input-bg); cursor: pointer; }
+    
+    /* Selected Row */
+    tr.master-row.selected td { 
+        background-color: rgba(67, 24, 255, 0.1) !important; 
+        font-weight: 700; color: var(--primary);
+        border-top: 1px solid var(--primary);
+        border-bottom: 1px solid var(--primary);
+    }
+
+    /* Colors */
+    .deficit-col { color: var(--danger); font-weight: 700; }
+    .surplus-col { color: var(--success); font-weight: 600; }
+    .text-start { text-align: left !important; }
+    .text-end { text-align: right !important; }
+    
+    /* KPI Boxes (Detail Panel) */
+    .kpi-box {
+        border-radius: 12px; padding: 15px; text-align: center; height: 100%;
+        display: flex; flex-direction: column; justify-content: center;
+        border: 1px solid transparent;
+    }
+    .kpi-box .small { text-transform: uppercase; font-size: 0.7rem; margin-bottom: 5px; opacity: 0.8; font-weight: 600; }
+    .kpi-box h4 { font-weight: 800; margin: 0; font-size: 1.2rem; }
+    
+    .bg-danger-custom { background-color: rgba(227, 26, 26, 0.1); color: var(--danger); border-color: rgba(227, 26, 26, 0.2); }
+    .bg-success-custom { background-color: rgba(5, 205, 153, 0.1); color: var(--success); border-color: rgba(5, 205, 153, 0.2); }
+    .bg-warning-custom { background-color: rgba(255, 181, 71, 0.1); color: #B71C1C; border-color: rgba(255, 181, 71, 0.2); }
+    .bg-light-custom { background-color: var(--input-bg); color: var(--text-dark); border-color: var(--border-color); }
+
+    /* Form Elements */
+    .form-control {
+        background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-dark); border-radius: 12px;
+    }
+    .form-control:focus { background-color: var(--card-bg); border-color: var(--primary); }
+    
+    /* Buttons */
+    .btn-excel { background-color: var(--success); color: white; border: none; }
+    .btn-excel:hover { background-color: #04b385; }
+    .dataTables_wrapper .dataTables_filter { display: none; } 
+</style>
+{% endblock %}
+
+{% block page_title %}<i class="fas fa-boxes me-2 text-danger"></i> DỰ BÁO TỒN KHO TỔNG THỂ{% endblock %}
+{% block page_sub %}Phân tích nhu cầu và cảnh báo đặt hàng.{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('lookup_bp.export_total_replenishment') }}" class="btn btn-success fw-bold shadow-sm me-2">
+    <i class="fas fa-file-excel me-2"></i>Xuất Excel
+</a>
+<a href="{{ url_for('index') }}" class="btn btn-back"><i class="fas fa-home me-2"></i>Portal</a>
+{% endblock %}
+
+{% block content %}
+    <div class="main-card mb-4" style="background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);">
+        <div class="row align-items-end">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Lọc nhanh (Nhóm hàng, Ngành...)</label>
+                <input type="text" id="masterSearchInput" class="form-control" placeholder="Nhập từ khóa để lọc bảng bên dưới...">
+            </div>
+            <div class="col-md-6">
+                <p class="text-muted small mb-2 ms-2"><i class="fas fa-info-circle me-1"></i> Click vào một Nhóm hàng để xem chi tiết các mã con.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="master-panel">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-list-ul"></i> Danh sách Nhóm hàng ({{ alert_list|length }})</span>
+                </div>
+                <div class="master-table-container">
+                    <table id="replenishmentTable" class="data-table">
+                        <thead class="text-center">
+                            <tr>
+                                <th class="text-start">Nhóm Hàng</th>
+                                <th class="text-end">Thiếu/Dư</th>
+                                <th class="text-end">ROP</th>
+                                <th class="text-end">Tồn-BO</th>
+                                <th class="text-end">Tiêu hao</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in alert_list %}
+                            <tr class="master-row" 
+                                onclick="loadGroupDetails(this, 
+                                    '{{ item.NhomHang }}', 
+                                    {{ item.LuongThieuDu|float|tojson }}, 
+                                    {{ item.DiemTaiDatROP|float|tojson }}, 
+                                    {{ item.TonBO|float|tojson }})">
+                                
+                                <td class="text-start fw-bold text-primary">{{ item.NhomHang }}</td>
+                                
+                                {% set deficit = item.LuongThieuDu|float %}
+                                <td class="text-end {% if deficit > 0 %}deficit-col{% else %}surplus-col{% endif %}">
+                                    {{ deficit | format_number }}
+                                </td>
+                                
+                                <td class="text-end">{{ item.DiemTaiDatROP | float | format_number }}</td>
+                                <td class="text-end text-secondary">{{ item.TonBO | float | format_number }}</td>
+                                <td class="text-end small">{{ "%.2f"|format(item.TieuHaoThang|float) }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted p-5">Không có dữ liệu.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="detail-panel">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-info-circle"></i> <span id="detailCardHeader">Chi tiết Nhóm hàng</span></span>
+                </div>
+                <div class="card-body-custom d-flex flex-column h-100 p-3">
+                    <div id="detail-summary" class="row g-3 mb-3"></div>
+                    <div id="detail-table" class="detail-table-container">
+                        <p class="text-center text-muted p-5">Vui lòng chọn một Nhóm hàng bên trái.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.5/datatables.min.js"></script>
+    <script>
+        function formatCurrency(num) {
+            let numValue = parseFloat(num);
+            if (isNaN(numValue)) { numValue = 0; }
+            return new Intl.NumberFormat('vi-VN').format(numValue);
+        }
+
+        let masterTable = null; 
+
+        $(document).ready(function() {
+            masterTable = $('#replenishmentTable').DataTable({
+                "paging": false, 
+                "ordering": false, 
+                "info": false, 
+                "scrollY": "calc(75vh - 100px)", 
+                "scrollCollapse": true,
+                "searching": true, 
+                "dom": 't'
+            });
+
+            $('#masterSearchInput').on('keyup', function() {
+                masterTable.search(this.value).draw();
+            });
+        });
+
+        let lastSelectedRow = null;
+
+        function loadGroupDetails(selectedRow, groupCode, luongThieuDu, diemTaiDatROP, tonBO) {
+            if (lastSelectedRow) { $(lastSelectedRow).removeClass('selected'); }
+            $(selectedRow).addClass('selected');
+            lastSelectedRow = selectedRow;
+
+            const header = $('#detailCardHeader');
+            const summaryDiv = $('#detail-summary');
+            const tableDiv = $('#detail-table');
+            
+            header.text(`Chi tiết Nhóm: ${groupCode}`);
+            
+            const deficitClass = luongThieuDu > 0 ? 'bg-danger-custom' : 'bg-success-custom';
+            summaryDiv.html(`
+                <div class="col-md-4">
+                    <div class="kpi-box ${deficitClass}">
+                        <div class="small">Lượng Thiếu/Dư</div>
+                        <h4>${formatCurrency(luongThieuDu)}</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="kpi-box bg-warning-custom">
+                        <div class="small">Điểm Tái Đặt (ROP)</div>
+                        <h4>${formatCurrency(diemTaiDatROP)}</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="kpi-box bg-light-custom">
+                        <div class="small">Tổng Dự Phòng (Tồn-BO)</div>
+                        <h4>${formatCurrency(tonBO)}</h4>
+                    </div>
+                </div>
+            `);
+            
+            tableDiv.html('<p class="text-center mt-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Đang tải chi tiết...</p>');
+
+            fetch(`/sales/api/replenishment_details/${encodeURIComponent(groupCode)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Không thể tải dữ liệu.');
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || !Array.isArray(data) || data.length === 0) {
+                        tableDiv.html('<p class="alert alert-info text-center m-3">Không tìm thấy mã hàng chi tiết.</p>');
+                        return;
+                    }
+
+                    let tableHtml = '<table class="data-table">';
+                    tableHtml += '<thead><tr>';
+                    tableHtml += '<th class="text-start">Mã Hàng</th>';
+                    tableHtml += '<th class="text-start">Tên Hàng</th>';
+                    tableHtml += '<th class="text-end">Tồn Kho</th>';
+                    tableHtml += '<th class="text-end">Hàng Về</th>';
+                    tableHtml += '</tr></thead><tbody>';
+
+                    data.forEach(item => {
+                        tableHtml += `<tr>
+                                        <td class="text-start text-primary fw-bold">${item.InventoryID}</td>
+                                        <td class="text-start">${item.InventoryName}</td>
+                                        <td class="text-end">${formatCurrency(item.TonKhoHienTai)}</td>
+                                        <td class="text-end text-secondary">${formatCurrency(item.HangDangVe)}</td>
+                                    </tr>`;
+                    });
+
+                    tableHtml += '</tbody></table>';
+                    tableDiv.html(tableHtml); 
+                })
+                .catch(error => {
+                    tableDiv.html(`<p class="alert alert-danger text-center m-3">Lỗi tải chi tiết: ${error.message}</p>`);
+                });
+        }
+    </script>
+{% endblock %}

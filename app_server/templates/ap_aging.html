@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý Nợ Phải Trả (AP Aging) | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* KPI CARDS */
+    .kpi-card {
+        background: var(--card-bg); border-radius: var(--card-radius); padding: 20px;
+        box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
+        height: 100%; display: flex; align-items: center; transition: transform 0.2s;
+    }
+    .kpi-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+    
+    .kpi-icon-box {
+        width: 56px; height: 56px; border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem; margin-right: 15px; flex-shrink: 0;
+    }
+    
+    .icon-total { background: var(--input-bg); color: var(--primary); }
+    .icon-overdue { background: rgba(227, 26, 26, 0.1); color: var(--danger); }
+    .icon-special { background: rgba(67, 24, 255, 0.1); color: var(--primary); }
+    
+    .kpi-content { flex-grow: 1; }
+    .kpi-label { font-size: 0.8rem; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+    .kpi-value { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); line-height: 1.1; }
+    
+    .text-danger-custom { color: var(--danger); }
+    
+    .kpi-sub-item { margin-bottom: 4px; }
+    .kpi-sub-label { font-size: 0.75rem; color: var(--secondary); display: block; }
+    .kpi-sub-val { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); }
+
+    /* TABLE STYLES - Optimized for HTMX swap */
+    .table-aging { width: 100%; border-collapse: separate; border-spacing: 0; }
+    
+    .table-aging th { 
+        background-color: var(--input-bg) !important; color: var(--secondary); font-weight: 700; 
+        font-size: 0.75rem; text-transform: uppercase; padding: 15px 8px; 
+        border-bottom: 2px solid var(--border-color); vertical-align: middle; white-space: nowrap;
+        position: sticky; top: 0; z-index: 10;
+    }
+    
+    .table-aging td { 
+        vertical-align: middle; font-size: 0.85rem; padding: 10px 8px;
+        border-bottom: 1px solid var(--border-color); color: var(--text-dark);
+    }
+    
+    /* Sticky Columns (Mã & Tên) */
+    .table-aging th:nth-child(2), .table-aging td:nth-child(2) {
+        position: sticky; left: 0; background-color: var(--card-bg); z-index: 5;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    }
+    .table-aging th:nth-child(2) { z-index: 11; background-color: var(--input-bg) !important; }
+
+    /* Row Highlights */
+    .row-bank { background-color: rgba(255, 181, 71, 0.05) !important; }
+    .table-aging tbody tr:hover td { background-color: var(--input-bg) !important; }
+    
+    .val-total { font-weight: 700; color: var(--text-dark); }
+    .val-overdue { color: var(--danger); font-weight: 700; background-color: rgba(227, 26, 26, 0.1); padding: 3px 6px; border-radius: 6px; display: inline-block; }
+    .val-current { color: var(--success); font-weight: 600; }
+    
+    /* Badges */
+    .badge-type { font-size: 0.65rem; font-weight: 700; padding: 4px 6px; border-radius: 6px; text-transform: uppercase; }
+    .badge-bank { background-color: rgba(255, 181, 71, 0.2); color: #B71C1C; border: 1px solid #FFCC80; }
+    .badge-supplier { background-color: rgba(67, 24, 255, 0.1); color: var(--primary); border: 1px solid var(--primary); }
+    .badge-gtg { background-color: rgba(13, 202, 240, 0.2); color: #000; }
+    .badge-vlp { background-color: #6c757d; color: white; }
+    .badge-other { background-color: var(--input-bg); color: var(--text-dark); border: 1px solid var(--border-color); }
+
+    /* Button Pay */
+    .btn-pay {
+        background-color: var(--primary); color: white; border: none; 
+        border-radius: 8px; padding: 6px 12px; font-size: 0.75rem; font-weight: 600;
+        box-shadow: var(--shadow-sm); transition: all 0.2s;
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-pay:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+    
+    .btn-pay-bank { background-color: var(--warning); color: #000; }
+    .btn-pay-bank:hover { background-color: #FF9E0F; }
+
+    /* Loading Indicator Overlay */
+    .htmx-indicator {
+        opacity: 0;
+        transition: opacity 200ms ease-in;
+    }
+    .htmx-request .htmx-indicator {
+        opacity: 1;
+    }
+    .htmx-request.htmx-indicator {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}<i class="fas fa-file-invoice-dollar me-2 text-primary"></i> QUẢN LÝ NỢ PHẢI TRẢ (AP){% endblock %}
+{% block page_sub %}Theo dõi công nợ Nhà cung cấp, Vay Ngân hàng (341) và các nhóm đặc thù.{% endblock %}
+
+{% block header_actions %}
+<a href="/budget/payment" class="btn btn-warning text-dark border-0 shadow-sm fw-bold">
+    <i class="fas fa-money-check-alt me-2"></i>Thực Chi (Payment)
+</a>
+<a href="/" class="btn btn-back"><i class="fas fa-home me-2"></i>Portal</a>
+{% endblock %}
+
+{% block content %}
+    <div class="row g-4 mb-4" x-data>
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon-box icon-total"><i class="fas fa-wallet"></i></div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Tổng Phải Trả</div>
+                    <div class="kpi-value">{{ kpi_total_payable | format_tr }}</div>
+                    <small class="text-muted">*NCC + Bank (Chưa bao gồm GTG)</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon-box icon-overdue"><i class="fas fa-exclamation-circle"></i></div>
+                <div class="kpi-content">
+                    <div class="kpi-label text-danger">Tổng Quá Hạn</div>
+                    <div class="kpi-value text-danger-custom">{{ kpi_total_overdue | format_tr }}</div>
+                    <small class="text-muted">*Ưu tiên thanh toán</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon-box icon-special"><i class="fas fa-tools"></i></div>
+                <div class="kpi-content">
+                    <div class="kpi-label text-primary" style="margin-bottom: 10px;">CÔNG NỢ ĐẶC THÙ</div>
+                    <div class="row">
+                        <div class="col-6 border-end">
+                            <span class="kpi-sub-label">Gia công (GTG)</span>
+                            <span class="kpi-sub-val">{{ kpi_gtg_total | format_tr }}</span>
+                        </div>
+                        <div class="col-6 ps-3">
+                            <span class="kpi-sub-label">Vật liệu phụ (VLP)</span>
+                            <span class="kpi-sub-val">{{ kpi_vlp_total | format_tr }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-card mb-4" x-data>
+        <div class="card-body-custom" style="padding: 20px;">
+            <form hx-post="{{ url_for('ap_bp.ap_aging_dashboard') }}" 
+                  hx-target="#ap-table-container" 
+                  hx-select="#ap-table-container"
+                  hx-swap="outerHTML"
+                  class="row g-3 align-items-end">
+                  
+                <div class="col-md-4">
+                    <label class="form-label text-secondary">Đối tượng (NCC / Bank...)</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-0 bg-transparent ps-3" style="position: absolute; z-index: 10;"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="vendor_name" class="form-control ps-5" value="{{ vendor_filter }}" placeholder="Tìm kiếm theo tên...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label text-secondary">Loại Công Nợ</label>
+                    <select class="form-select" name="debt_type">
+                        <option value="ALL" {% if debt_type_filter == 'ALL' %}selected{% endif %}>-- Tất cả --</option>
+                        <optgroup label="Nhóm chính">
+                            <option value="SUPPLIER" {% if debt_type_filter == 'SUPPLIER' %}selected{% endif %}>📉 Nhà Cung Cấp (331)</option>
+                            <option value="BANK" {% if debt_type_filter == 'BANK' %}selected{% endif %}>🏦 Vay Ngân Hàng (341)</option>
+                        </optgroup>
+                        <optgroup label="Nhóm đặc thù">
+                            <option value="GTG" {% if debt_type_filter == 'GTG' %}selected{% endif %}>🔧 Gia công (GTG)</option>
+                            <option value="VLP" {% if debt_type_filter == 'VLP' %}selected{% endif %}>🔩 Vật liệu phụ (VLP)</option>
+                            <option value="OTHER" {% if debt_type_filter == 'OTHER' %}selected{% endif %}>🤝 Khác (338)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary shadow-sm w-100">
+                        <i class="fas fa-filter me-2"></i> Lọc Dữ Liệu
+                        <span class="htmx-indicator spinner-border spinner-border-sm ms-2" role="status"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-card" x-data="{
+        planPayment(id, name, overdueAmount, type) {
+            let amountToFill = overdueAmount <= 0 ? 0 : overdueAmount;
+            let msg = type === 'BANK' ? `Lập đề nghị Trả vay / Gốc lãi cho Ngân hàng: ${name}?` : `Lập đề nghị thanh toán cho NCC: ${name}?`;
+            
+            Swal.fire({
+                title: 'Xác nhận lập đề nghị',
+                text: msg,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Đồng ý'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const url = `/budget/dashboard?create=1&obj_id=${encodeURIComponent(id)}&obj_name=${encodeURIComponent(name)}&amt=${amountToFill}&debt_type=${encodeURIComponent(type)}`;
+                    window.location.href = url;
+                }
+            })
+        }
+    }">
+        <div class="card-body-custom p-0" id="ap-table-container">
+            <div class="table-responsive" style="max-height: 70vh; overflow-y: auto;">
+                <table id="apTable" class="table table-aging mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center" width="5%">Loại</th>
+                            <th class="text-start" width="8%">Mã ĐT</th>
+                            <th class="text-start" width="20%">Tên Đối Tượng</th>
+                            <th class="text-center" width="6%">Hạn TT</th>
+                            <th class="text-end" width="10%">Tổng Nợ</th>
+                            <th class="text-end" width="10%">Quá Hạn</th>
+                            <th class="text-end" width="10%">Trong Hạn</th>
+                            
+                            <th class="text-end text-muted small" width="8%">1-30 QH</th>
+                            <th class="text-end text-muted small" width="8%">31-90 QH</th>
+                            <th class="text-end text-muted small" width="8%">91-180 QH</th>
+                            <th class="text-end text-danger small" width="8%">> 180 QH</th>
+                            
+                            <th class="text-center" width="7%">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in aging_data %}
+                        <tr class="{% if row.DebtType == 'BANK' %}row-bank{% endif %}">
+                            <td class="text-center">
+                                {% if row.DebtType == 'BANK' %}
+                                    <span class="badge-type badge-bank"><i class="fas fa-university me-1"></i>Bank</span>
+                                {% elif row.DebtType == 'SUPPLIER' %}
+                                    <span class="badge-type badge-supplier">NCC</span>
+                                {% elif row.DebtType == 'GTG' %}
+                                    <span class="badge-type badge-gtg">GTG</span>
+                                {% elif row.DebtType == 'VLP' %}
+                                    <span class="badge-type badge-vlp">VLP</span>
+                                {% else %}
+                                    <span class="badge-type badge-other">Other</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-start font-monospace text-primary">{{ row.ObjectID }}</td>
+                            <td class="text-start fw-bold text-dark text-truncate" style="max-width: 250px;" title="{{ row.ObjectName }}">
+                                {{ row.ObjectName }}
+                                {% if row.DebtType == 'BANK' %}
+                                    <br><small class="text-danger fst-italic"><i class="fas fa-info-circle me-1"></i>Dư nợ vay / Khế ước</small>
+                                {% elif row.TypeDisplay and row.TypeDisplay != 'Nhà Cung Cấp' %}
+                                    <br><small class="text-muted fw-normal">{{ row.TypeDisplay }}</small>
+                                {% endif %}
+                            </td>
+                            <td class="text-center small text-secondary">{{ row.ReDueDays }}</td>
+                            
+                            <td class="text-end val-total">
+                                {{ row.TotalDebt | format_tr }}
+                            </td>
+                            
+                            <td class="text-end">
+                                {% if row.TotalOverdueDebt > 0 %}
+                                    <span class="val-overdue">{{ row.TotalOverdueDebt | format_tr }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="text-end val-current">
+                                {{ row.Debt_Current | format_tr }}
+                            </td>
+                            
+                            <td class="text-end text-secondary small">{{ row.Debt_Range_1_30 | format_tr }}</td>
+                            <td class="text-end text-secondary small">{{ row.Debt_Range_31_90 | format_tr }}</td>
+                            <td class="text-end text-secondary small">{{ row.Debt_Range_91_180 | format_tr }}</td>
+                            <td class="text-end text-danger fw-bold small">{{ row.Debt_Over_180 | format_tr }}</td>
+                            
+                            <td class="text-center">
+                                <button class="btn-pay {{ 'btn-pay-bank' if row.DebtType == 'BANK' else '' }}" 
+                                        @click="planPayment('{{ row.ObjectID }}', '{{ row.ObjectName | replace("'", "\\'") }}', {{ row.TotalOverdueDebt }}, '{{ row.DebtType }}')">
+                                    <i class="fas {{ 'fa-money-bill-wave' if row.DebtType == 'BANK' else 'fa-file-invoice' }}"></i> 
+                                    {{ 'Trả' if row.DebtType == 'BANK' else 'Chi' }}
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                             <td colspan="12" class="text-center text-muted py-5">
+                                <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i><br>
+                                Không tìm thấy dữ liệu phù hợp.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{# Xóa block scripts cũ dùng jQuery DataTables #}

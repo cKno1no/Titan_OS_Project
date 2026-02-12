@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Báo cáo | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* MODERN TABLE */
+    .table-container {
+        background: var(--card-bg); border-radius: 16px;
+        box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid var(--border-color);
+    }
+    
+    .table-header-sticky th { 
+        position: sticky; top: 0; z-index: 10;
+        background-color: var(--input-bg) !important; 
+        color: var(--secondary) !important;
+        font-weight: 700; font-size: 0.85rem; text-transform: uppercase;
+        padding: 20px 15px; border-bottom: 2px solid var(--border-color); white-space: nowrap;
+    }
+
+    .report-table td { 
+        padding: 15px; border-bottom: 1px solid var(--border-color); 
+        font-size: 0.95rem; color: var(--text-dark); vertical-align: top;
+    }
+    .report-row:hover td { background-color: var(--input-bg); cursor: pointer; }
+
+    /* CONTENT CELL */
+    .content-cell { line-height: 1.6; color: var(--text-dark); min-width: 300px; }
+    
+    .highlight { background-color: var(--warning); color: #000; padding: 2px 4px; border-radius: 4px; }
+
+    /* BADGES */
+    .badge-id { background-color: var(--input-bg); color: var(--primary); border-radius: 8px; padding: 5px 10px; font-weight: 700; border: 1px solid var(--border-color); }
+    .badge-file { background-color: rgba(5, 205, 153, 0.1); color: var(--success); border: 1px solid var(--success); border-radius: 20px; padding: 4px 10px; font-size: 0.8rem; }
+    
+    /* FILTER */
+    .btn-filter {
+        background-color: var(--primary); color: white; border-radius: 16px; font-weight: 600; width: 100%; padding: 12px; border: none;
+    }
+    .btn-filter:hover { background-color: var(--primary-dark); }
+    
+    /* PAGINATION */
+    .pagination .page-link {
+        background-color: var(--card-bg); border: 1px solid var(--border-color);
+        margin: 0 3px; color: var(--secondary); font-weight: 600; border-radius: 10px;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary); color: white; border-color: var(--primary); box-shadow: var(--shadow-sm);
+    }
+    .pagination .page-item.disabled .page-link { background-color: var(--input-bg); color: var(--secondary); opacity: 0.5; }
+
+    @media (max-width: 768px) {
+        .table-responsive { overflow-x: auto; }
+        .report-table th, .report-table td { white-space: nowrap; padding: 12px 10px; }
+        .content-cell { white-space: normal !important; min-width: 250px; }
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}Dashboard Báo cáo{% endblock %}
+{% block page_sub %}Theo dõi & Quản lý thông tin khách hàng.{% endblock %}
+
+{% block header_actions %}
+<a href="{{ url_for('crm_bp.nhap_lieu') }}" class="btn btn-primary shadow-sm fw-bold">
+    <i class="fas fa-plus me-2"></i>Tạo Báo cáo
+</a>
+<a href="{{ url_for('index') }}" class="btn btn-back">
+    <i class="fas fa-times me-2"></i>Đóng
+</a>
+{% endblock %}
+
+{% block content %}
+    <div class="main-card">
+        <form method="POST" action="{{ url_for('crm_bp.dashboard_reports', page=1) }}" class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Từ Ngày</label>
+                <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Đến Ngày</label>
+                <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Nhân viên</label>
+                <select name="nv_bao_cao" class="form-select">
+                    <option value="">-- Tất cả --</option>
+                    {% for user in users %}
+                    <option value="{{ user.USERCODE }}" {% if selected_user == user.USERCODE %} selected {% endif %}>
+                        {{ user.SHORTNAME }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Khách hàng</label>
+                <input type="text" name="kh_search" class="form-control" value="{{ kh_search_term }}" placeholder="Tìm tên...">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Từ khóa nội dung</label>
+                <input type="text" name="text_search" class="form-control" value="{{ text_search_term }}" placeholder="Nội dung, đánh giá...">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-filter"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center p-4 border-bottom" style="border-color: var(--border-color) !important;">
+            <h5 class="m-0 fw-bold" style="color: var(--text-dark);">
+                <i class="fas fa-list text-primary me-2"></i>Danh sách Báo cáo
+            </h5>
+            <span class="badge rounded-pill px-3 py-2 border" style="background: var(--input-bg); color: var(--secondary); border-color: var(--border-color) !important;">
+                Tổng: {{ total_reports|default(0) }} bản ghi
+            </span>
+        </div>
+
+        {% if reports %}
+        <div class="table-responsive" style="max-height: 65vh; overflow-y: auto;">
+            <table class="table report-table mb-0">
+                <thead class="table-header-sticky">
+                    <tr>
+                        <th width="5%" class="text-center">ID</th>
+                        <th width="8%">Ngày</th>
+                        <th width="5%">NV</th>
+                        <th width="15%">Đối tượng</th>
+                        <th width="30%">Nội dung Chính</th>
+                        <th width="30%">Đánh giá / Kế hoạch</th>
+                        <th width="7%" class="text-center">Tệp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in reports %}
+                    <tr class="report-row" onclick="window.open('{{ url_for('crm_bp.report_detail_page', report_stt=row.ID_KEY) }}', '_blank')">
+                        <td class="text-center"><span class="badge-id">#{{ row.ID_KEY }}</span></td>
+                        <td class="fw-medium" style="color: var(--secondary); font-size: 0.85rem;">{{ row.NGAY | format_date }}</td>
+                        <td class="fw-bold text-primary">{{ row.NV }}</td>
+                        <td class="fw-bold" style="color: var(--text-dark);">{{ row.KH }}</td>
+                        
+                        <td class="content-cell">
+                            {{ row['NOI DUNG 1'] | safe }}
+                        </td>
+                        
+                        <td class="content-cell">
+                            {{ row['DANH GIA 1'] | safe }}
+                        </td>
+                        
+                        <td class="text-center">
+                            {% if row.FILE_COUNT and row.FILE_COUNT > 0 %}
+                                <span class="badge-file"><i class="fas fa-paperclip me-1"></i>{{ row.FILE_COUNT }}</span>
+                            {% else %}
+                                <span class="opacity-25" style="color: var(--secondary);">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="d-flex justify-content-center py-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    {% set url_params = {'nv_bao_cao': selected_user, 'date_from': date_from, 'date_to': date_to, 'kh_search': kh_search_term, 'text_search': text_search_term} %}
+                    
+                    <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('crm_bp.dashboard_reports', page=page - 1, **url_params) }}"><i class="fas fa-chevron-left"></i></a>
+                    </li>
+                    
+                    {% set start_page = [1, page - 2] | max %}
+                    {% set end_page = [total_pages, page + 2] | min %}
+
+                    {% if start_page > 1 %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('crm_bp.dashboard_reports', page=1, **url_params) }}">1</a></li>
+                        {% if start_page > 2 %}<li class="page-item disabled"><span class="page-link">...</span></li>{% endif %}
+                    {% endif %}
+
+                    {% for p in range(start_page, end_page + 1) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('crm_bp.dashboard_reports', page=p, **url_params) }}">{{ p }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if end_page < total_pages %}
+                        {% if end_page < total_pages - 1 %}<li class="page-item disabled"><span class="page-link">...</span></li>{% endif %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('crm_bp.dashboard_reports', page=total_pages, **url_params) }}">{{ total_pages }}</a></li>
+                    {% endif %}
+
+                    <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('crm_bp.dashboard_reports', page=page + 1, **url_params) }}"><i class="fas fa-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x mb-3 opacity-25" style="color: var(--secondary);"></i>
+            <p class="text-muted">Không tìm thấy báo cáo nào phù hợp.</p>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function highlightSearchTerm(element, terms) {
+            if (!terms || terms.length === 0) return;
+            let html = element.innerHTML;
+            terms.forEach(term => {
+                if (term.trim() === '') return;
+                const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')})(?![^<]*>)`, 'gi');
+                html = html.replace(regex, '<span class="highlight">$1</span>');
+            });
+            element.innerHTML = html;
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            const rawSearchTerm = '{{ text_search_term | default('') }}';
+            const searchTerms = rawSearchTerm.split(';').map(t => t.trim()).filter(t => t.length > 0);
+
+            if (searchTerms.length > 0) {
+                document.querySelectorAll('.content-cell').forEach(cell => {
+                    highlightSearchTerm(cell, searchTerms);
+                });
+            }
+        });
+    </script>
+{% endblock %}

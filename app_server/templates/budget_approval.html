@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+
+{% block title %}Phê duyệt Ngân sách | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* TABLE APPROVAL */
+    .table-approval { width: 100%; border-collapse: separate; border-spacing: 0; }
+    
+    .table-approval th { 
+        background-color: var(--input-bg) !important; color: var(--secondary); font-weight: 700; 
+        font-size: 0.85rem; text-transform: uppercase; padding: 15px; 
+        border-bottom: 2px solid var(--border-color); text-align: left; white-space: nowrap;
+        position: sticky; top: 0; z-index: 10;
+    }
+    
+    .table-approval td { 
+        padding: 15px; border-bottom: 1px solid var(--border-color); 
+        font-size: 0.95rem; color: var(--text-dark); vertical-align: middle;
+    }
+    
+    .table-approval tbody tr { transition: background-color 0.2s; cursor: pointer; }
+    .table-approval tbody tr:hover td { background-color: var(--input-bg); }
+
+    /* BADGES & BUTTONS */
+    .amount-highlight { font-weight: 700; color: var(--primary); }
+    .badge-warning-custom { 
+        background-color: rgba(255, 181, 71, 0.1); color: #B71C1C; 
+        border: 1px solid rgba(255, 181, 71, 0.5); padding: 4px 8px; border-radius: 6px;
+    }
+    
+    .btn-action-sm {
+        padding: 6px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; border: none;
+    }
+    .btn-review { background-color: var(--primary); color: white; box-shadow: var(--shadow-sm); }
+    .btn-review:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+
+    /* MODAL STYLES */
+    .modal-header { background-color: var(--input-bg); border-bottom: 1px solid var(--border-color); }
+    .modal-title { color: var(--text-dark); font-weight: 700; }
+    .modal-body { padding: 25px; background-color: var(--card-bg); color: var(--text-dark); }
+    .modal-footer { background-color: var(--card-bg); border-top: 1px solid var(--border-color); }
+    
+    .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-color); }
+    .info-label { color: var(--secondary); font-size: 0.9rem; }
+    .info-val { color: var(--text-dark); font-weight: 600; }
+    
+    /* Progress Box */
+    .budget-context-box {
+        background-color: var(--input-bg); border-radius: 16px; padding: 15px; margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+    .budget-context-box.warning { background-color: rgba(227, 26, 26, 0.05); border-color: rgba(227, 26, 26, 0.2); }
+    
+    .context-title { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--secondary); margin-bottom: 10px; }
+    
+    .progress-custom {
+        height: 12px; border-radius: 6px; background-color: var(--border-color); overflow: hidden; margin-top: 5px;
+    }
+    
+    .form-control-modal {
+        border: 1px solid var(--border-color); background-color: var(--input-bg); border-radius: 12px; padding: 12px;
+        width: 100%; margin-bottom: 15px; color: var(--text-dark);
+    }
+    .form-control-modal:focus { background-color: var(--card-bg); border-color: var(--primary); outline: none; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .table-responsive { overflow-x: auto; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 12px; }
+        .table-approval th, .table-approval td { white-space: nowrap; padding: 12px 10px; }
+        .info-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}<i class="fas fa-check-double me-2 text-success"></i> PHÊ DUYỆT NGÂN SÁCH{% endblock %}
+{% block page_sub %}Danh sách các đề nghị thanh toán đang chờ duyệt.{% endblock %}
+
+{% block header_actions %}
+<a href="/" class="btn btn-back"><i class="fas fa-home me-2"></i>Portal</a>
+{% endblock %}
+
+{% block content %}
+    <div class="main-card">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-list-ul me-2 text-primary"></i> DANH SÁCH CHỜ DUYỆT</span>
+            <span class="badge bg-light text-dark border">{{ pending_list|length }} phiếu</span>
+        </div>
+        <div class="card-body-custom p-0">
+            <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+                <table class="table-approval">
+                    <thead>
+                        <tr>
+                            <th>Ngày tạo</th>
+                            <th>Mã Phiếu</th>
+                            <th>Người đề nghị</th>
+                            <th>Người duyệt</th>
+                            <th>Đối tượng thụ hưởng</th> <th>Khoản mục</th>
+                            <th class="text-end">Số tiền</th>
+                            <th>Lý do & Hồ sơ</th>
+                            <th class="text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in pending_list %}
+                        <tr onclick='openReviewModal({{ item | tojson }})'>
+                            <td class="text-secondary small">{{ item.RequestDate | format_date }}</td>
+                            <td class="fw-bold text-primary">{{ item.RequestID }}</td>
+                            <td>
+                                <div class="fw-bold">{{ item.RequesterName }}</div>
+                                <div class="small text-muted">{{ item.UserCode }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info">{{ item.CurrentApproverName }}</span>
+                            </td>
+                            
+                            <td>
+                                <div class="fw-bold text-dark">{{ item.ObjectName }}</div>
+                                <div class="small text-muted">{{ item.ObjectID }}</div>
+                            </td>
+
+                            <td>
+                                <div class="text-dark">{{ item.BudgetName }}</div>
+                                <div class="small text-secondary font-monospace">{{ item.BudgetCode }}</div>
+                            </td>
+                            <td class="text-end amount-highlight">
+                                {{ item.Amount | format_tr }}
+                            </td>
+                            <td>
+                                {% if item.IsWarning %}
+                                    <span class="badge badge-warning-custom mb-1"><i class="fas fa-exclamation-triangle"></i> Vượt NS</span><br>
+                                {% endif %}
+                                <span class="text-muted small">{{ item.Reason | truncate(40) }}</span>
+                                
+                                {% if item.Attachments %}
+                                    <div class="mt-1">
+                                        <span class="badge bg-light text-secondary border">
+                                            <i class="fas fa-paperclip me-1"></i> File
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <button class="btn-action-sm btn-review">
+                                    <i class="fas fa-eye me-1"></i> Xem
+                                </button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center text-muted p-5">
+                                <i class="fas fa-check-circle fa-3x mb-3 opacity-25"></i><br>
+                                Không có đề nghị nào cần duyệt lúc này.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết Đề nghị</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="md_request_id">
+                    
+                    <div class="info-row">
+                        <span class="info-label">Người đề nghị:</span>
+                        <span class="info-val" id="md_requester">...</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Đối tượng thụ hưởng:</span>
+                        <span class="info-val text-primary" id="md_object_info">...</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Số tiền:</span>
+                        <span class="info-val text-primary fs-5" id="md_amount">...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Khoản mục:</span>
+                        <span class="info-val" id="md_budget">...</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="info-label d-block mb-1">Lý do chi:</span>
+                        <div class="p-3 rounded small" style="background: var(--input-bg); color: var(--text-dark);" id="md_reason">...</div>
+                    </div>
+
+                    <div id="md_attachments_box" class="mb-3 d-none">
+                        <span class="info-label d-block mb-1 text-primary fw-bold"><i class="fas fa-paperclip"></i> Tài liệu đính kèm:</span>
+                        <div class="d-flex flex-wrap gap-2" id="md_attachment_list"></div>
+                    </div>
+
+                    <div id="md_context_box" class="budget-context-box">
+                        <div class="context-title d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-chart-pie me-1"></i> NGÂN SÁCH (<span id="md_parent_code"></span>)</span>
+                            <span id="md_warning_badge" class="badge bg-danger d-none">CẢNH BÁO</span>
+                        </div>
+                        
+                        <div class="progress-custom mb-2">
+                            <div id="bar_actual" class="progress-bar bg-secondary" style="width: 0%" title="Đã chi (ERP)"></div>
+                            <div id="bar_current" class="progress-bar bg-primary progress-bar-striped progress-bar-animated" style="width: 0%" title="Phiếu này"></div>
+                        </div>
+                        
+                        <div class="row g-2 small mb-2">
+                            <div class="col-4">
+                                <span class="d-block text-muted">Tổng NS</span>
+                                <strong style="color: var(--text-dark);" id="md_plan">0</strong>
+                            </div>
+                            <div class="col-4 text-center">
+                                <span class="d-block text-muted">Đã dùng</span>
+                                <strong class="text-secondary" id="md_used">0</strong>
+                            </div>
+                            <div class="col-4 text-end">
+                                <span class="d-block text-muted">Còn lại</span>
+                                <strong class="text-success" id="md_remaining">0</strong>
+                            </div>
+                        </div>
+
+                        <div id="md_alert_msg" class="alert alert-danger py-2 px-3 mt-2 mb-0 small fw-bold d-none">
+                            <i class="fas fa-exclamation-circle me-1"></i> Cảnh báo: Duyệt phiếu này sẽ vượt ngân sách!
+                        </div>
+                    </div>
+
+                    <label class="form-label small fw-bold text-secondary">Ghi chú duyệt / Lý do từ chối:</label>
+                    <textarea id="md_note" class="form-control-modal" rows="2" placeholder="Nhập ghi chú..."></textarea>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="button" class="btn btn-outline-danger me-md-2 px-4" onclick="submitDecision('REJECT')">
+                            <i class="fas fa-times me-1"></i> Từ chối
+                        </button>
+                        <button type="button" class="btn btn-success px-4 text-white" onclick="submitDecision('APPROVE')">
+                            <i class="fas fa-check me-1"></i> Duyệt Chi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+
+        // Hàm format số chuẩn (1,234,567) cho Modal chi tiết
+        function formatNumberExact(num) {
+            if (num === undefined || num === null) return '0';
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        // Hàm format số rút gọn cho context (1.2M)
+        function formatNumberCompact(num) {
+            if (!num) return '0';
+            return new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(num);
+        }
+
+        function openReviewModal(item) {
+            document.getElementById('md_request_id').value = item.RequestID;
+            document.getElementById('md_requester').innerText = item.RequesterName;
+            
+            // [MỚI] Hiển thị Đối tượng thụ hưởng
+            const objName = item.ObjectName || '---';
+            const objId = item.ObjectID || '';
+            document.getElementById('md_object_info').innerText = objId ? `${objName} (${objId})` : objName;
+
+            document.getElementById('md_amount').innerText = formatNumberExact(item.Amount) + ' VNĐ';
+            document.getElementById('md_budget').innerText = `${item.BudgetName} (${item.BudgetCode})`;
+            document.getElementById('md_reason').innerText = item.Reason;
+
+            // Attachments
+            const attachBox = document.getElementById('md_attachments_box');
+            const attachList = document.getElementById('md_attachment_list');
+            attachList.innerHTML = '';
+            
+            const rawFiles = item.Attachments || item.attachments;
+            if (rawFiles && rawFiles.trim() !== '') {
+                attachBox.classList.remove('d-none');
+                rawFiles.split(';').forEach(file => {
+                    if(file.trim()) {
+                        const link = document.createElement('a');
+                        link.href = `/attachments/${file}`;
+                        link.target = '_blank';
+                        link.className = 'btn btn-sm btn-light border shadow-sm text-primary';
+                        // Lấy tên file gốc (bỏ prefix timestamp)
+                        const name = file.split('_').slice(2).join('_') || file;
+                        link.innerHTML = `<i class="fas fa-file-download me-1"></i> ${name}`; 
+                        attachList.appendChild(link);
+                    }
+                });
+            } else {
+                attachBox.classList.add('d-none');
+            }
+
+            // Budget Context (Logic Progress bar)
+            const ytdPlan = parseFloat(item.YTD_Plan) || 0;
+            const ytdActual = parseFloat(item.YTD_Actual) || 0; 
+            const currentAmount = parseFloat(item.Amount) || 0;
+            const totalUsage = ytdActual + currentAmount;
+            const remaining = ytdPlan - totalUsage;
+
+            let pctActual = (ytdPlan > 0) ? (ytdActual / ytdPlan) * 100 : 0;
+            let pctCurrent = (ytdPlan > 0) ? (currentAmount / ytdPlan) * 100 : 0;
+
+            // Nếu vượt quá 100% thì scale lại
+            if (pctActual + pctCurrent > 100) {
+                const scale = 100 / (pctActual + pctCurrent);
+                pctActual *= scale; pctCurrent *= scale;
+            }
+
+            document.getElementById('bar_actual').style.width = `${pctActual}%`;
+            document.getElementById('bar_current').style.width = `${pctCurrent}%`;
+
+            document.getElementById('md_plan').innerText = formatNumberCompact(ytdPlan);
+            document.getElementById('md_used').innerText = formatNumberCompact(ytdActual);
+            document.getElementById('md_parent_code').innerText = item.ParentCode || '';
+
+            const alertMsg = document.getElementById('md_alert_msg');
+            const badge = document.getElementById('md_warning_badge');
+            const elRemaining = document.getElementById('md_remaining');
+            
+            elRemaining.innerText = formatNumberCompact(remaining);
+            elRemaining.className = remaining < 0 ? "text-danger fw-bold" : "text-success fw-bold";
+
+            if (item.IsWarning) {
+                alertMsg.classList.remove('d-none');
+                badge.classList.remove('d-none');
+                document.getElementById('md_context_box').classList.add('warning');
+            } else {
+                alertMsg.classList.add('d-none');
+                badge.classList.add('d-none');
+                document.getElementById('md_context_box').classList.remove('warning');
+            }
+            
+            document.getElementById('md_note').value = '';
+            reviewModal.show();
+        }
+
+        function submitDecision(action) {
+            const reqId = document.getElementById('md_request_id').value;
+            const note = document.getElementById('md_note').value;
+
+            if (action === 'REJECT' && !note.trim()) { alert("Vui lòng nhập lý do từ chối."); return; }
+            if(!confirm(`Xác nhận ${action === 'APPROVE' ? 'DUYỆT' : 'TỪ CHỐI'} đề nghị này?`)) return;
+
+            fetch('/api/budget/approve', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ request_id: reqId, action: action, note: note })
+            })
+            .then(r => r.json()).then(data => {
+                if (data.success) { reviewModal.hide(); location.reload(); } 
+                else { alert("Lỗi: " + data.message); }
+            }).catch(() => alert("Lỗi kết nối server."));
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{
+  "system_info": {
+    "project": "Titan OS",
+    "last_updated": "2026-02-12",
+    "total_sp": 54
+  },
+  "modules": {
+    "kpi_performance": {
+      "title": "Module KPI & Hiệu suất",
+      "procedures": [
+        {"name": "sp_GetRealtimeSalesKPI", "desc": "Tính điểm KPI kinh doanh thời gian thực (HCM)"},
+        {"name": "sp_GetRealtimeSalesKPI_HN", "desc": "Tính điểm KPI kinh doanh thời gian thực (HN)"},
+        {"name": "sp_GetExecutiveKPI", "desc": "Báo cáo KPI dành cho cấp quản lý"},
+        {"name": "sp_GetSalesPerformanceSummary", "desc": "Tổng hợp hiệu suất bán hàng"}
+      ]
+    },
+    "sales_lookup": {
+      "title": "Module Tra cứu & Kinh doanh",
+      "procedures": [
+        {"name": "sp_GetSalesLookup_Block1", "desc": "Tra cứu tồn kho, giá, thông tin hàng hóa nhanh"},
+        {"name": "Titan_Get_SalesBacklog", "desc": "Lấy danh sách đơn hàng tồn đọng chưa giao"},
+        {"name": "sp_GetSalesGrossProfit_Analysis", "desc": "Phân tích lợi nhuận gộp theo đơn hàng"}
+      ]
+    },
+    "inventory_warehouse": {
+      "title": "Module Kho & Quản trị tồn kho",
+      "procedures": [
+        {"name": "sp_GetInventoryAging_Cache", "desc": "Lấy dữ liệu tuổi hàng tồn kho từ bộ nhớ đệm (Tối ưu tốc độ)"},
+        {"name": "sp_GetInventory_Breakdown", "desc": "Phân tích chi tiết cơ cấu kho hàng"},
+        {"name": "sp_UpdateDeliveryPool", "desc": "Cập nhật danh sách điều phối giao hàng"}
+      ]
+    },
+    "finance_debt": {
+      "title": "Module Tài chính & Công nợ",
+      "procedures": [
+        {"name": "sp_GetARAgingDetail", "desc": "Chi tiết công nợ phải thu (AR)"},
+        {"name": "sp_GetAPAgingDetail", "desc": "Chi tiết công nợ phải trả (AP)"},
+        {"name": "sp_GetExpenses_By_Group", "desc": "Phân tích chi phí theo nhóm ngân sách"}
+      ]
+    },
+    "approval_system": {
+      "title": "Module Phê duyệt (Dành cho Mobile)",
+      "procedures": [
+        {"name": "sp_GetQuotesForApproval_Optimized", "desc": "Lấy danh sách báo giá chờ duyệt (đã tối ưu)"},
+        {"name": "sp_GetSalesOrdersForApproval_Optimized", "desc": "Lấy danh sách đơn hàng chờ duyệt"}
+      ]
+    }
+  }
+}

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Titan AI Command Center</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Playfair+Display:wght@700&family=Merriweather:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <style>
+        /* --- CORE THEME VARIABLES --- */
+        :root {
+            --primary: #4318FF; --text-color: #2B3674;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --bubble-bot: #FFFFFF; --bubble-user: #4318FF; --text-user: #FFF;
+        }
+        [data-theme="dark"] {
+            --primary: #7551FF; --text-color: #E3E8EF;
+            --glass-bg: rgba(11, 20, 55, 0.9); --glass-border: rgba(255, 255, 255, 0.1);
+            --bubble-bot: rgba(30, 41, 59, 0.8); --bubble-user: #7551FF;
+        }
+        [data-theme="adorable"] {
+            --primary: #FF6B81; --text-color: #2F3542;
+            --glass-bg: rgba(255, 255, 255, 0.92); --glass-border: #FFD1D6;
+            --bubble-bot: #FFF0F3; --bubble-user: #FF6B81;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            height: 100vh; overflow: hidden; margin: 0; color: var(--text-color);
+            background-color: #f0f2f5;
+        }
+        
+        .bg-image {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-size: cover; background-position: center; filter: blur(20px) opacity(0.6);
+            transition: background-image 0.5s;
+        }
+
+        /* --- LAYOUT --- */
+        .main-layout {
+            display: flex; height: 100%; padding: 30px; gap: 25px;
+            max-width: 1600px; margin: 0 auto;
+        }
+
+        .side-panel { width: 320px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .glass-card {
+            background: var(--glass-bg); backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            padding: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- CHAT AREA --- */
+        .chat-wrapper {
+            flex-grow: 1; display: flex; flex-direction: column;
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1); overflow: hidden;
+        }
+
+        .chat-messages {
+            flex-grow: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .message { display: flex; gap: 15px; max-width: 85%; align-items: flex-end; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        
+        .avatar {
+            width: 45px; height: 45px; border-radius: 50%; overflow: hidden;
+            background: #fff; border: 2px solid var(--primary); flex-shrink: 0;
+        }
+
+        .bubble {
+            padding: 16px 22px; border-radius: 20px; font-size: 1rem; line-height: 1.6;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: relative;
+        }
+        .message.bot .bubble { background: var(--bubble-bot); color: var(--text-color); border-bottom-left-radius: 4px; }
+        .message.user .bubble { background: var(--bubble-user); color: var(--text-user); border-bottom-right-radius: 4px; }
+        
+        /* Markdown Styles within Bubble */
+        .bubble p { margin-bottom: 0.5rem; }
+        .bubble p:last-child { margin-bottom: 0; }
+        .bubble strong { font-weight: 700; color: inherit; filter: brightness(1.2); }
+        .bubble ul { padding-left: 20px; margin-bottom: 0.5rem; }
+
+        /* --- TITAN STORY CARD (NEW CSS) --- */
+        .titan-card-wrapper {
+            background: #fff; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-top: 10px;
+            border: 1px solid rgba(0,0,0,0.05); position: relative; color: #333;
+        }
+        [data-theme="dark"] .titan-card-wrapper { background: #1e272e; color: #d2dae2; border-color: #485460; }
+
+        .titan-card-wrapper::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+        }
+
+        .titan-card-header { padding: 25px 25px 15px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .titan-card-header h3 {
+            margin: 0; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.5rem; color: #2c3e50;
+        }
+        [data-theme="dark"] .titan-card-header h3 { color: #f1f2f6; }
+
+        .titan-badge {
+            display: inline-block; background: #f1f2f6; color: #57606f;
+            font-size: 0.8rem; padding: 4px 12px; border-radius: 20px;
+            margin-top: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        [data-theme="dark"] .titan-badge { background: #485460; color: #d2dae2; }
+
+        .titan-card-img { width: 100%; height: 220px; overflow: hidden; position: relative; }
+        .titan-card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+        .titan-card-img:hover img { transform: scale(1.05); }
+
+        /* --- NÂNG CẤP GIAO DIỆN HỒI KÝ BLOGGER --- */
+        .titan-card-body {
+            padding: 35px;
+            font-family: 'Merriweather', serif; /* Font chữ có chân trang trọng */
+            line-height: 2.1; /* Khoảng cách dòng thưa giúp đọc dài không mỏi mắt */
+            font-size: 1.05rem;
+            color: #2c3e50;
+            background: #fdfdfd;
+            background-image: radial-gradient(#e5e5e5 0.5px, transparent 0.5px); /* Hiệu ứng giấy mỹ thuật */
+            background-size: 20px 20px;
+            text-align: justify;
+        }
+
+        /* Hiệu ứng Chữ cái đầu dòng to (Drop Cap) như tạp chí chuyên nghiệp */
+        .titan-card-body p:first-of-type::first-letter {
+            font-family: 'Playfair Display', serif;
+            float: left;
+            font-size: 4rem;
+            line-height: 3.5rem;
+            padding-right: 12px;
+            color: #d35400; /* Màu nhấn thương hiệu */
+            font-weight: 700;
+        }
+
+        /* Định dạng trích dẫn (Blockquote) cho các câu nói tâm đắc */
+        .titan-card-body blockquote {
+            border-left: 4px solid #FFD700;
+            padding: 15px 25px;
+            margin: 30px 0;
+            font-style: italic;
+            background: rgba(255, 215, 0, 0.05);
+            color: #57606f;
+            font-size: 1.1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Tiêu đề phụ trong bài viết */
+        .titan-card-body strong {
+            display: block;
+            margin-top: 25px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: #2c3e50;
+        }
+        /* Style cho Tags trong Story */
+        .titan-tag { color: #d35400; font-weight: 700; cursor: pointer; }
+        .titan-tag:hover { text-decoration: underline; }
+
+        /* --- INPUT AREA --- */
+        .input-area { padding: 20px 30px; display: flex; gap: 15px; align-items: center; border-top: 1px solid var(--glass-border); }
+        .chat-input {
+            flex-grow: 1; border: 2px solid var(--glass-border); background: rgba(255,255,255,0.4);
+            border-radius: 30px; padding: 15px 25px; color: var(--text-color); outline: none; transition: 0.3s;
+        }
+        .chat-input:focus { border-color: var(--primary); background: #fff; }
+        .btn-send {
+            width: 55px; height: 55px; border-radius: 50%; border: none;
+            background: var(--primary); color: white; font-size: 1.2rem; cursor: pointer; 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-send:hover { transform: scale(1.1); }
+        .btn-send:disabled { background: #ccc; transform: none; }
+
+        /* --- UTILS --- */
+        .theme-btn {
+            width: 100%; padding: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.2);
+            border-radius: 12px; color: var(--text-color); cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600;
+        }
+        .theme-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        
+        #wandering-pet { position: fixed; width: 120px; z-index: 999; cursor: pointer; display: none; }
+        [x-cloak] { display: none !important; }
+
+        
+    </style>
+</head>
+
+<body x-data="chatApp()" x-init="initApp()">
+
+    <div class="bg-image" :style="`background-image: url('https://picsum.photos/1920/1080?random=${bgRandom}')`"></div>
+
+    <div class="main-layout">
+        
+        <div class="side-panel d-none d-xl-flex">
+            <div class="glass-card">
+                <h5 class="fw-bold mb-3"><i class="fas fa-bolt text-warning me-2"></i>Truy cập nhanh</h5>
+                <template x-for="action in quickActions">
+                    <button class="theme-btn mb-2" style="justify-content: flex-start; text-align: left;" 
+                            @click="setInput(action.text)">
+                        <i :class="action.icon" class="me-2"></i> <span x-text="action.label"></span>
+                    </button>
+                </template>
+            </div>
+
+            <div class="glass-card">
+                <h6 class="fw-bold text-center mb-3 opacity-75">Giao diện</h6>
+                <div class="d-grid gap-2 grid-cols-2" style="grid-template-columns: 1fr 1fr; display: grid;">
+                    <button class="theme-btn" :class="{ 'active': theme === 'light' }" @click="setTheme('light')"><i class="fas fa-sun"></i> Business</button>
+                    <button class="theme-btn" :class="{ 'active': theme === 'dark' }" @click="setTheme('dark')"><i class="fas fa-moon"></i> Dark</button>
+                    <button class="theme-btn" :class="{ 'active': theme === 'adorable' }" @click="setTheme('adorable')"><i class="fas fa-heart"></i> Gen Z</button>
+                    <button class="theme-btn" :class="{ 'active': theme === 'fantasy' }" @click="setTheme('fantasy')"><i class="fas fa-dragon"></i> Sci-Fi</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-wrapper">
+            <div class="d-flex align-items-center p-3 border-bottom" style="background: rgba(255,255,255,0.3)">
+                <div class="avatar p-1 me-3">
+                    <lottie-player :src="petUrl" background="transparent" speed="1" loop autoplay></lottie-player>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold">Titan AI Assistant</h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success bg-opacity-75">Online</span>
+                        <small class="opacity-75" x-text="statusText"></small>
+                    </div>
+                </div>
+                <button class="btn btn-sm ms-auto text-secondary" onclick="window.close()"><i class="fas fa-times fs-4"></i></button>
+            </div>
+
+            <div class="chat-messages" id="chat-box">
+                <template x-for="msg in messages" :key="msg.id">
+                    <div class="message" :class="msg.sender">
+                        
+                        <template x-if="msg.sender === 'bot'">
+                            <div class="avatar p-1">
+                                <lottie-player :src="petUrl" speed="1" style="width:100%;height:100%" loop autoplay></lottie-player>
+                            </div>
+                        </template>
+
+                        <div class="bubble">
+                            <div x-html="renderMessage(msg.text)"></div>
+                            <small class="opacity-50 d-block text-end mt-1" style="font-size: 0.7rem" x-text="msg.time"></small>
+                        </div>
+
+                        <template x-if="msg.sender === 'user'">
+                            <div class="avatar">
+                                <img src="{{ user_context.stats.AvatarUrl if user_context.stats and user_context.stats.AvatarUrl else 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }}" 
+                                     style="width:100%;height:100%;object-fit:cover">
+                            </div>
+                        </template>
+
+                    </div>
+                </template>
+
+                <div x-show="isLoading" class="message bot" x-transition>
+                    <div class="avatar p-1">
+                        <lottie-player :src="petUrl" speed="1" style="width:100%;height:100%" loop autoplay></lottie-player>
+                    </div>
+                    <div class="bubble text-muted fst-italic">
+                        <i class="fas fa-pen-nib fa-bounce me-2"></i>Titan đang soạn tin...
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" class="chat-input" placeholder="Hỏi Titan bất cứ điều gì..." 
+                       x-model="userInput" @keydown.enter="sendMessage()" autofocus>
+                <button class="btn-send" @click="sendMessage()" :disabled="isLoading || !userInput.trim()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="side-panel d-none d-xxl-flex">
+            <div class="glass-card text-center">
+                <div class="mx-auto mb-3" style="width: 100px; height: 100px; position: relative;">
+                    <img src="{{ user_context.stats.AvatarUrl if user_context.stats and user_context.stats.AvatarUrl else 'https://cdn-icons-png.flaticon.com/512/149/149071.png' }}" 
+                         class="rounded-circle border border-3 border-primary shadow" style="width:100%;height:100%;object-fit:cover">
+                </div>
+                <h5 class="fw-bold">{{ user_context.shortname or 'Sếp' }}</h5>
+                <span class="badge bg-warning text-dark mb-3">LV.{{ user_context.stats.Level }}</span>
+                
+                <div class="d-flex justify-content-between px-3 mt-3 border-top pt-3">
+                    <span class="text-muted">Tin nhắn</span>
+                    <strong x-text="messages.length"></strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="wandering-pet" x-show="showPet" x-transition.duration.500ms @click="petInteract()">
+        <lottie-player :src="petUrl" speed="1" style="width:100%;height:100%" loop autoplay></lottie-player>
+    </div>
+
+    <script>
+        function chatApp() {
+            return {
+                theme: localStorage.getItem('titan_theme') || 'light',
+                messages: [],
+                userInput: '',
+                isLoading: false,
+                bgRandom: new Date().getTime(),
+                statusText: 'Sẵn sàng',
+                showPet: false,
+                petUrl: "{{ url_for('static', filename='assets/json/') }}" + "{{ user_context.stats.EquippedPet if user_context.stats and user_context.stats.EquippedPet else 'fox' }}" + ".json",
+                
+                quickActions: [
+                    { text: 'Giá mã 6205 cho khách Kraft?', label: 'Tra giá 6205 Kraft', icon: 'fas fa-tag text-primary' },
+                    { text: 'Đơn hàng Tanamaz giao chưa?', label: 'Check giao hàng Tanamaz', icon: 'fas fa-shipping-fast text-success' },
+                    { text: 'Kể về Sếp Đông chủ đề Lãnh đạo', label: 'Hồ sơ Titan: Sếp Đông', icon: 'fas fa-book-open text-warning' }
+                ],
+
+                initApp() {
+                    this.setTheme(this.theme);
+                    setTimeout(() => {
+                        this.addMsg('bot', "Chào Sếp! Em đã sẵn sàng nhận lệnh. Hôm nay Sếp cần kiểm tra gì không ạ? 🦊");
+                    }, 500);
+                    
+                    this.schedulePet();
+                },
+
+                setTheme(val) {
+                    this.theme = val;
+                    document.documentElement.setAttribute('data-theme', val);
+                    localStorage.setItem('titan_theme', val);
+                },
+
+                setInput(text) {
+                    this.userInput = text;
+                },
+
+                addMsg(sender, text) {
+                    this.messages.push({
+                        id: Date.now(),
+                        sender: sender,
+                        text: text,
+                        time: new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})
+                    });
+                    this.$nextTick(() => {
+                        const box = document.getElementById('chat-box');
+                        box.scrollTop = box.scrollHeight;
+                    });
+                },
+
+                renderMessage(rawText) {
+                    // Nếu text chứa HTML card (bắt đầu bằng <div class="titan-card...), trả về luôn
+                    if (rawText.trim().startsWith('<div class="titan-card')) {
+                        return rawText;
+                    }
+                    // Ngược lại parse Markdown
+                    return marked.parse(rawText);
+                },
+
+                async sendMessage() {
+                    const text = this.userInput.trim();
+                    if (!text) return;
+                    
+                    this.addMsg('user', text);
+                    this.userInput = '';
+                    this.isLoading = true;
+                    this.statusText = 'Đang suy nghĩ...';
+
+                    try {
+                        const res = await fetch('/api/chatbot_query', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ message: text, theme: this.theme })
+                        });
+                        const data = await res.json();
+                        
+                        this.addMsg('bot', data.response);
+                    } catch (e) {
+                        this.addMsg('bot', "❌ Mất kết nối server. Sếp thử lại nhé!");
+                    } finally {
+                        this.isLoading = false;
+                        this.statusText = 'Online';
+                    }
+                },
+
+                // Pet Logic
+                schedulePet() {
+                    const randomTime = Math.random() * (300000 - 60000) + 60000;
+                    setTimeout(() => {
+                        this.showPet = true;
+                        const petEl = document.getElementById('wandering-pet');
+                        petEl.style.left = Math.random() * (window.innerWidth - 150) + 'px';
+                        petEl.style.bottom = '-150px';
+                        petEl.style.display = 'block';
+                        
+                        // Simple animation logic would go here or use CSS classes
+                        setTimeout(() => this.showPet = false, 15000);
+                        this.schedulePet();
+                    }, randomTime);
+                },
+                
+                petInteract() {
+                    this.showPet = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Dự báo Dự phòng Khách hàng | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* MAIN PANELS */
+    .master-panel, .detail-panel { 
+        height: 75vh; display: flex; flex-direction: column; 
+        background: var(--card-bg); border-radius: 16px;
+        box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid var(--border-color);
+    }
+    .master-table-container, .detail-table-container { flex-grow: 1; overflow-y: auto; }
+
+    .card-header-custom {
+        background-color: var(--card-bg); color: var(--text-dark);
+        font-weight: 700; font-size: 1.1rem; padding: 20px 25px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex; align-items: center;
+    }
+    .card-header-custom i { font-size: 1.1rem; margin-right: 12px; color: var(--primary); }
+    .card-body-custom { padding: 25px; background-color: var(--card-bg); }
+
+    /* FORMS */
+    .form-control, .form-select {
+        border: 1px solid var(--border-color); background-color: var(--input-bg); border-radius: 12px;
+        padding: 10px 15px; font-size: 0.95rem; color: var(--text-dark); box-shadow: none;
+    }
+    .form-control:focus { background-color: var(--card-bg); box-shadow: 0 0 0 2px var(--primary); }
+    
+    .btn-primary { background-color: var(--primary); border: none; border-radius: 12px; font-weight: 600; padding: 10px 20px; }
+    .btn-primary:hover { background-color: var(--primary-dark); }
+    
+    /* Dropdown search */
+    .search-container { position: relative; }
+    .search-results-dropdown { 
+        width: 100%; border-radius: 12px; border: 1px solid var(--primary);
+        outline: none; display: none; position: absolute;
+        z-index: 1000; margin-top: 5px; background: var(--card-bg);
+        box-shadow: var(--shadow-md); color: var(--text-dark);
+    }
+
+    /* TABLES */
+    .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .data-table th { 
+        background-color: var(--input-bg) !important; color: var(--secondary) !important;
+        padding: 15px 10px; font-weight: 600; font-size: 0.85rem; text-transform: uppercase;
+        border-bottom: 2px solid var(--border-color); position: sticky; top: 0; z-index: 5;
+        text-align: center;
+    }
+    .data-table td { 
+        padding: 12px 10px; border-bottom: 1px solid var(--border-color); 
+        font-size: 0.9rem; color: var(--text-dark); vertical-align: middle;
+    }
+    .data-table tbody tr:hover { background-color: var(--input-bg); cursor: pointer; }
+    
+    /* Selected Row */
+    tr.master-row.selected td { 
+        background-color: rgba(67, 24, 255, 0.1) !important; 
+        font-weight: 700; color: var(--primary);
+        border-top: 1px solid var(--primary);
+        border-bottom: 1px solid var(--primary);
+    }
+    
+    /* KPI Boxes (Detail) */
+    .kpi-box {
+        border-radius: 12px; padding: 15px; text-align: center; height: 100%;
+        display: flex; flex-direction: column; justify-content: center;
+        border: 1px solid transparent;
+    }
+    .kpi-box .small { text-transform: uppercase; font-size: 0.75rem; margin-bottom: 5px; opacity: 0.8; font-weight: 600; }
+    .kpi-box h4 { font-weight: 800; margin: 0; font-size: 1.2rem; }
+    
+    .bg-danger-custom { background-color: rgba(227, 26, 26, 0.1); color: var(--danger); border-color: rgba(227, 26, 26, 0.2); }
+    .bg-success-custom { background-color: rgba(5, 205, 153, 0.1); color: var(--success); border-color: rgba(5, 205, 153, 0.2); }
+    .bg-warning-custom { background-color: rgba(255, 181, 71, 0.1); color: #B71C1C; border-color: rgba(255, 181, 71, 0.2); }
+    .bg-light-custom { background-color: var(--input-bg); color: var(--text-dark); border-color: var(--border-color); }
+
+    .deficit-col { color: var(--danger); font-weight: 700; }
+    .surplus-col { color: var(--success); font-weight: 600; }
+    .text-start { text-align: left !important; }
+    .text-end { text-align: right !important; }
+</style>
+{% endblock %}
+
+{% block page_title %}<i class="fas fa-user-clock me-2 text-success"></i> DỰ BÁO DỰ PHÒNG KHÁCH HÀNG{% endblock %}
+{% block page_sub %}Phân tích nhu cầu tái đặt hàng (ROP) theo từng khách.{% endblock %}
+
+{% block header_actions %}
+<a href="/" class="btn btn-back"><i class="fas fa-home me-2"></i>Portal</a>
+{% endblock %}
+
+{% block content %}
+    <div class="main-card mb-4" style="background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color);">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-8 search-container"> 
+                <label class="form-label fw-bold">Chọn Khách hàng (VMS, Acecook...)</label>
+                <input type="text" id="kh_search_input" placeholder="Gõ Mã/Tên Khách hàng..." class="form-control">
+                <input type="hidden" id="kh_ma_selected">
+                <select id="kh_search_results" class="form-select search-results-dropdown" size="5"></select>
+                <small id="kh_status" class="form-text text-muted mt-2 ms-1">Hiển thị Top 20 mã hàng (Recurring).</small>
+            </div>
+            <div class="col-md-4"> 
+                <button class="btn btn-primary w-100" id="searchBtn">
+                    <i class="fas fa-search me-2"></i> Tra cứu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="master-panel">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-list-ul"></i> <span id="masterCardHeader">Danh sách Nhóm hàng</span></span>
+                </div>
+                <div class="master-table-container">
+                    <table class="data-table">
+                        <thead class="text-center">
+                            <tr>
+                                <th class="text-start">Nhóm Hàng</th>
+                                <th class="text-end">Thiếu/Dư (KH)</th>
+                                <th class="text-end">ROP</th>
+                                <th class="text-end">Tồn-BO (Chung)</th>
+                                <th class="text-end">Tiêu hao (Tháng)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted p-5">
+                                    <i class="fas fa-search fa-3x mb-3 opacity-25"></i><br>
+                                    Vui lòng chọn khách hàng và nhấn "Tra cứu".
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="detail-panel">
+                <div class="card-header-custom">
+                    <span><i class="fas fa-info-circle"></i> <span id="detailCardHeader">Chi tiết Nhóm hàng</span></span>
+                </div>
+                <div class="card-body-custom d-flex flex-column h-100 p-3">
+                    <div id="detail-summary" class="row g-3 mb-3"></div>
+                    <div id="detail-table" class="detail-table-container">
+                        <p class="text-center text-muted p-5">Vui lòng chọn một Nhóm hàng bên trái.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function formatCurrency(num) {
+            let numValue = parseFloat(num);
+            if (isNaN(numValue)) { numValue = 0; }
+            return new Intl.NumberFormat('vi-VN').format(numValue);
+        }
+
+        function debounce(func, timeout = 300) {
+            let timer;
+            return (...args) => { clearTimeout(timer); timer = setTimeout(() => { func.apply(this, args); }, timeout); };
+        }
+
+        function timKhachHang() {
+            const term = $('#kh_search_input').val().trim();
+            const statusMsg = $('#kh_status');
+            const resultsDropdown = $('#kh_search_results');
+            
+            resultsDropdown.hide().empty();
+            $('#kh_ma_selected').val('');
+            
+            if (term.length < 2) { statusMsg.text('Nhập ít nhất 2 ký tự.'); return; }
+            statusMsg.text('Đang tìm kiếm...');
+            
+            fetch(`/sales/api/khachhang/${term}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        data.forEach(kh => {
+                            const option = `<option value="${kh.ID}" data-fullname="${kh.FullName}">${kh.ID} - ${kh.FullName}</option>`;
+                            resultsDropdown.append(option);
+                        });
+                        resultsDropdown.show().attr('size', Math.max(Math.min(data.length, 5), 2)); 
+                        statusMsg.html(`Tìm thấy ${data.length} kết quả. Vui lòng chọn.`);
+                    } else {
+                        statusMsg.text('Không tìm thấy kết quả nào.');
+                    }
+                })
+                .catch(error => { statusMsg.text(`Lỗi tra cứu: ${error.message}`); });
+        }
+
+        $('#kh_search_results').on('change', function() {
+            const selectedOption = $('#kh_search_results').find('option:selected');
+            if (selectedOption.length) {
+                const id = selectedOption.val();
+                const fullName = selectedOption.data('fullname');
+                const displayText = id + ' - ' + fullName;
+                
+                $('#kh_search_results').hide();
+                $('#kh_ma_selected').val(id); 
+                $('#kh_search_input').val(displayText); 
+                $('#kh_status').html('<span class="text-success fw-bold"><i class="fas fa-check-circle"></i> Khách hàng đã được chọn.</span>');
+                
+                $('#searchBtn').click(); 
+            }
+        });
+
+        let lastSelectedRow_Cust = null;
+
+        function loadCustomerReplenishmentDetails(selectedRow, groupCode, luongThieuDu, rop_kh_goc, tongDuPhong) {
+            if (lastSelectedRow_Cust) { $(lastSelectedRow_Cust).removeClass('selected'); }
+            $(selectedRow).addClass('selected');
+            lastSelectedRow_Cust = selectedRow;
+
+            const header = $('#detailCardHeader');
+            const summaryDiv = $('#detail-summary');
+            const tableDiv = $('#detail-table');
+            
+            header.text(`Chi tiết Nhóm: ${groupCode}`);
+
+            const deficitClass = luongThieuDu > 0 ? 'bg-danger-custom' : 'bg-success-custom';
+            summaryDiv.html(`
+                <div class="col-md-4">
+                    <div class="kpi-box ${deficitClass}">
+                        <div class="small">Lượng Thiếu/Dư (KH)</div>
+                        <h4>${formatCurrency(luongThieuDu)}</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="kpi-box bg-warning-custom">
+                        <div class="small">Điểm tái đặt (ROP)</div>
+                        <h4>${formatCurrency(rop_kh_goc)}</h4>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="kpi-box bg-light-custom">
+                        <div class="small">Tổng Tồn-BO (Chung)</div>
+                        <h4>${formatCurrency(tongDuPhong)}</h4>
+                    </div>
+                </div>
+            `);
+            
+            tableDiv.html('<p class="text-center mt-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i> Đang tải chi tiết...</p>');
+
+            fetch(`/sales/api/replenishment_details/${encodeURIComponent(groupCode)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Không thể tải dữ liệu.');
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || !Array.isArray(data) || data.length === 0) {
+                        tableDiv.html('<p class="alert alert-info text-center m-3">Không tìm thấy mã hàng chi tiết.</p>');
+                        return;
+                    }
+
+                    let tableHtml = '<table class="data-table">';
+                    tableHtml += '<thead><tr>';
+                    tableHtml += '<th class="text-start">Mã Hàng</th>';
+                    tableHtml += '<th class="text-start">Tên Hàng</th>';
+                    tableHtml += '<th class="text-end">Tồn Kho</th>';
+                    tableHtml += '<th class="text-end">Hàng Về</th>';
+                    tableHtml += '</tr></thead><tbody>';
+
+                    data.forEach(item => {
+                        tableHtml += `<tr>
+                                        <td class="text-start fw-bold text-primary">${item.InventoryID}</td>
+                                        <td class="text-start">${item.InventoryName}</td>
+                                        <td class="text-end">${formatCurrency(item.TonKhoHienTai)}</td>
+                                        <td class="text-end text-secondary">${formatCurrency(item.HangDangVe)}</td>
+                                    </tr>`;
+                    });
+
+                    tableHtml += '</tbody></table>';
+                    tableDiv.html(tableHtml);
+                })
+                .catch(error => {
+                    tableDiv.html(`<p class="alert alert-danger text-center m-3">Lỗi: ${error.message}</p>`);
+                });
+        }
+
+        $(document).ready(function() {
+            $('#kh_search_input').on('input', debounce(timKhachHang, 300));
+
+            $('#searchBtn').on('click', function() {
+                const customerId = $('#kh_ma_selected').val();
+                if (!customerId) { alert('Vui lòng chọn một khách hàng hợp lệ.'); return; }
+
+                const button = $(this);
+                const resultBody = $('#resultBody');
+                const detailPanel = $('.detail-panel'); 
+
+                button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang tra cứu...');
+                resultBody.html('<tr><td colspan="5" class="text-center text-muted p-5">Đang tải dữ liệu...</td></tr>');
+                detailPanel.find('#detail-summary').empty();
+                detailPanel.find('#detail-table').html('<p class="text-center text-muted p-5">Vui lòng chọn một Nhóm hàng bên trái.</p>');
+                detailPanel.find('#detailCardHeader').text('Chi tiết Nhóm hàng');
+                lastSelectedRow_Cust = null; 
+
+                fetch(`/sales/api/customer_replenishment/${customerId}`) 
+                    .then(response => {
+                        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu từ server.');
+                        return response.json();
+                    })
+                    .then(data => {
+                        resultBody.empty();
+                        if (!data || data.length === 0) {
+                            resultBody.html('<tr><td colspan="5" class="text-center text-success p-5">Khách hàng này không có mã hàng nào cần dự phòng.</td></tr>');
+                            return;
+                        }
+
+                        data.forEach(item => {
+                            const isAlert = item.LuongThieuDu > 0;
+                            const deficit = parseFloat(item.LuongThieuDu) || 0;
+                            const rop_kh = parseFloat(item.DiemTaiDatROP) || 0;
+                            const duphong = parseFloat(item.TonBO) || 0;
+                            const sv_kh = parseFloat(item.TieuHaoThang) || 0;
+                            const rop_goc = parseFloat(item.NhuCauTrongLeadTime_Goc) || 0;
+                            const tongduphong_goc = parseFloat(item.TongDuPhong) || 0;
+                            
+                            const rowHtml = `
+                                <tr class="master-row" onclick="loadCustomerReplenishmentDetails(this, '${item.NhomHang}', ${deficit}, ${rop_goc}, ${tongduphong_goc})">
+                                    <td class="text-start fw-bold">${item.NhomHang}</td>
+                                    <td class="text-end fw-bold ${isAlert ? 'deficit-col' : 'surplus-col'}">${deficit.toFixed(0)}</td>
+                                    <td class="text-end">${rop_kh.toFixed(0)}</td>
+                                    <td class="text-end text-secondary">${duphong.toFixed(0)}</td>
+                                    <td class="text-end small">${sv_kh.toFixed(2)}</td>
+                                </tr>
+                            `;
+                            resultBody.append(rowHtml);
+                        });
+                    })
+                    .catch(error => {
+                        resultBody.html(`<tr><td colspan="5" class="text-center text-danger p-5">Lỗi: ${error.message}</td></tr>`);
+                    })
+                    .finally(() => {
+                        button.prop('disabled', false).html('<i class="fas fa-search me-2"></i> Tra cứu');
+                    });
+            });
+        });
+    </script>
+{% endblock %}

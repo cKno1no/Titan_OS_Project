@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Tra Cứu Bán Hàng | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- CUSTOM LAYOUT & THEME --- */
+    .main-card {
+        border: none; background: var(--card-bg); border-radius: var(--card-radius);
+        box-shadow: var(--shadow-sm); margin-bottom: 20px; overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    .card-header-custom {
+        background-color: var(--card-bg); color: var(--text-dark); font-weight: 700; font-size: 1.1rem;
+        padding: 20px 25px; border-bottom: 1px solid var(--border-color);
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .card-header-custom i { font-size: 1.1rem; margin-right: 12px; color: var(--primary); }
+    .card-body-custom { padding: 25px; background-color: var(--card-bg); }
+
+    /* Result Headers */
+    .card-header-custom.result-header { background-color: var(--input-bg); color: var(--primary); }
+    .card-header-custom.result-header i { color: var(--primary); }
+    .card-header-custom.result-header-2 i { color: var(--success); }
+    .card-header-custom.result-header-3 i { color: var(--warning); }
+
+    /* Inputs & Buttons */
+    .form-label { font-weight: 600; color: var(--text-dark); font-size: 0.9rem; margin-bottom: 8px; }
+    .form-control, .form-select {
+        border: 1px solid var(--border-color); background-color: var(--input-bg); border-radius: 16px;
+        padding: 12px 15px; font-size: 0.95rem; color: var(--text-dark); box-shadow: none; height: 48px;
+    }
+    .form-control:focus, .form-select:focus { background-color: var(--card-bg); border-color: var(--primary); }
+
+    .btn-action { padding: 12px 20px; border-radius: 16px; font-weight: 600; border: none; height: 48px; transition: all 0.2s; }
+    .btn-lookup-custom { background-color: var(--primary); color: white; }
+    .btn-lookup-custom:hover { background-color: var(--primary-dark); }
+    .btn-quick-lookup { background-color: var(--warning); color: #000; }
+    .btn-quick-lookup:hover { background-color: #ffc44f; }
+    
+    .button-column-fix { padding-top: 32px; }
+
+    /* Tables */
+    .data-table { width: 100% !important; border-collapse: collapse !important; margin-top: 10px; }
+    .data-table th { 
+        background-color: var(--input-bg) !important; color: var(--secondary) !important;
+        padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border-color); 
+        font-weight: 600; font-size: 0.85rem; text-transform: uppercase;
+    }
+    .data-table td { 
+        padding: 12px 10px; border-bottom: 1px solid var(--border-color); 
+        font-size: 0.95rem; color: var(--text-dark);
+    }
+    .data-table tbody tr:hover { background-color: var(--input-bg); }
+    
+    /* History Table */
+    .history-table { width: 100%; margin-top: 10px; font-size: 0.8rem; }
+    .history-table th { 
+        background-color: var(--input-bg); color: var(--primary); 
+        padding: 8px; text-align: center; border: 1px solid var(--border-color); 
+        white-space: nowrap; font-size: 0.8rem;
+    }
+    .history-table td { padding: 6px; border: 1px solid var(--border-color); text-align: center; white-space: nowrap; color: var(--text-dark); }
+    
+    /* Search Dropdown */
+    .search-results-dropdown { 
+        width: 100%; border-radius: 12px; border: 1px solid var(--primary);
+        position: absolute; z-index: 1000; margin-top: 5px; background: var(--card-bg);
+        box-shadow: var(--shadow-md); display: none;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .button-column-fix { padding-top: 0 !important; margin-top: 10px; }
+        .btn-action { width: 100%; }
+        .table-responsive { overflow-x: auto; }
+        .data-table th, .data-table td { white-space: nowrap; padding: 10px 5px; }
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}Tra Cứu Thông Tin Bán Hàng{% endblock %}
+{% block page_sub %}Tra cứu giá, tồn kho và lịch sử giao dịch.{% endblock %}
+
+{% block header_actions %}
+<a href="/" class="btn btn-back"><i class="fas fa-home me-2"></i>Portal</a>
+{% endblock %}
+
+{% block content %}
+    <div class="main-card" id="lookup-card">
+        <div class="card-header-custom">
+            <span><i class="fas fa-search"></i> Thông tin Tra cứu</span>
+        </div>
+        <div class="card-body-custom">
+            <form method="POST" action="{{ url_for('lookup_bp.sales_lookup_dashboard') }}" class="row g-3">
+                
+                <div class="col-md-4">
+                    <label class="form-label">Tìm theo Mã/Tên Mặt hàng</label>
+                    <input type="text" id="item_search_input" name="item_search" 
+                           placeholder="Gõ Mã/Tên (VD: 23152, 6220)" class="form-control"
+                           value="{{ item_search | default('') }}">
+                    <small class="form-text text-muted mt-2 d-block">Ngăn cách bằng dấu phẩy (,).</small>
+                </div>
+
+                <div class="col-md-5 search-container">
+                    <label class="form-label">Tìm theo Mã/Tên Khách hàng (Tùy chọn)</label>
+                    <input type="text" id="kh_search_input" 
+                           placeholder="Gõ Mã/Tên Khách hàng..." class="form-control"
+                           value="{{ object_id_display | default('') }}">
+                    <small id="kh_status" class="form-text text-muted mt-2 d-block">Để trống nếu muốn xem giá chung.</small>
+
+                    <input type="hidden" name="object_id" id="kh_ma_selected" value="{{ object_id | default('') }}">
+                    <input type="hidden" name="object_id_display" id="kh_display_selected" value="{{ object_id_display | default('') }}">
+                    <select id="kh_search_results" class="form-select search-results-dropdown" size="5" onchange="chonKhachHang()"></select>
+                </div>
+                
+                <div class="col-md-3 button-column-fix">
+                    <div class="d-flex w-100 gap-2">
+                        <button type="button" class="btn-action btn-quick-lookup w-50" id="quickLookupBtn" title="Tra nhanh Tồn">
+                            <i class="fas fa-bolt"></i> Tra nhanh
+                        </button>
+                        <button type="submit" class="btn-action btn-lookup-custom w-50">
+                            <i class="fas fa-search"></i> Tra cứu
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="main-card" id="block1-container" {% if not results.block1 %}style="display: none;"{% endif %}>
+        <div class="card-header-custom result-header">
+            <div>
+                <i class="fas fa-warehouse"></i>
+                <span>1. Tồn kho và Giá (Khớp với '{{ item_search }}')</span>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="toggleTonKho">
+                <label class="form-check-label small fw-bold" for="toggleTonKho">Tồn > 0</label>
+            </div>
+        </div>
+        <div class="card-body-custom">
+            <div id="block1-filter-toolbar" class="mb-3"></div>
+            
+            <div class="table-responsive">
+                <table id="block1-table" class="data-table table table-hover">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Mã hàng</th>
+                            <th class="text-start">Tên hàng</th>
+                            <th class="text-end">Tồn kho</th>
+                            <th class="text-end">Back Order</th>
+                            <th class="text-end">Giá Bán QĐ</th>
+                            <th class="text-end">Giá Bán (HĐ)</th>
+                            <th class="text-end">Giá Chào (BG)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results.block1 %}
+                        <tr style="cursor: pointer;" onclick="showBackorderModal('{{ item.InventoryID }}', {{ item.InventoryName | tojson }})">
+                            <td class="text-start text-primary fw-bold">{{ item.InventoryID }}</td>
+                            <td class="text-start text-wrap" style="max-width: 300px;">{{ item.InventoryName }}</td>
+                            
+                            <td class="text-end fw-bold">{{ item.Ton | format_number }}</td>
+                            <td class="text-end text-danger">{{ item.BackOrder | format_number }}</td>
+                            
+                            <td class="text-end text-success fw-bold">{{ item.GiaBanQuyDinh | format_number }}</td>
+                            <td class="text-end">{{ item.GiaBanGanNhat_HD | format_number }}</td>
+                            <td class="text-end">{{ item.GiaChaoGanNhat_BG | format_number }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+        
+    {% if show_block_2 and results.block2 %}
+    <div class="main-card" id="block2-container">
+        <div class="card-header-custom result-header result-header-2">
+            <span><i class="fas fa-shipping-fast"></i> 2. Lịch sử ĐH Bán, Xuất kho & Hóa đơn (Top 20)</span>
+        </div>
+        <div class="card-body-custom" style="padding: 10px 15px;">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="history-table table table-sm table-bordered">
+                    <thead>
+                        <tr style="background-color: var(--input-bg);">
+                            <th colspan="4" class="text-center" style="color: var(--primary);">Đơn Hàng Bán</th>
+                            <th colspan="3" class="text-center" style="color: var(--success);">Phiếu Xuất Kho</th>
+                            <th colspan="3" class="text-center" style="color: var(--warning);">Hóa Đơn</th>
+                        </tr>
+                        <tr>
+                            <th>Số ĐH</th>
+                            <th>Ngày ĐH</th>
+                            <th class="text-end">SL</th>
+                            <th class="text-end">Giá</th>
+                            <th>Số PXK</th>
+                            <th>Ngày PXK</th>
+                            <th class="text-end">SL Xuất</th>
+                            <th>Số HĐ</th>
+                            <th>Ngày HĐ</th>
+                            <th class="text-end">SL HĐ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for history in results.block2 %}
+                        <tr>
+                            <td class="text-nowrap">{{ history.VoucherNo | default('—') }}</td>
+                            <td>{{ history.OrderDate | format_date }}</td>
+                            <td class="text-end">{{ history.OrderQuantity | format_number }}</td>
+                            <td class="text-end">{{ history.SalePrice | format_number }}</td>
+                            
+                            <td class="text-start">{{ history.SoPXK | default('—') }}</td>
+                            <td>{{ history.NgayPXK | format_date }}</td>
+                            <td class="text-end">{{ history.SL_PXK | format_number }}</td>
+                            
+                            <td class="text-start">{{ history.SoHoaDon | default('—') }}</td>
+                            <td>{{ history.NgayHĐ | format_date }}</td>
+                            <td class="text-end">{{ history.SL_HoaDon | format_number }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if show_block_3 and results.block3 %}
+    <div class="main-card" id="block3-container">
+        <div class="card-header-custom result-header result-header-3">
+            <span><i class="fas fa-truck-loading"></i> 3. Lịch sử Đơn hàng Mua (PO) & Phiếu Nhập (Top 20)</span>
+        </div>
+        <div class="card-body-custom" style="padding: 10px 15px;">
+            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                <table class="history-table table table-sm table-bordered">
+                    <thead>
+                        <tr style="background-color: var(--input-bg);">
+                            <th colspan="4" class="text-center" style="color: var(--primary);">Tham chiếu ĐH Bán</th>
+                            <th colspan="3" class="text-center" style="color: var(--warning);">Đơn Hàng Mua (PO)</th>
+                            <th colspan="3" class="text-center" style="color: var(--success);">Phiếu Nhập Kho</th>
+                        </tr>
+                        <tr>
+                            <th>Số ĐH</th>
+                            <th>Ngày ĐH</th>
+                            <th class="text-end">SL</th>
+                            <th class="text-end">Giá</th>
+                            <th>Số PO</th>
+                            <th>Ngày PO</th>
+                            <th class="text-end">SL PO</th>
+                            <th>Số PN</th>
+                            <th>Ngày PN</th>
+                            <th class="text-end">SL PN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for history in results.block3 %}
+                        <tr>
+                            <td class="text-nowrap">{{ history.VoucherNo | default('—') }}</td>
+                            <td>{{ history.OrderDate | format_date }}</td>
+                            <td class="text-end">{{ history.OrderQuantity | format_number }}</td>
+                            <td class="text-end">{{ history.SalePrice | format_number }}</td>
+                            
+                            <td class="text-start">{{ history.SoPO | default('—') }}</td>
+                            <td>{{ history.NgayPO | format_date }}</td>
+                            <td class="text-end">{{ history.SL_PO | format_number }}</td>
+                            
+                            <td class="text-start">{{ history.SoPN | default('—') }}</td>
+                            <td>{{ history.NgayPN | format_date }}</td>
+                            <td class="text-end">{{ history.SL_PN | format_number }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if request.method == 'POST' and (not results.block1 and not results.block2 and not results.block3) %}
+         <p class="alert alert-warning rounded-4 mt-3 text-center">Không tìm thấy dữ liệu phù hợp.</p>
+    {% endif %}
+
+    <div class="modal fade" id="backorderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background: var(--card-bg);">
+                <div class="modal-header" style="background: var(--primary); color: white;">
+                    <h5 class="modal-title" id="backorderModalTitle">Chi tiết BackOrder</h5> 
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="backorderModalBody">
+                    <p class="text-center"><i class="fas fa-spinner fa-spin me-2"></i> Đang tải...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.11.5/datatables.min.js"></script>
+    <script src="{{ url_for('static', filename='js/sales_lookup.js') }}"></script>
+{% endblock %}

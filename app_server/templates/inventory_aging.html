@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Phân tích Tồn kho (Chuẩn Profit Dashboard){% endblock %}
+
+{% block extra_css %}
+<style>
+    /* TABLE STYLING GIỐNG PROFIT DASHBOARD */
+    .table-custom { table-layout: fixed; width: 100%; border-collapse: separate; border-spacing: 0; }
+    
+    /* Header cố định */
+    .table-custom thead th {
+        background-color: var(--input-bg); color: var(--secondary);
+        font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+        padding: 12px 8px; border-bottom: 2px solid var(--border-color);
+        position: sticky; top: 0; z-index: 10;
+        vertical-align: middle;
+    }
+
+    /* Master Row (Dòng nhóm) */
+    .row-master { background-color: white; cursor: pointer; transition: background 0.2s; }
+    .row-master:hover { background-color: #F8F9FA; }
+    .row-master td { border-bottom: 1px solid #eee; padding: 12px 8px; vertical-align: middle; font-weight: 600; }
+    
+    /* Hiệu ứng khi mở */
+    .row-master.expanded { background-color: #F4F7FE; border-left: 3px solid var(--primary); }
+    .row-master.expanded td { color: var(--primary-dark); }
+
+    /* Detail Row (Dòng chi tiết) */
+    .row-detail { background-color: #FAFBFF; animation: slideDown 0.2s ease-out; }
+    .row-detail td { 
+        border-bottom: 1px dashed #E0E0E0; padding: 8px 8px; 
+        font-size: 0.85rem; color: #555; vertical-align: middle; 
+    }
+    
+    /* Utility */
+    .rotate-90 { transform: rotate(90deg); transition: transform 0.2s; }
+    .text-purple { color: #9C27B0; }
+    
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid" x-data="inventoryApp()">
+    
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold m-0 text-dark"><i class="fas fa-cubes me-2 text-primary"></i> PHÂN TÍCH TỒN KHO</h1>
+        <div class="d-flex gap-2">
+             <div class="input-group shadow-sm" style="width: 300px;">
+                <span class="input-group-text bg-white border-0 ps-3"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" x-model="search" class="form-control border-0" placeholder="Tìm nhanh nhóm hàng...">
+            </div>
+            <a href="/" class="btn btn-light border shadow-sm fw-bold"><i class="fas fa-arrow-left me-2"></i>Về Dashboard</a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="main-card p-3 h-100 d-flex align-items-center border-0 shadow-sm" style="background: white;">
+                <div class="rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="background: #F4F7FE; color: var(--primary); width: 60px; height: 60px; font-size: 1.5rem;"><i class="fas fa-boxes"></i></div>
+                <div>
+                    <div class="small fw-bold text-secondary text-uppercase mb-1">Tổng Tồn Kho</div>
+                    <div class="fs-4 fw-bolder text-dark lh-1">{{ kpi_total_inventory | format_tr }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="main-card p-3 h-100 d-flex align-items-center border-0 shadow-sm" style="background: white;">
+                <div class="rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="background: rgba(5, 205, 153, 0.1); color: var(--success); width: 60px; height: 60px; font-size: 1.5rem;"><i class="fas fa-leaf"></i></div>
+                <div>
+                    <div class="small fw-bold text-uppercase mb-1" style="color: var(--success);">Tồn Mới (< 6T)</div>
+                    <div class="fs-4 fw-bolder" style="color: var(--success);">{{ kpi_new_6_months | format_tr }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="main-card p-3 h-100 d-flex align-items-center border-0 shadow-sm" style="background: white;">
+                <div class="rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="background: rgba(156, 39, 176, 0.1); color: #9C27B0; width: 60px; height: 60px; font-size: 1.5rem;"><i class="fas fa-ban"></i></div>
+                <div>
+                    <div class="small fw-bold text-uppercase mb-1" style="color: #9C27B0;">Hàng CLC (Cột D)</div>
+                    <div class="fs-4 fw-bolder" style="color: #9C27B0;">{{ kpi_clc_value | format_tr }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="main-card p-3 h-100 d-flex align-items-center border-0 shadow-sm" style="background: white;">
+                <div class="rounded-circle p-3 me-3 d-flex align-items-center justify-content-center" style="background: rgba(227, 26, 26, 0.1); color: var(--danger); width: 60px; height: 60px; font-size: 1.5rem;"><i class="fas fa-exclamation-triangle"></i></div>
+                <div>
+                    <div class="small fw-bold text-danger text-uppercase mb-1">Rủi Ro (> 2 Năm)</div>
+                    <div class="fs-4 fw-bolder text-danger">{{ kpi_over_2_years | format_tr }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-card border-0 shadow-md">
+        <div class="table-responsive" style="min-height: 500px;">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 4%;">#</th>
+                        <th style="width: 26%;">MÃ NHÓM / TÊN HÀNG</th>
+                        <th class="text-center" style="width: 6%;">LOẠI</th>
+                        <th class="text-end" style="width: 10%;">TỔNG TỒN</th>
+                        
+                        <th class="text-end text-muted" style="width: 9%;">0-180</th>
+                        <th class="text-end text-muted" style="width: 9%;">181-360</th>
+                        <th class="text-end text-muted" style="width: 9%;">361-540</th>
+                        <th class="text-end text-muted" style="width: 9%;">541-720</th>
+                        
+                        <th class="text-end text-danger" style="width: 9%;">> 720 (RISK)</th>
+                        <th class="text-end text-purple" style="width: 9%;">CỘT D (CLC)</th>
+                    </tr>
+                </thead>
+                
+                {% for group in aging_data %}
+                <tbody x-data="{ expanded: false, loaded: false }" 
+                       x-show="matchesSearch('{{ group.GroupName|lower }} {{ group.GroupID|lower }}')">
+                    
+                    <tr class="row-master" 
+                        :class="expanded ? 'expanded' : ''"
+                        @click="if(!loaded){ 
+                            htmx.trigger($el, 'loadDetail'); 
+                            loaded = true; 
+                        } 
+                        expanded = !expanded"
+                        
+                        hx-get="/api/inventory/group_detail/{{ group.GroupID }}"
+                        hx-trigger="loadDetail"
+                        hx-target="closest tbody"
+                        hx-swap="beforeend"> 
+                        
+                        <td class="text-center">
+                            <i class="fas fa-chevron-right text-primary rotate-90" 
+                               :style="expanded ? 'transform: rotate(90deg)' : 'transform: rotate(0deg)'"
+                               style="transition: transform 0.2s"></i>
+                        </td>
+                        
+                        <td class="text-truncate" style="max-width: 0;">
+                            <div class="d-flex align-items-center">
+                                <span class="fw-bold text-primary me-2">{{ group.GroupID }}</span>
+                                <span class="small text-muted text-truncate">{{ group.GroupName }}</span>
+                                <span class="badge bg-light text-secondary border rounded-pill ms-2 small">{{ group.Items|length }}</span>
+                            </div>
+                        </td>
+                        
+                        <td></td> <td class="text-end fw-bold text-dark">{{ group.Group_TotalVal | format_tr }}</td>
+                        
+                        <td></td><td></td><td></td><td></td>
+                        
+                        <td class="text-end fw-bold {{ 'text-danger' if group.Group_Over720 > 0 else 'text-muted opacity-50' }}">
+                            {{ group.Group_Over720 | format_tr }}
+                        </td>
+                        <td class="text-end fw-bold {{ 'text-purple' if group.Group_CLC > 0 else 'text-muted opacity-50' }}">
+                            {{ group.Group_CLC | format_tr }}
+                        </td>
+                    </tr>
+                    
+                    </tbody>
+                {% endfor %}
+            </table>
+            
+            {% if not aging_data %}
+            <div class="text-center py-5 text-muted">
+                <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+                <p>Không có dữ liệu tồn kho nào.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function inventoryApp() {
+        return {
+            search: '',
+            matchesSearch(text) {
+                if (!this.search) return true;
+                return text.toLowerCase().includes(this.search.toLowerCase());
+            }
+        }
+    }
+</script>
+{% endblock %}

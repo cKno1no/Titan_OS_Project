@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Chi tiết Hiệu suất - {{ salesman_name }} | Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* KPI CARDS CUSTOM */
+    .kpi-card {
+        background: var(--card-bg); border-radius: 20px; padding: 25px;
+        box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+        height: 100%; display: flex; align-items: center; transition: transform 0.2s;
+    }
+    .kpi-card:hover { transform: translateY(-5px); }
+    .kpi-icon-box {
+        width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        margin-right: 20px; font-size: 1.6rem; flex-shrink: 0;
+    }
+    .icon-reg { background-color: rgba(5, 205, 153, 0.1); color: var(--success); }
+    .icon-ytd { background-color: rgba(67, 24, 255, 0.1); color: var(--primary); }
+    .icon-po { background-color: rgba(227, 26, 26, 0.1); color: var(--danger); }
+    
+    .kpi-label { color: var(--secondary); font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+    .kpi-value { color: var(--text-dark); font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .kpi-unit { font-size: 0.85rem; color: var(--secondary); margin-top: 4px; }
+
+    /* TABLE CUSTOM */
+    .table th { 
+        background-color: var(--input-bg) !important; color: var(--secondary) !important;
+        font-weight: 700; font-size: 0.8rem; text-transform: uppercase;
+        border-bottom: 1px solid var(--border-color); vertical-align: middle;
+    }
+    .table td { 
+        vertical-align: middle; font-size: 0.9rem; padding: 12px 15px;
+        border-bottom: 1px solid var(--border-color); color: var(--text-dark);
+    }
+
+    /* Progress Bar Custom */
+    .progress-wrapper {
+        position: relative; height: 24px; width: 100%;
+        background-color: var(--input-bg); border-radius: 6px; overflow: hidden; display: flex; align-items: center;
+    }
+    .progress-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+    .progress-text {
+        position: absolute; right: 8px; font-size: 0.8rem; font-weight: 700;
+        color: var(--text-dark); z-index: 2; line-height: 24px;
+    }
+    .text-white-shadow { color: white; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
+
+    /* Highlights */
+    .highlight-row { background-color: rgba(255, 181, 71, 0.1) !important; }
+    .group-row { background-color: rgba(67, 24, 255, 0.05) !important; font-weight: 600; }
+    
+    .data-amount { font-weight: 600; color: var(--text-dark); }
+    .pending-amount { color: var(--danger); font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block page_title %}CHI TIẾT HIỆU SUẤT KHÁCH HÀNG{% endblock %}
+{% block page_sub %}Nhân viên: {{ salesman_name }} ({{ employee_id }}) — Năm {{ current_year }}{% endblock %}
+
+{% block header_actions %}
+<a href="/sales_dashboard" class="btn btn-back">
+    <i class="fas fa-arrow-left me-2"></i> Về Bảng Tổng hợp
+</a>
+{% endblock %}
+
+{% block content %}
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon-box icon-reg"><i class="fas fa-file-contract"></i></div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Tổng DS Đăng Ký</div>
+                    <div class="kpi-value">{{ "{:,.0f}".format(total_registered_sales | default(0)) }}</div>
+                    <div class="kpi-unit">Triệu VNĐ</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon-box icon-ytd"><i class="fas fa-chart-line"></i></div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Tổng DS YTD</div>
+                    <div class="kpi-value">{{ "{:,.0f}".format(total_ytd_sales | default(0)) }}</div>
+                    <div class="kpi-unit">Triệu VNĐ</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="kpi-card">
+                <div class="kpi-icon-box icon-po"><i class="fas fa-hourglass-half"></i></div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Tổng Giá Trị PO</div>
+                    <div class="kpi-value">{{ "{:,.0f}".format(total_poa_amount | default(0)) }}</div>
+                    <div class="kpi-unit">Triệu VNĐ</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="card-header-custom">
+            <span><i class="fas fa-table me-2 text-primary"></i> Phân tích theo Khách hàng</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Mã KH</th>
+                        <th style="width: 25%;">Phân loại / Tên KH</th>
+                        <th class="text-end" style="width: 12%;">DS tháng</th>
+                        <th class="text-end" style="width: 12%;">DS Đăng ký</th>
+                        <th class="text-end" style="width: 15%;">DS YTD</th>
+                        <th class="text-end" style="width: 8%;">Số DHB</th>
+                        <th class="text-end" style="width: 10%;">PO Tồn</th>
+                        <th class="text-center" style="width: 8%;">Analysis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in client_summary %}
+                    {% set client_type = row.ClientName | default(row.ClientType) %}
+                    
+                    {% if 'KHÁCH NHỎ LẺ' in client_type %}
+                    <tr class="group-row">
+                    {% elif 'PS mới' in client_type or 'Chờ giao' in client_type %}
+                    <tr class="highlight-row">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td class="font-monospace text-secondary">{{ row.ClientID | default('N/A') }}</td>
+                        <td>
+                            {% if 'KHÁCH NHỎ LẺ' in client_type %}
+                                <span class="text-primary fw-bold">{{ client_type | replace("--- ", "") }}</span>
+                            {% elif 'PS mới' in client_type or 'Chờ giao' in client_type %}
+                                <span class="text-warning fw-bold">{{ client_type | replace("--- PS mới - ", "") | replace("--- Chờ giao - ", "") }}</span>
+                            {% else %}
+                                <span class="fw-bold">{{ row.ClientName | default('---') }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end data-amount">
+                            {{ "{:,.0f}".format(row.CurrentMonthSales | default(0)) }}
+                        </td>
+                        <td class="text-end text-secondary">
+                            {{ "{:,.0f}".format(row.RegisteredSales | default(0)) }}
+                        </td>
+                        
+                        {% set reg_sales = row.RegisteredSales | default(0) | float %}
+                        {% set ytd_sales = row.TotalSalesAmount | default(0) | float %}
+                        <td class="text-end" style="padding: 8px 15px !important;">
+                            {% set completion_percent = (ytd_sales / reg_sales) * 100 if reg_sales > 0 else 0 %}
+                            {% set bar_width = [completion_percent, 100] | min %} 
+                            {% set bar_color = 'var(--success)' if completion_percent >= 100 else 'var(--primary)' %}
+
+                            <div class="progress-wrapper">
+                                <div class="progress-bar-fill" style="width: {{ bar_width }}%; background-color: {{ bar_color }};"></div>
+                                <span class="progress-text {{ 'text-white-shadow' if bar_width > 50 else '' }}">
+                                    {{ "{:,.0f}".format(ytd_sales) }}
+                                </span>
+                            </div>
+                        </td>
+                        
+                        <td class="text-end text-secondary">
+                            {{ "{:,.0f}".format(row.TotalOrders | default(0)) }}
+                        </td>
+                        <td class="text-end pending-amount">
+                            {{ "{:,.0f}".format(row.PendingOrdersAmount | default(0)) }}
+                        </td>
+                        
+                        <td class="text-center">
+                            <a href="/customer_360/{{ row.ClientID }}" target="_blank" 
+                               class="btn btn-sm btn-light border shadow-sm text-primary"
+                               data-bs-toggle="tooltip" title="Deep Analysis 360">
+                                <i class="fas fa-microscope"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Init Tooltips
+    document.addEventListener("DOMContentLoaded", function(){
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
+{% endblock %}
