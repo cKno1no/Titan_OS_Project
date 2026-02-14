@@ -10,116 +10,101 @@
         --card-bg: #1c1f26;
         --text-primary: #ffffff;
         --text-secondary: #9ca3af;
-        --accent-color: #3b82f6; /* Blue 500 */
-        --mandatory-color: #ef4444; /* Red 500 */
+        --accent-color: #3b82f6; 
+        --mandatory-color: #ef4444; 
     }
 
     body { background-color: var(--bg-dark) !important; color: var(--text-primary) !important; font-family: 'Inter', sans-serif; }
     
-    /* 2. HERO BANNER - NÂNG CẤP VISUAL */
+    /* 2. HERO BANNER */
     .hero-wrapper {
-        position: relative;
-        padding: 80px 5% 40px;
-        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 40%),
-                    radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.1), transparent 40%);
-        overflow: hidden;
+        position: relative; padding: 80px 5% 40px;
+        /* FIX TÌM KIẾM BỊ CẮT */
+        overflow: visible; 
     }
     
+    .hero-bg {
+        position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.1), transparent 40%);
+    }
+
+    .hero-content { position: relative; z-index: 10; }
     .hero-content h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 1rem; }
     .hero-content p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; }
 
     /* SEARCH BAR GLOW EFFECT */
-    .search-box {
-        position: relative;
-        max-width: 700px;
-        margin-top: 30px;
-    }
+    .search-box { position: relative; max-width: 700px; margin-top: 30px; z-index: 50; }
     .search-input {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
-        height: 55px;
-        border-radius: 16px;
-        padding-left: 50px;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white; height: 55px; border-radius: 16px; padding-left: 50px;
+        backdrop-filter: blur(10px); transition: all 0.3s ease;
     }
-    .search-input:focus {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-        color: white;
-    }
-    .search-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+    .search-input:focus { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-color); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); color: white; }
+    .search-icon { position: absolute; left: 20px; top: 15px; color: var(--text-secondary); font-size: 1.2rem; }
 
-    /* 3. MANDATORY SECTION (KHÓA BẮT BUỘC) */
+    .search-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: #1c1f26; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px; margin-top: 10px; z-index: 1000;
+        max-height: 350px; overflow-y: auto; backdrop-filter: blur(15px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .search-dropdown::-webkit-scrollbar { width: 6px; }
+    .search-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    .search-item { transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover { background: rgba(59, 130, 246, 0.1); }
+
+    /* 3. MANDATORY SECTION (ĐÃ KHÔI PHỤC) */
     .section-header { display: flex; align-items: center; gap: 10px; margin: 40px 5% 20px; }
     .section-title { font-size: 1.25rem; font-weight: 700; color: white; margin: 0; }
     .mandatory-badge { background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 600; }
 
-    .mandatory-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-        padding: 0 5%;
-    }
+    .mandatory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 5%; }
     
     .mandatory-card {
-        background: linear-gradient(145deg, #1c1f26, #232730);
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 16px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        transition: transform 0.2s;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
+        background: linear-gradient(145deg, #1c1f26, #232730); border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px;
+        transition: transform 0.2s; cursor: pointer; position: relative; overflow: hidden;
     }
     .mandatory-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--mandatory-color); }
-    .mandatory-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.1); }
+    .mandatory-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
     
     .m-icon { width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--mandatory-color); font-size: 1.2rem; }
 
-    /* 4. CATEGORY GRID (SỬA LỖI TRÙNG LẶP) */
-    .cat-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 24px;
-        padding: 40px 5% 80px;
-    }
-    @media (max-width: 1200px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 768px) { .cat-grid { grid-template-columns: 1fr; } }
+    /* 4. GIAO DIỆN BENTO BOX CHO CATEGORY */
+    .cat-grid { display: grid; gap: 24px; padding: 0 5% 80px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 
     .cat-card {
-        height: 160px;
-        border-radius: 20px;
-        background-size: cover;
-        background-position: center;
-        position: relative;
-        overflow: hidden;
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: 1px solid rgba(255,255,255,0.05);
+        position: relative; height: 200px; border-radius: 24px; overflow: hidden;
+        text-decoration: none; display: flex; flex-direction: column; justify-content: flex-end;
+        padding: 24px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; group;
     }
-    .cat-card::after {
-        content: ''; position: absolute; inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2));
-        transition: opacity 0.3s;
-    }
-    .cat-card:hover { transform: scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
     
-    .cat-content { position: absolute; bottom: 20px; left: 20px; z-index: 2; }
-    .cat-name { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .cat-count { font-size: 0.85rem; opacity: 0.8; }
-    
-    .cat-icon-float {
-        position: absolute; top: 15px; right: 15px; font-size: 1.5rem;
-        background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);
-        width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; z-index: 2; color: white;
+    .cat-bg {
+        position: absolute; inset: 0; background-size: cover; background-position: center;
+        opacity: 0.4; transition: transform 0.7s ease, opacity 0.5s ease; z-index: 0; filter: grayscale(30%);
     }
+    
+    .cat-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(15,17,21,1) 10%, rgba(15,17,21,0.2) 100%); transition: background 0.5s ease; }
+    .cat-content { position: relative; z-index: 2; width: 100%; }
+    
+    .cat-icon-wrapper {
+        position: absolute; top: 20px; right: 20px; z-index: 2; width: 48px; height: 48px; border-radius: 16px;
+        background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; color: white; border: 1px solid rgba(255,255,255,0.1); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .cat-name { font-size: 1.2rem; font-weight: 800; color: white; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s; }
+    .cat-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+
+    .cat-card:hover { transform: translateY(-8px); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 40px rgba(59, 130, 246, 0.1); }
+    .cat-card:hover .cat-bg { transform: scale(1.1); opacity: 0.6; filter: grayscale(0%); }
+    .cat-card:hover .cat-overlay { background: linear-gradient(to top, rgba(15,17,21,0.9) 0%, rgba(59,130,246,0.2) 100%); }
+    .cat-card:hover .cat-icon-wrapper { background: var(--accent-color); color: white; border-color: var(--accent-color); transform: scale(1.1) rotate(5deg); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
+    .cat-card:hover .cat-count { color: #93c5fd; }
 </style>
 {% endblock %}
 
@@ -127,6 +112,7 @@
 <div x-data="homeApp()">
 
     <div class="hero-wrapper">
+        <div class="hero-bg"></div>
         <div class="hero-content">
             <h1>Hệ thống Đào tạo <span class="text-primary">Titan Academy</span></h1>
             <p>Nâng cao năng lực chuyên môn và kỹ năng quản lý. Truy cập kho tri thức nội bộ mọi lúc, mọi nơi.</p>
@@ -137,14 +123,13 @@
                        placeholder="Tìm kiếm khóa học, tài liệu, quy trình..."
                        x-model="query" @input.debounce.500ms="search()">
                 
-                <div class="position-absolute w-100 bg-dark border border-secondary rounded-3 mt-2 shadow-lg overflow-hidden" 
-                     x-show="results.length > 0" x-cloak style="z-index: 100;">
+                <div class="search-dropdown" x-show="results.length > 0" x-cloak>
                     <template x-for="item in results" :key="item.id">
-                        <a :href="'/training/course/' + item.id" class="d-flex align-items-center p-3 text-white text-decoration-none border-bottom border-secondary hover-bg-light">
-                            <img :src="item.thumbnail || 'https://via.placeholder.com/40'" width="40" height="40" class="rounded me-3">
+                        <a :href="'/training/course/' + item.id" target="_blank" class="search-item d-flex align-items-center p-3 text-white text-decoration-none">
+                            <img :src="item.thumbnail || 'https://cdn3d.iconscout.com/3d/premium/thumb/folder-5206733-4352249.png'" width="48" height="48" class="rounded-3 me-3" style="object-fit: contain; background: #2a2d35;">
                             <div>
-                                <div class="fw-bold" x-text="item.title"></div>
-                                <small class="text-muted" x-text="item.category"></small>
+                                <div class="fw-bold mb-1" x-text="item.title"></div>
+                                <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25" x-text="item.category"></span>
                             </div>
                         </a>
                     </template>
@@ -155,13 +140,13 @@
 
     <div x-show="mandatoryCourses.length > 0" x-cloak>
         <div class="section-header">
-            <h2 class="section-title">Nhiệm vụ bắt buộc</h2>
+            <h2 class="section-title"><i class="fas fa-exclamation-circle text-danger me-2"></i> Nhiệm vụ bắt buộc</h2>
             <span class="mandatory-badge" x-text="mandatoryCourses.length + ' khóa'"></span>
         </div>
         
         <div class="mandatory-grid">
             <template x-for="c in mandatoryCourses" :key="c.id">
-                <div class="mandatory-card" @click="window.location.href='/training/course/' + c.id">
+                <div class="mandatory-card" @click="window.open('/training/course/' + c.id, '_blank')">
                     <div class="m-icon"><i class="fas fa-exclamation-triangle"></i></div>
                     <div class="flex-grow-1">
                         <div class="fw-bold text-white text-truncate mb-1" style="max-width: 200px;" x-text="c.title"></div>
@@ -178,19 +163,22 @@
     </div>
 
     <div class="section-header mt-5">
-        <h2 class="section-title">Danh mục đào tạo</h2>
+        <h2 class="section-title"><i class="fas fa-layer-group text-primary me-2"></i> Danh mục đào tạo</h2>
     </div>
     
     <div class="cat-grid">
         <template x-for="cat in categories" :key="cat.id">
-            <div class="cat-card" 
-                 :style="`background-image: url('${cat.bg}')`"
-                 @click="window.location.href = '/training/category/' + encodeURIComponent(cat.name)">
+            <div class="cat-card" @click="window.location.href = '/training/category/' + encodeURIComponent(cat.name)">
+                <div class="cat-bg" :style="`background-image: url('${cat.bg}')`"></div>
+                <div class="cat-overlay"></div>
                 
-                <div class="cat-icon-float" x-html="cat.icon"></div>
+                <div class="cat-icon-wrapper" x-html="cat.icon"></div>
+                
                 <div class="cat-content">
                     <h3 class="cat-name" x-text="cat.name"></h3>
-                    <div class="cat-count" x-text="cat.count + ' khóa học'"></div>
+                    <div class="cat-count">
+                        <i class="fas fa-book-open"></i> <span x-text="cat.count + ' khóa học'"></span>
+                    </div>
                 </div>
             </div>
         </template>
@@ -203,17 +191,16 @@
         return {
             query: '',
             results: [],
-            mandatoryCourses: [],
-            // Danh sách cứng 8 Category, không được duplicate
+            mandatoryCourses: [], // Khôi phục mảng chứa khóa học bắt buộc
             categories: [
-                { id: 1, name: 'Kỹ thuật', icon: '<i class="fas fa-cog"></i>', bg: 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?w=500&q=80', count: 0 },
-                { id: 2, name: 'Kinh doanh', icon: '<i class="fas fa-chart-line"></i>', bg: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&q=80', count: 0 },
+                { id: 1, name: 'Kiến thức Sản phẩm', icon: '<i class="fas fa-box-open"></i>', bg: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&q=80', count: 0 },
+                { id: 2, name: 'Giới thiệu về STDD và năng lực cung cấp', icon: '<i class="fas fa-building"></i>', bg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80', count: 0 },
                 { id: 3, name: 'Kỹ năng mềm', icon: '<i class="fas fa-users"></i>', bg: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80', count: 0 },
-                { id: 4, name: 'Quy định & Chính sách', icon: '<i class="fas fa-balance-scale"></i>', bg: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80', count: 0 },
-                { id: 5, name: 'Quy trình Vận hành', icon: '<i class="fas fa-tasks"></i>', bg: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80', count: 0 },
-                { id: 6, name: 'Công cụ & Biểu mẫu', icon: '<i class="fas fa-file-alt"></i>', bg: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&q=80', count: 0 },
-                { id: 7, name: 'Phát triển Tư duy', icon: '<i class="fas fa-brain"></i>', bg: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80', count: 0 },
-                { id: 8, name: 'Khác', icon: '<i class="fas fa-folder-open"></i>', bg: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&q=80', count: 0 }
+                { id: 4, name: 'Quy trình & Vận hành', icon: '<i class="fas fa-project-diagram"></i>', bg: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80', count: 0 },
+                { id: 5, name: 'Catalogue / Tra cứu', icon: '<i class="fas fa-book"></i>', bg: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&q=80', count: 0 },
+                { id: 6, name: 'Quy định & chính sách', icon: '<i class="fas fa-balance-scale"></i>', bg: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80', count: 0 },
+                { id: 7, name: 'Công cụ & biểu mẫu', icon: '<i class="fas fa-file-alt"></i>', bg: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&q=80', count: 0 },
+                { id: 8, name: 'Văn hóa & phát triển cá nhân', icon: '<i class="fas fa-seedling"></i>', bg: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80', count: 0 }
             ],
 
             async init() {
@@ -221,27 +208,21 @@
                     const res = await fetch('/api/training/dashboard_v2');
                     const data = await res.json();
                     
-                    let mandatories = [];
-                    
-                    // Reset counts để tránh cộng dồn nếu init chạy lại
+                    let mandatories = []; // Biến hứng khóa học bắt buộc
                     this.categories.forEach(c => c.count = 0);
 
-                    // Map dữ liệu
                     for (const [catName, subCats] of Object.entries(data)) {
-                        // Tính tổng số bài của Category
                         let totalInCat = 0;
                         for (const list of Object.values(subCats)) {
                             totalInCat += list.length;
-                            // Lọc khóa bắt buộc
+                            
+                            // KHÔI PHỤC LOGIC LỌC KHÓA BẮT BUỘC
                             list.forEach(c => { 
-                                if(c.is_mandatory) {
-                                    // Kiểm tra trùng lặp ID trước khi push
-                                    if(!mandatories.some(m => m.id === c.id)) mandatories.push(c);
+                                if(c.is_mandatory && !mandatories.some(m => m.id === c.id)) {
+                                    mandatories.push(c);
                                 }
                             });
                         }
-
-                        // Update UI Count
                         const target = this.categories.find(c => 
                             c.name.toLowerCase() === catName.toLowerCase() || 
                             catName.toLowerCase().includes(c.name.toLowerCase())
@@ -249,6 +230,7 @@
                         if(target) target.count = totalInCat;
                     }
                     
+                    // Gán mảng vào giao diện
                     this.mandatoryCourses = mandatories;
                 } catch(e) { console.error("Lỗi tải dashboard:", e); }
             },

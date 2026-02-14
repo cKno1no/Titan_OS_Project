@@ -113,6 +113,7 @@ class TrainingService:
         return messages_to_send
 
     # 3. LẤY TRẠNG THÁI CHALLENGE (Cho Frontend hiển thị)
+    
     def get_current_challenge_status(self, user_code):
         """
         Kiểm tra trạng thái Đấu trường của User.
@@ -121,32 +122,69 @@ class TrainingService:
         now = datetime.now()
 
         # 1. KIỂM TRA BÀI ĐÃ HOÀN THÀNH (Đã được AI chấm xong)
-        sql_done = """
-            SELECT TOP 1 AIScore, AIFeedback 
-            FROM TRAINING_DAILY_SESSION 
-            WHERE UserCode = ? 
-            AND Status = 'COMPLETED'
-            AND CAST(BatchTime AS DATE) = CAST(GETDATE() AS DATE)
-            ORDER BY SessionID DESC
-        """
-        done_check = self.db.get_data(sql_done, (user_code,))
+        # [SỬA]: Lấy thêm UserAnswerContent, CorrectAnswer, Explanation, và EarnedXP
+        try:
+             sql_done = """
+                SELECT TOP 1 
+                    S.SessionID, S.AIScore, S.AIFeedback, S.UserAnswerContent, S.EarnedXP,
+                    Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation
+                FROM TRAINING_DAILY_SESSION S
+                JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
+                WHERE S.UserCode = ? 
+                AND S.Status = 'COMPLETED'
+                AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
+                ORDER BY S.SessionID DESC
+            """
+             done_check = self.db.get_data(sql_done, (user_code,))
+             has_earned_xp = True
+        except Exception as e:
+             # Fallback nếu chưa tạo cột EarnedXP trong DB
+             print(f"Lỗi lấy trạng thái DONE (Có thể thiếu cột EarnedXP): {e}")
+             sql_done = """
+                SELECT TOP 1 
+                    S.SessionID, S.AIScore, S.AIFeedback, S.UserAnswerContent,
+                    Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation
+                FROM TRAINING_DAILY_SESSION S
+                JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
+                WHERE S.UserCode = ? 
+                AND S.Status = 'COMPLETED'
+                AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
+                ORDER BY S.SessionID DESC
+            """
+             done_check = self.db.get_data(sql_done, (user_code,))
+             has_earned_xp = False
+
         if done_check:
+            row = done_check[0]
             return {
-                'status': 'DONE', 
-                'score': done_check[0]['AIScore'], 
-                'feedback': done_check[0]['AIFeedback']
+                'status': 'DONE',
+                'question': row['QuestionContent'],
+                'user_answer': row['UserAnswerContent'],
+                'score': row['AIScore'], 
+                'feedback': row['AIFeedback'],
+                'correct_answer': row['CorrectAnswer'],
+                'explanation': row['Explanation'],
+                'earned_xp': row['EarnedXP'] if has_earned_xp else 0
             }
 
         # 2. KIỂM TRA BÀI ĐÃ NỘP - CHỜ AI QUÉT CHẤM (Trạng thái SUBMITTED)
+        # [SỬA]: Lấy thêm UserAnswerContent và Question Content để hiển thị
         sql_submitted = """
-            SELECT TOP 1 SessionID 
-            FROM TRAINING_DAILY_SESSION 
-            WHERE UserCode = ? AND Status = 'SUBMITTED'
-            AND CAST(BatchTime AS DATE) = CAST(GETDATE() AS DATE)
+            SELECT TOP 1 S.SessionID, S.UserAnswerContent, Q.Content as QuestionContent
+            FROM TRAINING_DAILY_SESSION S
+            JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
+            WHERE S.UserCode = ? AND S.Status = 'SUBMITTED'
+            AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
+            ORDER BY S.SessionID DESC
         """
         submitted_check = self.db.get_data(sql_submitted, (user_code,))
         if submitted_check:
-            return {'status': 'SUBMITTED'}
+             row = submitted_check[0]
+             return {
+                 'status': 'SUBMITTED',
+                 'question': row['QuestionContent'],
+                 'user_answer': row['UserAnswerContent']
+             }
 
         # 3. KIỂM TRA PHIÊN ĐANG DIỄN RA (Có thể làm bài)
         sql_available = """
@@ -179,7 +217,6 @@ class TrainingService:
                 self.db.execute_non_query("UPDATE TRAINING_DAILY_SESSION SET Status='EXPIRED' WHERE SessionID=?", (row['SessionID'],))
         
         # 4. TRẠNG THÁI CHỜ PHIÊN TIẾP THEO (WAITING)
-        # Đồng bộ với server.py: 09:05, 14:47, 17:05
         current_time_str = now.strftime("%H:%M")
         if current_time_str < "08:10":
             next_slot = "08:10"
@@ -703,16 +740,27 @@ class TrainingService:
                     feedback = grade_result.get('feedback', 'Đã chấm điểm tự động.')
 
                     # Phân định thưởng: >= 50đ tính là Đúng (50 XP), ngược lại là Tham gia (10 XP)
+                    # Phân định thưởng: >= 50đ tính là Đúng (50 XP), ngược lại là Tham gia (10 XP)
                     is_correct = 1 if score >= 50 else 0
                     xp_reward = 50 if is_correct else 10
                     
                     # CẬP NHẬT DATABASE (Khớp các cột AIScore, AIFeedback, IsCorrect trong SSMS)
-                    sql_update = """
-                        UPDATE TRAINING_DAILY_SESSION 
-                        SET AIScore = ?, AIFeedback = ?, Status = 'COMPLETED', IsCorrect = ?
-                        WHERE SessionID = ?
-                    """
-                    self.db.execute_non_query(sql_update, (score, feedback, is_correct, sid))
+                    # [SỬA]: Thêm cột EarnedXP vào lệnh UPDATE
+                    try:
+                        sql_update = """
+                            UPDATE TRAINING_DAILY_SESSION 
+                            SET AIScore = ?, AIFeedback = ?, Status = 'COMPLETED', IsCorrect = ?, EarnedXP = ?
+                            WHERE SessionID = ?
+                        """
+                        self.db.execute_non_query(sql_update, (score, feedback, is_correct, xp_reward, sid))
+                    except Exception as e:
+                        print(f"⚠️ Chưa tạo cột EarnedXP trong DB. Bỏ qua ghi nhận XP vào Session: {e}")
+                        sql_update = """
+                            UPDATE TRAINING_DAILY_SESSION 
+                            SET AIScore = ?, AIFeedback = ?, Status = 'COMPLETED', IsCorrect = ?
+                            WHERE SessionID = ?
+                        """
+                        self.db.execute_non_query(sql_update, (score, feedback, is_correct, sid))
 
                     # CỘNG XP VÀO HỆ THỐNG GAMIFICATION
                     self.gamification.add_xp(user_code, xp_reward, f"Hoàn thành Daily Challenge #{sid}")

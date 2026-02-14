@@ -1,144 +1,144 @@
 {% extends "base.html" %}
-{% block title %}{{ category_name }} - Titan Academy{% endblock %}
+
+{% block title %}Chi tiết Danh mục Đào tạo - Titan OS{% endblock %}
 
 {% block extra_css %}
 <style>
-    body { background-color: #f3f4f6 !important; } /* Nền xám nhạt sáng sủa */
-    
-    .header-area { padding: 40px 5%; margin-bottom: 20px; }
-    .header-area h1 { font-weight: 800; color: #1f2937; }
-
-    /* --- NEW CARD STYLE (LIKE IMAGE 2) --- */
-    .course-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 25px;
-        padding: 0 5% 60px;
-    }
-
-    .clean-card {
-        background: white;
-        border-radius: 24px;
-        padding: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        border: 1px solid #f0f0f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-        transition: all 0.3s ease;
-        height: 100%;
-        position: relative;
-    }
-
-    .clean-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
-        border-color: #e5e7eb;
-    }
-
-    /* Thumbnail giờ là Icon nhỏ 80x80 hoặc 64x64, object-fit contain */
-    .clean-thumb {
-        width: 80px;
-        height: 80px;
-        object-fit: contain;
-        margin-bottom: 20px;
-        /* Fallback icon style nếu ảnh lỗi */
-        background-color: #f9fafb;
-        border-radius: 16px;
-        padding: 10px;
-    }
-
-    .lesson-badge {
-        position: absolute; top: 20px; right: 20px;
-        background: #f3f4f6; color: #6b7280;
-        font-size: 0.75rem; font-weight: 600;
-        padding: 4px 10px; border-radius: 8px;
-    }
-
-    .clean-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 10px;
-        line-height: 1.5;
-        display: -webkit-box;
-        -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        height: 3em;
-    }
-
-    .progress-area { width: 100%; margin: 15px 0; }
-    .progress-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: #9ca3af; margin-bottom: 5px; }
-    .progress-bar-bg { width: 100%; height: 6px; background: #f3f4f6; border-radius: 10px; overflow: hidden; }
-    .progress-fill { height: 100%; background: #3b82f6; border-radius: 10px; transition: width 0.5s; }
-
-    .card-footer-custom {
-        width: 100%;
-        display: flex; justify-content: space-between; align-items: center;
-        margin-top: auto; padding-top: 15px;
-        border-top: 1px dashed #f3f4f6;
+    :root {
+        --bg-light: #f4f7f9; 
+        --card-bg: #ffffff;
+        --text-primary: #1e293b; 
+        --text-secondary: #64748b; 
+        --accent-color: #2563eb; 
+        --border-color: #e2e8f0; 
     }
     
-    .xp-tag { color: #f59e0b; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
-    .btn-detail { color: #2563eb; font-weight: 600; font-size: 0.85rem; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: gap 0.2s; }
-    .btn-detail:hover { gap: 8px; }
+    body { background-color: var(--bg-light) !important; color: var(--text-primary) !important; font-family: 'Inter', sans-serif; }
+    
+    .category-hero {
+        padding: 50px 5% 30px;
+        background: linear-gradient(to right, rgba(37, 99, 235, 0.05), #ffffff);
+        border-bottom: 1px solid var(--border-color); margin-bottom: 30px;
+    }
+    
+    .filter-pill {
+        background: #ffffff; border: 1px solid var(--border-color); color: var(--text-secondary);
+        padding: 8px 20px; border-radius: 30px; cursor: pointer; transition: all 0.2s ease;
+        white-space: nowrap; font-size: 0.95rem; font-weight: 500;
+    }
+    .filter-pill:hover { background: #f1f5f9; color: var(--text-primary); }
+    .filter-pill.active { background: var(--accent-color); color: white; border-color: var(--accent-color); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+    
+    /* CARD KHÓA HỌC THẾ HỆ MỚI (OVERLAY HOVER) */
+    .course-card {
+        background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
+        overflow: hidden; transition: all 0.3s ease; height: 100%; display: flex; flex-direction: column;
+        cursor: pointer; position: relative;
+    }
+    .course-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+    
+    /* Phần chứa ảnh (Dùng relative để làm bệ phóng cho Overlay) */
+    .thumb-wrapper { position: relative; width: 100%; height: 140px; overflow: hidden; background: #f8fafc; border-bottom: 1px solid var(--border-color); }
+    .course-thumb { width: 100%; height: 100%; object-fit: contain; padding: 15px; transition: transform 0.5s ease; }
+    .course-card:hover .course-thumb { transform: scale(1.05); }
 
+    /* LỚP PHỦ OVERLAY KHI HOVER (HIỆN MÔ TẢ) */
+    .course-overlay {
+        position: absolute; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px);
+        color: white; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        padding: 20px; text-align: center; opacity: 0; transition: all 0.3s ease;
+        transform: translateY(10px);
+    }
+    .course-card:hover .course-overlay { opacity: 1; transform: translateY(0); }
+    
+    .overlay-desc { font-size: 0.85rem; line-height: 1.5; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: #e2e8f0; }
+    .overlay-btn { background: var(--accent-color); color: white; border: none; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; }
+    .overlay-btn:hover { background: #1d4ed8; }
+
+    /* Phần thông tin tĩnh bên dưới */
+    .course-body { padding: 15px 20px 20px; flex-grow: 1; display: flex; flex-direction: column; }
+    .course-title { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: auto; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+    
+    .course-meta-divider { height: 1px; background: var(--border-color); margin: 15px 0; }
+    .course-meta { font-size: 0.85rem; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; font-weight: 500; }
+    .meta-item { display: flex; align-items: center; gap: 6px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div x-data="categoryApp()">
+<div x-data="categoryApp()" x-init="init()" x-cloak>
     
-    <div class="header-area">
-        <a href="/training" class="text-secondary text-decoration-none fw-bold mb-2 d-inline-block"><i class="fas fa-chevron-left me-1"></i> Dashboard</a>
-        <h1 x-text="categoryName"></h1>
-        
-        <div class="d-flex gap-2 mt-4 overflow-auto pb-2">
-            <button class="btn btn-light rounded-pill px-4 fw-bold shadow-sm" 
-                    :class="{ 'bg-primary text-white': selectedSub === 'all' }"
-                    @click="filter('all')">Tất cả</button>
-            
-            <template x-for="sub in subCategories" :key="sub">
-                <button class="btn btn-light rounded-pill px-4 fw-bold shadow-sm"
-                        :class="{ 'bg-primary text-white': selectedSub === sub }"
-                        @click="filter(sub)" x-text="sub"></button>
-            </template>
-        </div>
+    <div class="category-hero">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a href="/training" class="text-secondary text-decoration-none"><i class="fas fa-home"></i> Thư viện</a></li>
+                <li class="breadcrumb-item active text-primary fw-bold" aria-current="page" x-text="catName"></li>
+            </ol>
+        </nav>
+        <h1 class="fw-bold mb-2 text-dark" x-text="catName"></h1>
+        <p class="text-secondary mb-0"><i class="fas fa-book-open text-primary me-1"></i> Có <span x-text="totalCourses" class="fw-bold text-dark"></span> khóa học trong danh mục này</p>
     </div>
 
-    <div class="course-grid">
-        <template x-for="course in filteredCourses" :key="course.id">
-            <div class="clean-card" @click="window.location.href='/training/course/' + course.id" style="cursor: pointer;">
-                
-                <span class="lesson-badge" x-text="course.lessons + ' bài'"></span>
+    <div class="container-fluid px-md-5 pb-5">
+        <div x-show="isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
 
-                <img :src="course.thumbnail || 'https://cdn-icons-png.flaticon.com/512/2641/2641457.png'" 
-                     class="clean-thumb" 
-                     onerror="this.src='https://cdn-icons-png.flaticon.com/512/2641/2641457.png'">
-
-                <h3 class="clean-title" x-text="course.title" :title="course.title"></h3>
-                
-                <div class="progress-area">
-                    <div class="progress-label">
-                        <span>Tiến độ</span>
-                        <span x-text="course.progress + '%'"></span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-fill" :class="course.progress >= 100 ? 'bg-success' : 'bg-primary'" :style="'width: ' + course.progress + '%'"></div>
-                    </div>
-                </div>
-
-                <div class="card-footer-custom">
-                    <span class="xp-tag"><i class="fas fa-star"></i> <span x-text="'+' + course.xp + ' XP'"></span></span>
-                    <span class="btn-detail">Chi tiết <i class="fas fa-arrow-right"></i></span>
-                </div>
+        <div x-show="!isLoading">
+            <div class="d-flex flex-wrap gap-2 mb-4" x-show="subCategories.length > 0">
+                <button class="filter-pill" :class="{'active': activeSubCat === 'all'}" @click="activeSubCat = 'all'">
+                    Tất cả <span class="badge bg-light text-dark ms-1 rounded-pill border" x-text="totalCourses"></span>
+                </button>
+                <template x-for="sub in subCategories" :key="sub.name">
+                    <button class="filter-pill" :class="{'active': activeSubCat === sub.name}" @click="activeSubCat = sub.name">
+                        <span x-text="sub.name"></span>
+                        <span class="badge bg-secondary bg-opacity-10 text-secondary ms-1 rounded-pill" x-text="sub.courses.length"></span>
+                    </button>
+                </template>
             </div>
-        </template>
-        
-        <div x-show="filteredCourses.length === 0" class="col-12 text-center py-5 text-muted" style="grid-column: 1/-1;">
-            <p>Chưa có khóa học nào trong mục này.</p>
+
+            <div x-show="subCategories.length === 0" class="text-center py-5">
+                <div class="mb-3"><i class="fas fa-box-open" style="font-size: 4rem; color: #cbd5e1"></i></div>
+                <h5 class="text-dark fw-bold">Chưa có dữ liệu</h5>
+                <a href="/training" class="btn btn-outline-primary mt-3"><i class="fas fa-arrow-left me-1"></i> Quay lại Thư viện</a>
+            </div>
+
+            <div class="row g-4">
+                <template x-for="sub in subCategories" :key="sub.name">
+                    <template x-if="activeSubCat === 'all' || activeSubCat === sub.name">
+                        <template x-for="course in sub.courses" :key="course.id">
+                            <div class="col-12 col-md-6 col-lg-4 col-xl-3 animate__animated animate__fadeIn">
+                                
+                                <div class="course-card" @click="window.open('/training/course/' + course.id, '_blank')">
+                                    
+                                    <div class="thumb-wrapper">
+                                        <img :src="course.thumbnail || '/static/img/3d_assets/culture/books.png'" class="course-thumb" alt="Thumbnail">
+                                        <div class="course-overlay">
+                                            <p class="overlay-desc" x-text="course.desc || 'Chưa có mô tả chi tiết cho khóa học này.'"></p>
+                                            <button class="overlay-btn">Vào Học Ngay</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="course-body">
+                                        <h5 class="course-title" x-text="course.title"></h5>
+                                        <div class="course-meta-divider"></div>
+                                        <div class="course-meta">
+                                            <div class="meta-item text-primary bg-primary bg-opacity-10 px-2 py-1 rounded">
+                                                <i class="fas fa-file-alt"></i> <span x-text="course.lessons + ' Bài học'"></span>
+                                            </div>
+                                            <div class="meta-item text-dark fw-bold">
+                                                <i class="fas fa-star text-warning"></i> <span x-text="course.xp || 300"></span> XP
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                </template>
+            </div>
+            
         </div>
     </div>
 </div>
@@ -146,34 +146,48 @@
 <script>
     function categoryApp() {
         return {
-            selectedSub: 'all',
-            // Load dữ liệu & lọc trùng lặp ID
-            allCourses: [],
-            filteredCourses: [],
-            subCategories: {{ sub_categories | tojson }},
-            categoryName: '{{ category_name }}',
+            catName: '',
+            subCategories: [],
+            activeSubCat: 'all',
+            totalCourses: 0,
+            isLoading: true,
 
-            init() {
-                // Lấy dữ liệu raw từ server
-                const rawData = {{ courses | tojson }};
-                
-                // [QUAN TRỌNG] Lọc trùng lặp ID ngay khi nhận dữ liệu
-                const uniqueIds = new Set();
-                this.allCourses = rawData.filter(course => {
-                    if (uniqueIds.has(course.id)) return false;
-                    uniqueIds.add(course.id);
-                    return true;
-                });
-
-                this.filteredCourses = this.allCourses;
-            },
-
-            filter(subName) {
-                this.selectedSub = subName;
-                if (subName === 'all') {
-                    this.filteredCourses = this.allCourses;
-                } else {
-                    this.filteredCourses = this.allCourses.filter(c => c.sub_cat_display === subName);
+            async init() {
+                let path = window.location.pathname.replace(/\/$/, '');
+                this.catName = decodeURIComponent(path.split('/').pop());
+                try {
+                    const res = await fetch('/api/training/dashboard_v2');
+                    const data = await res.json();
+                    
+                    const searchCat = this.catName.trim().toLowerCase();
+                    const currentCat = Object.keys(data).find(k => {
+                        const apiCat = k.trim().toLowerCase();
+                        return apiCat === searchCat || apiCat.includes(searchCat) || searchCat.includes(apiCat);
+                    });
+                    
+                    if (currentCat && data[currentCat]) {
+                        const rawSubCats = data[currentCat];
+                        let processedSubs = {};
+                        
+                        for (let subName of Object.keys(rawSubCats)) {
+                            let cleanName = (!subName || subName === 'null' || String(subName).trim() === '') ? 'Chuyên đề chung' : String(subName).trim();
+                            if (!processedSubs[cleanName]) processedSubs[cleanName] = [];
+                            processedSubs[cleanName].push(...rawSubCats[subName]);
+                        }
+                        
+                        this.subCategories = Object.keys(processedSubs).map(name => {
+                            return { name: name, courses: processedSubs[name] };
+                        });
+                        
+                        this.subCategories.sort((a, b) => b.courses.length - a.courses.length);
+                        this.totalCourses = this.subCategories.reduce((acc, sub) => acc + sub.courses.length, 0);
+                    } else {
+                        this.subCategories = []; this.totalCourses = 0;
+                    }
+                } catch(e) {
+                    console.error("Lỗi tải chi tiết Category:", e);
+                } finally {
+                    this.isLoading = false;
                 }
             }
         }

@@ -1,246 +1,288 @@
 {% extends "base.html" %}
 
-{% block title %}Nâng Tầm Tri Thức | Titan OS{% endblock %}
+{% block title %}Daily Challenge - Titan OS{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* 1. BACKGROUND MỜ ẢO NGẪU NHIÊN */
-    body {
-        /* Lấy ảnh ngẫu nhiên chủ đề Vũ trụ/Thiên nhiên mờ ảo từ Unsplash */
-        background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
-        background-size: cover !important;
-        position: relative;
+    :root {
+        --bg-dark: #0f1115;
+        --card-bg: #1c1f26;
+        --text-primary: #ffffff;
+        --text-secondary: #9ca3af;
+        --accent-color: #3b82f6;
     }
+    body { background-color: var(--bg-dark) !important; color: var(--text-primary) !important; font-family: 'Inter', sans-serif; }
     
-    /* Lớp phủ kính mờ (Backdrop Filter) */
-    body::before {
-        content: '';
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(15, 17, 21, 0.7); /* Lớp phủ tối */
-        backdrop-filter: blur(15px); /* Hiệu ứng kính mờ */
-        z-index: -1;
+    .hero-banner {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(15, 17, 21, 1) 100%);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding: 60px 0 40px;
+        margin-bottom: 40px;
     }
 
-    /* Card trong suốt nhẹ để hòa quyện với background */
-    .card {
-        background: rgba(28, 31, 38, 0.8) !important;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 24px;
-    }
-
-    .floating-anim { animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+    .card { background-color: var(--card-bg); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+    .card-header { border-bottom: 1px solid rgba(255,255,255,0.05); background-color: rgba(255,255,255,0.02); }
     
-    .timer-badge {
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
+    .timeline-item { position: relative; padding-left: 30px; margin-bottom: 20px; }
+    .timeline-item::before {
+        content: ''; position: absolute; left: 0; top: 5px; width: 12px; height: 12px;
+        border-radius: 50%; background-color: var(--accent-color);
     }
-    .timer-danger {
-        color: #ff4444 !important;
-        animation: blink 1s infinite;
+    .timeline-item::after {
+        content: ''; position: absolute; left: 5px; top: 20px; bottom: -20px; width: 2px;
+        background-color: rgba(255,255,255,0.1);
     }
-    @keyframes blink { 50% { opacity: 0.5; } }
-    
-    .alert-custom { border-radius: 12px; box-shadow: var(--shadow-sm); }
+    .timeline-item:last-child::after { display: none; }
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5" x-data="dailyGame()" x-init="init()">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+<div x-data="dailyChallengeApp()" x-init="initData()" x-cloak>
+
+    <div class="hero-banner">
+        <div class="container px-4">
+            <h1 class="fw-bold text-white mb-2"><i class="fas fa-fire text-warning me-2"></i> Thử thách Mỗi Ngày</h1>
+            <p class="text-secondary fs-5">Rèn luyện tư duy, củng cố kiến thức và tích lũy XP thăng cấp.</p>
+        </div>
+    </div>
+
+    <div class="container px-4 pb-5">
+        <div class="row g-4">
             
-            <div class="text-center mb-5">
-                <h1 class="fw-black text-primary display-4 mb-2">
-                    <i class="fas fa-brain text-warning me-2"></i>NÂNG TẦM TRI THỨC
-                </h1>
-                <p class="text-muted lead">Cập nhật bản thân - Làm chủ công nghệ</p>
-            </div>
+            <div class="col-lg-8">
+                
+                <template x-if="!question">
+                    <div class="card p-5 text-center">
+                        <i class="fas fa-clock fs-1 text-secondary mb-3"></i>
+                        <h4 class="text-white">Hiện chưa có thử thách nào</h4>
+                        <p class="text-secondary">Hãy quay lại vào các khung giờ: 08:00, 13:00 và 17:00.</p>
+                    </div>
+                </template>
 
-            <div class="alert alert-warning border-0 shadow-sm mb-4 small">
-                <div class="d-flex">
-                    <i class="fas fa-user-shield me-2 mt-1"></i>
+                <template x-if="question">
                     <div>
-                        <strong>Lời nhắn từ Titan:</strong> Bạn hãy ưu tiên sử dụng kiến thức và kinh nghiệm của bản thân nhé. 
-                        Hệ thống <b>không khuyến khích</b> sao chép từ AI (GPT/Google) để chúng ta cùng xây dựng giá trị thật.
-                    </div>
-                </div>
-            </div>
+                        <div class="card mb-4 shadow-sm border-primary border-opacity-25">
+                            <div class="card-header p-4 d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-question-circle me-2"></i> Câu hỏi hiện tại</h5>
+                                <span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50">Đang diễn ra</span>
+                            </div>
+                            <div class="card-body p-4">
+                                <p class="fs-5 text-white mb-0" style="line-height: 1.6;" x-html="formatText(question.Content)"></p>
+                            </div>
+                        </div>
 
-            <div x-show="loading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-3 text-muted">Đang kết nối trung tâm tri thức...</p>
-            </div>
-
-            <div x-show="!loading && status === 'WAITING'" class="card shadow-lg text-center p-5 animate__animated animate__fadeIn">
-                <div class="mb-4">
-                    <img src="https://cdn3d.iconscout.com/3d/premium/thumb/clock-5206700-4352236.png" width="150" class="floating-anim">
-                </div>
-                <h3 class="fw-bold text-white">Chưa đến giờ cập nhật tri thức!</h3>
-                <p class="text-white-50 mb-4">
-                    Thử thách tiếp theo sẽ mở vào: <strong class="text-primary fs-5" x-text="nextSlot"></strong>
-                </p>
-                <div class="mt-4">
-                    <a href="/" class="btn btn-outline-light rounded-pill px-4">Về trang chủ</a>
-                </div>
-            </div>
-
-            <div x-show="!loading && status === 'AVAILABLE'" class="card shadow-lg overflow-hidden animate__animated animate__fadeInUp">
-                <div class="card-header bg-primary text-white p-4 d-flex justify-content-between align-items-center">
-                    <span class="badge bg-white text-primary fw-bold px-3 py-2"> ĐANG DIỄN RA</span>
-                    <div class="h4 m-0 fw-bold timer-badge" :class="secondsLeft < 60 ? 'timer-danger' : 'text-white'">
-                        <i class="fas fa-clock me-2"></i><span x-text="formatTime(secondsLeft)">15:00</span>
-                    </div>
-                </div>
-                <div class="card-body p-4 text-white">
-                    <div class="alert alert-custom border-start border-4 border-primary bg-light fs-5 fw-bold text-dark mb-4 shadow-sm">
-                        <i class="fas fa-question-circle me-2 text-primary"></i>
-                        <span x-text="question"></span>
-                    </div>
-                    
-                    <div class="options-list mb-4" x-show="options && (options.A || options.B || options.C || options.D)">
-                        <p class="text-white-50 small fw-bold mb-2 text-uppercase"><i class="fas fa-list-ul me-2"></i>Dữ liệu gợi ý / Câu hỏi phụ:</p>
-                        <div class="d-flex flex-column gap-2">
-                            <template x-for="(val, key) in options" :key="key">
-                                <template x-if="val">
-                                    <div class="p-3 rounded-3 border bg-dark bg-opacity-50 d-flex align-items-start">
-                                        <b class="text-primary me-2" x-text="key + '.'"></b> <span x-text="val"></span>
+                        <div class="card shadow-sm">
+                            <div class="card-header p-4">
+                                <h5 class="mb-0 text-white fw-bold"><i class="fas fa-pen-nib me-2 text-secondary"></i> Bài làm của bạn</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                
+                                <template x-if="sessionState === 'PENDING'">
+                                    <div>
+                                        <label class="text-secondary mb-2">Nhập câu trả lời chi tiết:</label>
+                                        <textarea class="form-control bg-dark text-white border-secondary mb-3" rows="6" 
+                                                  x-model="userAnswer" 
+                                                  @input="saveDraft()"
+                                                  placeholder="Hãy diễn giải rõ ràng, có phân tích. Hệ thống tự động lưu nháp khi bạn gõ..."></textarea>
+                                        <div class="text-end">
+                                            <button class="btn btn-primary px-4 py-2 fw-bold" @click="submitAnswer()" :disabled="isSubmitting || userAnswer.trim() === ''">
+                                                <i class="fas fa-paper-plane me-2"></i> <span x-text="isSubmitting ? 'Đang gửi...' : 'Gửi đáp án'"></span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </template>
-                            </template>
+
+                                <template x-if="sessionState === 'SUBMITTED'">
+                                    <div class="text-center py-5">
+                                        <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                                        <h4 class="text-white fw-bold">Đã nộp bài thành công!</h4>
+                                        <p class="text-secondary">Giám khảo AI đang phân tích và chấm điểm bài của bạn. Vui lòng quay lại sau vài phút...</p>
+                                        
+                                        <div class="text-start mt-4 p-4 bg-secondary bg-opacity-10 border border-secondary rounded">
+                                            <span class="text-muted d-block mb-2 text-uppercase fw-bold" style="font-size: 0.8rem;">Nội dung bạn đã gửi:</span>
+                                            <div class="text-white" style="white-space: pre-wrap;" x-text="userAnswer"></div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template x-if="sessionState === 'GRADED'">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center p-4 mb-4 rounded border" 
+                                             :class="score >= 80 ? 'bg-success bg-opacity-10 border-success' : (score >= 50 ? 'bg-warning bg-opacity-10 border-warning' : 'bg-danger bg-opacity-10 border-danger')">
+                                            <div>
+                                                <h3 class="mb-1 fw-bold" :class="score >= 80 ? 'text-success' : (score >= 50 ? 'text-warning' : 'text-danger')">
+                                                    <i class="fas" :class="score >= 80 ? 'fa-medal' : (score >= 50 ? 'fa-star-half-alt' : 'fa-times-circle')"></i> 
+                                                    Điểm: <span x-text="score"></span>/100
+                                                </h3>
+                                                <span class="text-muted">Do Hệ thống AI đánh giá tự động</span>
+                                            </div>
+                                            
+                                            <div class="text-end" x-show="earnedXP > 0">
+                                                <span class="badge bg-success py-2 px-3 fs-5 shadow-lg animate__animated animate__tada animate__delay-1s border border-light">
+                                                    <i class="fas fa-star text-warning me-1"></i> +<span x-text="earnedXP"></span> XP
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-4 p-4 bg-dark border border-secondary rounded">
+                                            <span class="text-muted d-block mb-2 text-uppercase fw-bold" style="font-size: 0.8rem;">Bài nộp của bạn:</span>
+                                            <div class="text-white" style="white-space: pre-wrap;" x-text="userAnswer"></div>
+                                        </div>
+
+                                        <div class="mt-4 p-4 bg-primary bg-opacity-10 border border-primary border-opacity-50 rounded" x-show="correctAnswer">
+                                            <h5 class="text-primary fw-bold mb-3"><i class="fas fa-check-circle me-2"></i> Đáp án chuẩn hóa</h5>
+                                            <div class="text-white fs-6" style="line-height: 1.6;" x-html="formatText(correctAnswer)"></div>
+                                            
+                                            <template x-if="explanation">
+                                                <div>
+                                                    <hr class="border-primary opacity-25 my-4">
+                                                    <h6 class="text-info fw-bold mb-2"><i class="fas fa-lightbulb me-2 text-warning"></i> Chuyên gia giải thích:</h6>
+                                                    <div class="text-white opacity-75" style="line-height: 1.5;" x-html="formatText(explanation)"></div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-primary">Bài làm của bạn:</label>
-                        <textarea class="form-control form-control-lg border-0 shadow-sm" rows="6" 
-                                x-model="answer" placeholder="Dựa vào các gợi ý trên, bạn hãy nhập câu trả lời chi tiết tại đây..."></textarea>
+                </template>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm">
+                    <div class="card-header p-4">
+                        <h6 class="mb-0 text-white fw-bold"><i class="fas fa-history me-2 text-secondary"></i> Lịch sử thử thách</h6>
                     </div>
-                    
-                    <button @click="submit()" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow" 
-                            :disabled="submitting || answer.trim().length < 10">
-                        <span x-show="!submitting">Nộp Bài <i class="fas fa-paper-plane ms-2"></i></span>
-                        <span x-show="submitting"><i class="fas fa-spinner fa-spin me-2"></i>Đang gửi...</span>
-                    </button>
+                    <div class="card-body p-4">
+                        <template x-if="history.length === 0">
+                            <p class="text-secondary text-center mb-0">Bạn chưa tham gia thử thách nào.</p>
+                        </template>
+                        
+                        <template x-for="h in history" :key="h.SessionID">
+                            <div class="timeline-item">
+                                <div class="text-muted small mb-1" x-text="h.FormattedDate"></div>
+                                <div class="fw-bold text-white mb-1 text-truncate" x-text="h.QuestionContent"></div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge" :class="h.Status === 'GRADED' ? 'bg-success bg-opacity-25 text-success' : 'bg-warning bg-opacity-25 text-warning'" 
+                                          x-text="h.Status === 'GRADED' ? 'Đã chấm' : 'Đang chờ chấm'"></span>
+                                    <strong x-show="h.Status === 'GRADED'" class="text-white"><span x-text="h.Score"></span> điểm</strong>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
-
-            <div x-show="!loading && status === 'SUBMITTED'" class="card shadow-lg text-center p-5 animate__animated animate__zoomIn">
-                <div class="mb-4">
-                    <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_9n6mxtis.json" 
-                                   background="transparent" speed="1" style="width: 200px; height: 200px; margin: auto;" loop autoplay></lottie-player>
-                </div>
-                <h3 class="fw-bold text-primary">Bài làm đã được ghi nhận!</h3>
-                <div class="alert alert-info border-0 shadow-sm mt-3 text-start small">
-                    <i class="fas fa-info-circle me-2"></i>
-                    AI sẽ chấm điểm và gửi thông báo kết quả vào hòm thư sau khi <b>kết thúc 15 phút làm bài</b>. Bạn hãy nghỉ ngơi nhé!
-                </div>
-                <div class="mt-4">
-                    <a href="/" class="btn btn-primary rounded-pill px-5">Quay lại Dashboard</a>
-                </div>
-            </div>
-
-            <div x-show="!loading && status === 'DONE'" class="card shadow-lg text-center p-5 animate__animated animate__zoomIn">
-                <div class="mb-3 display-1">🎉</div>
-                <h2 class="fw-bold text-success">Đã hoàn thành phiên này!</h2>
-                <p class="text-white-50">Kết quả ghi nhận: <strong class="fs-4 text-primary" x-text="score"></strong>/10</p>
-                <div class="p-3 bg-dark bg-opacity-50 rounded-3 mb-4 text-white-50 small italic" x-text="feedback"></div>
-                <a href="/" class="btn btn-primary rounded-pill px-5">Về trang chủ</a>
-            </div>
-
+            
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function dailyGame() {
+    function dailyChallengeApp() {
         return {
-            loading: true,
-            status: 'WAITING',
-            nextSlot: '',
-            question: '',
-            options: { A: '', B: '', C: '', D: '' },
-            sessionId: null,
-            secondsLeft: 900,
-            answer: '',
-            submitting: false,
-            score: 0,
-            feedback: '',
-            timer: null,
+            question: null,
+            sessionState: 'PENDING',
+            userAnswer: '',
+            score: null,
+            earnedXP: 0,
+            correctAnswer: '',
+            explanation: '',
+            isSubmitting: false,
+            history: [],
 
-            init() { this.checkStatus(); },
-
-            checkStatus() {
-                this.loading = true;
-                fetch('/api/challenge/status').then(r => r.json()).then(data => {
-                    this.status = data.status;
-                    if (data.status === 'AVAILABLE') {
-                        this.question = data.question;
-                        this.options = data.options || { A: '', B: '', C: '', D: '' };
-                        this.sessionId = data.session_id;
-                        this.secondsLeft = data.seconds_left || 900;
-                        this.startTimer();
-                    } else if (data.status === 'WAITING') {
-                        this.nextSlot = data.next_slot;
-                    } else if (data.status === 'DONE') {
-                        this.score = data.score;
-                        this.feedback = data.feedback;
-                    }
-                    this.loading = false;
-                }).catch(err => {
-                    this.status = 'WAITING';
-                    this.nextSlot = 'Lỗi kết nối';
-                    this.loading = false;
-                });
-            },
-
-            startTimer() {
-                if (this.timer) clearInterval(this.timer);
-                this.timer = setInterval(() => {
-                    if (this.secondsLeft <= 0) {
-                        clearInterval(this.timer);
-                        this.status = 'WAITING';
-                        Swal.fire({ title: 'Hết giờ!', text: 'Thời gian cập nhật tri thức đã kết thúc.', icon: 'error' }).then(() => window.location.reload());
-                        return;
-                    }
-                    this.secondsLeft--;
-                }, 1000);
-            },
-
-            async submit() {
-                if (!this.answer.trim()) return;
-                this.submitting = true;
+            async initData() {
                 try {
-                    const res = await fetch('/api/challenge/submit', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ session_id: this.sessionId, answer: this.answer })
-                    });
+                    // 1. Fetch Trạng thái Câu hỏi hiện tại
+                    const res = await fetch('/api/training/daily_challenge/current');
                     const data = await res.json();
-                    if (data.success) {
-                        this.status = 'SUBMITTED';
-                        if (this.timer) clearInterval(this.timer);
-                        Swal.fire('Thành công!', data.msg, 'success');
+                    
+                    if(data.success) {
+                        this.question = data.question;
+                        this.sessionState = data.session.status || 'PENDING';
+                        
+                        if (this.sessionState === 'PENDING') {
+                            // CHỐNG MẤT BÀI F5: Lấy nháp từ LocalStorage
+                            const draft = localStorage.getItem('draft_daily_' + this.question.ID);
+                            if (draft) this.userAnswer = draft;
+                        } else {
+                            // Đã nộp hoặc Đã chấm -> Khóa form, show bài đã nộp
+                            this.userAnswer = data.session.userAnswer;
+                            
+                            if (this.sessionState === 'GRADED') {
+                                this.score = data.session.score;
+                                this.earnedXP = data.session.earnedXP || 0;
+                                // API Backend phải trả về CorrectAnswer & Explanation khi trạng thái là GRADED
+                                this.correctAnswer = data.question.CorrectAnswer || '';
+                                this.explanation = data.question.Explanation || '';
+                                // Xóa nháp vì đã hoàn thành
+                                localStorage.removeItem('draft_daily_' + this.question.ID);
+                            }
+                        }
                     } else {
-                        Swal.fire('Thông báo', data.msg, 'warning');
+                        this.question = null; 
                     }
-                } catch (e) {
-                    Swal.fire('Lỗi', 'Không thể gửi bài. Vui lòng kiểm tra mạng.', 'error');
-                } finally {
-                    this.submitting = false;
+                    
+                    // 2. Fetch Lịch sử
+                    const hRes = await fetch('/api/training/daily_challenge/history');
+                    const hData = await hRes.json();
+                    if(hData.success) {
+                        this.history = hData.history;
+                    }
+                } catch(e) { console.error("Lỗi:", e); }
+            },
+
+            saveDraft() {
+                // Tự động lưu nháp mỗi khi người dùng gõ
+                if(this.question && this.question.ID) {
+                    localStorage.setItem('draft_daily_' + this.question.ID, this.userAnswer);
                 }
             },
 
-            formatTime(s) {
-                if (s < 0) return "00:00";
-                const m = Math.floor(s / 60);
-                const sec = s % 60;
-                return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            async submitAnswer() {
+                if(!this.userAnswer.trim()) return;
+                this.isSubmitting = true;
+                
+                try {
+                    const res = await fetch('/api/training/daily_challenge/submit', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            question_id: this.question.ID,
+                            answer: this.userAnswer
+                        })
+                    });
+                    const result = await res.json();
+                    
+                    if(result.success) {
+                        this.sessionState = 'SUBMITTED';
+                        // Nộp thành công thì dọn dẹp bộ nhớ nháp
+                        localStorage.removeItem('draft_daily_' + this.question.ID);
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Tuyệt vời!',
+                            text: 'Bài của bạn đã được nộp thành công. Giám khảo AI đang chấm điểm, hãy quay lại xem kết quả sau ít phút nhé.',
+                            background: '#1c1f26', color: '#fff',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Lỗi', text: result.message, background: '#1c1f26', color: '#fff' });
+                    }
+                } catch (e) {
+                    Swal.fire({ icon: 'warning', title: 'Lỗi kết nối', text: 'Mất mạng tạm thời. Bản nháp của bạn đã được tự động lưu lại!', background: '#1c1f26', color: '#fff' });
+                } finally {
+                    this.isSubmitting = false;
+                }
+            },
+            
+            formatText(text) {
+                if(!text) return '';
+                // Chuyển ký tự xuống dòng (\n) thành thẻ ngắt dòng HTML (<br>)
+                return text.replace(/\n/g, '<br>');
             }
         }
     }
