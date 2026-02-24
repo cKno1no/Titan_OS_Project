@@ -5,6 +5,7 @@ from datetime import timedelta
 import os
 import redis
 import config
+import json
 from flask_session import Session
 # [NEW] Import Logger Setup
 from logger_setup import setup_production_logging
@@ -33,6 +34,7 @@ from services.user_service import UserService
 from services.customer_analysis_service import CustomerAnalysisService
 from services.gamification_service import GamificationService
 from services.training_service import TrainingService  # <--- [THÊM MỚI]
+from services.kpi_service import KPIService
 
 # 2. Import Blueprints
 from blueprints.crm_bp import crm_bp
@@ -52,6 +54,8 @@ from blueprints.user_bp import user_bp
 from blueprints.customer_analysis_bp import customer_analysis_bp
 from blueprints.training_bp import training_bp         # <--- [THÊM MỚI]
 # Khởi tạo đối tượng Cache (chưa gắn app)
+from blueprints.kpi_evaluation_bp import kpi_evaluation_bp
+
 cache = Cache()
 
 def create_app():
@@ -144,7 +148,8 @@ def create_app():
     app.ap_aging_service = APAgingService(db_manager)
     app.commission_service = CommissionService(db_manager)
     app.customer_analysis_service = CustomerAnalysisService(app.db_manager, app.redis_client)
-    
+    app.kpi_service = KPIService(db_manager)
+
     # [FIX] Khởi tạo và gắn PortalService
     app.portal_service = PortalService(db_manager)
     app.user_service = UserService(db_manager)
@@ -178,6 +183,7 @@ def create_app():
     app.register_blueprint(customer_analysis_bp) # Đường dẫn mặc định sẽ theo định nghĩa trong bp
     app.register_blueprint(training_bp) # <--- [THÊM MỚI] Đăng ký đường dẫn /training
     # 5. Inject User Context
+    app.register_blueprint(kpi_evaluation_bp)
    
     @app.context_processor
     # 5. Inject User Context (ĐÃ FIX LỖI)
@@ -279,5 +285,71 @@ def create_app():
         # Có thể thêm logic kiểm tra DB connection hoặc Global Security tại đây
         pass
     
-    # [QUAN TRỌNG] Phải trả về biến app, nếu không bên app.py sẽ nhận được None
+    # =========================================================================
+    # [THÊM MỚI] 7. GLOBAL AUDIT LOG MIDDLEWARE
+    # =========================================================================
+    @app.after_request
+    def auto_audit_logger(response):
+        # 1. Bỏ qua các Method chỉ đọc dữ liệu (GET, OPTIONS, HEAD)
+        if request.method not in ['POST', 'PUT', 'DELETE', 'PATCH']:
+            return response
+        
+        # 2. Bỏ qua các route không quan trọng, tĩnh, hoặc chatbot
+        if request.path.startswith('/static') or '/api/pet/' in request.path:
+            return response
+
+        try:
+            # Lấy thông tin user hiện tại
+            user_code = session.get('user_code', 'GUEST/SYSTEM')
+            
+            # Lấy IP
+            ip_address = request.headers.get("X-Forwarded-For", request.remote_addr)
+            if ip_address and ',' in ip_address:
+                ip_address = ip_address.split(',')[0].strip()
+
+            # 3. Trích xuất Payload
+            payload = {}
+            if request.is_json:
+                payload = request.get_json(silent=True) or {}
+            elif request.form:
+                payload = dict(request.form)
+
+            # 4. Che giấu Mật khẩu (Data Masking)
+            safe_payload = {}
+            for k, v in payload.items():
+                if 'password' in k.lower() or 'mat_khau' in k.lower():
+                    safe_payload[k] = '*** MASKED ***'
+                else:
+                    safe_payload[k] = v
+            
+            payload_str = json.dumps(safe_payload, ensure_ascii=False)
+            if len(payload_str) > 1000:
+                payload_str = payload_str[:1000] + "...[TRUNCATED]"
+
+            # 5. Phân loại Mức độ
+            severity = 'INFO'
+            if response.status_code >= 400:
+                severity = 'WARNING' 
+            if request.method == 'DELETE':
+                severity = 'CRITICAL'
+
+            # 6. Ghi xuống DB (Dùng thẳng app.db_manager đã khởi tạo ở trên)
+            action_type = f"AUTO_{request.method}"
+            details = f"[{request.endpoint}] {request.path} | HTTP {response.status_code} | Data: {payload_str}"
+
+            if hasattr(app, 'db_manager'):
+                app.db_manager.write_audit_log(
+                    user_code=user_code,
+                    action_type=action_type,
+                    severity=severity,
+                    details=details,
+                    ip_address=ip_address
+                )
+        except Exception as e:
+            app.logger.error(f"Global Audit Log Error: {e}")
+
+        return response
+    
+    # [QUAN TRỌNG] Phải trả về biến app
+    
     return app

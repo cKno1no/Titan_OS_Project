@@ -1,0 +1,56 @@
+[2026-01-23 04:47:51,662] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 04:47:57,657] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-23 04:51:56,228] ERROR in db_manager:131 [KD010]: Lỗi execute_non_query: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[2026-01-23 04:51:56,228] ERROR in db_manager:131 [KD010]: Lỗi execute_non_query: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[2026-01-23 04:51:56,248] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT MA_SO FROM {config.TABLE_COMMISSION_DETAIL} WHERE VoucherID = ?]
+[parameters: ('AV20250000023058',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 04:51:56,248] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT MA_SO FROM {config.TABLE_COMMISSION_DETAIL} WHERE VoucherID = ?]
+[parameters: ('AV20250000023055',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 04:51:56,276] ERROR in db_manager:131 [KD010]: Lỗi execute_non_query: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[2026-01-23 04:51:56,276] ERROR in db_manager:131 [KD010]: Lỗi execute_non_query: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[2026-01-23 04:51:56,278] ERROR in db_manager:131 [KD010]: Lỗi execute_non_query: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[2026-01-23 04:51:56,278] ERROR in db_manager:131 [KD010]: Lỗi execute_non_query: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[2026-01-23 04:51:56,298] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT MA_SO FROM {config.TABLE_COMMISSION_DETAIL} WHERE VoucherID = ?]
+[parameters: ('AV20250000023039',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 04:51:56,304] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT MA_SO FROM {config.TABLE_COMMISSION_DETAIL} WHERE VoucherID = ?]
+[parameters: ('AV20250000023052',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 04:51:56,304] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT MA_SO FROM {config.TABLE_COMMISSION_DETAIL} WHERE VoucherID = ?]
+[parameters: ('AV20250000023049',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 04:51:56,304] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT MA_SO FROM {config.TABLE_COMMISSION_DETAIL} WHERE VoucherID = ?]
+[parameters: ('AV20250000023061',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 04:52:32,844] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server]Syntax error, permission violation, or other nonspecific error (0) (SQLPrepare)')
+[SQL: SELECT * FROM {config.TABLE_COMMISSION_MASTER} WHERE MA_SO = ?]
+[parameters: ('BH20260123045301',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-23 11:33:59,660] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-23 11:34:55,408] INFO in chatbot_service:418 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Lãnh đạo', 'titan_name': 'Sếp Đông'}
+[2026-01-23 12:43:10,632] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 13:34:28,271] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 13:39:12,477] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 13:40:00,585] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 13:43:59,831] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 14:04:47,214] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 14:05:50,215] INFO in budget_service:15 [KD010]: WARNING: send_notification_email not found in utils.py
+[2026-01-23 14:05:50,217] INFO in budget_service:228 [KD010]: 📧 Notification sent to pdong@stdvn.com
+[2026-01-23 15:39:09,159] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 15:40:34,312] INFO in budget_service:15 [KD010]: WARNING: send_notification_email not found in utils.py
+[2026-01-23 15:40:34,314] INFO in budget_service:228 [KD010]: 📧 Notification sent to pdong@stdvn.com
+[2026-01-23 16:01:58,669] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 16:02:54,101] ERROR in commission_service:263 [KD010]: Lỗi tạo file HTML: name 'os' is not defined
+[2026-01-23 16:02:54,375] INFO in budget_service:15 [KD010]: WARNING: send_notification_email not found in utils.py
+[2026-01-23 16:02:54,377] INFO in budget_service:228 [KD010]: 📧 Notification sent to pdong@stdvn.com
+[2026-01-23 16:08:55,226] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-23 16:09:31,668] INFO in budget_service:15 [KD010]: WARNING: send_notification_email not found in utils.py
+[2026-01-23 16:09:31,676] INFO in budget_service:228 [KD010]: 📧 Notification sent to pdong@stdvn.com

@@ -1,0 +1,405 @@
+[2026-02-19 15:16:51,898] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 15:26:48,259] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-19 15:27:26,541] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 15:27:26,603] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-19 15:58:29,993] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 15:58:51,706] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 15:58:51,767] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-19 16:01:16,020] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 16:01:16,087] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-19 16:01:56,310] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 16:01:56,379] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-19 16:34:49,923] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 16:34:49,988] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-19 16:36:01,636] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 16:36:01,782] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-19 16:43:32,716] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 16:43:32,786] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-19 20:16:58,359] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-19 20:27:33,328] ERROR in app:875 [KD010]: Exception on /analysis/comparison [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 129, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\executive_bp.py", line 104, in comparison_dashboard
+    return render_template(
+        'comparison_dashboard.html',
+    ...<4 lines>...
+        user_context=user_context
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\comparison_dashboard.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 121, in top-level template code
+    {% block header %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\base.html", line 192, in block 'header'
+    {% if user_context.role == 'ADMIN' or user_context.can('THEME_DARK') %}
+    ^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\utils.py", line 92, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'None' has no attribute 'can'
+[2026-02-19 20:37:39,424] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 20:38:13,861] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 20:38:13,929] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-19 20:38:42,915] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 20:38:42,984] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-19 20:39:36,316] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 20:39:36,381] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-19 21:45:30,721] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 21:45:34,098] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 59, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',  # Sử dụng template tên mới
+    ...<7 lines>...
+        is_admin=is_admin
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 36, in block 'content'
+    <h2 class="fw-black mb-0 {% if total_kpi_score >= 100 %}text-success{% elif total_kpi_score >= 80 %}text-primary{% elif total_kpi_score >= 60 %}text-warning{% else %}text-danger{% endif %}">
+    ^
+jinja2.exceptions.UndefinedError: 'total_kpi_score' is undefined
+[2026-02-19 21:48:34,437] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 21:48:39,572] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 60, in kpi_dashboard
+    user_info=user_info,
+              ^^^^^^^^^
+NameError: name 'user_info' is not defined
+[2026-02-19 21:48:46,606] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 60, in kpi_dashboard
+    user_info=user_info,
+              ^^^^^^^^^
+NameError: name 'user_info' is not defined
+[2026-02-19 21:51:17,612] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 21:51:19,797] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'HO TEN'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CHUC DANH'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: 
+        SELECT USERCODE AS EmployeeID, [HO TEN] AS EmployeeName, [CHUC DANH] AS Title 
+        FROM [dbo].[GD - NGUOI DUNG] 
+        WHERE USERCODE = ?
+    ]
+[parameters: ('KD010',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-19 21:51:20,035] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 71, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',
+    ...<7 lines>...
+        total_kpi_score=total_kpi_score
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 54, in block 'content'
+    <form method="GET" action="{{ url_for('kpi_evaluation_bp.kpi_eval_detail') }}">
+    ^^^^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'kpi_evaluation_bp.kpi_eval_detail'. Did you mean 'kpi_evaluation_bp.evaluate_kpi' instead?
+[2026-02-19 21:54:14,797] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 21:56:12,843] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 21:56:12,910] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-19 22:24:44,168] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:25:01,073] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 69, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',
+    ...<7 lines>...
+        total_kpi_score=total_kpi_score
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 303, in block 'content'
+    const apiUrl = `{{ url_for('kpi_evaluation_bp.api_kpi_detail') }}?criteria_id=${criteriaId}&target_user=${targetUser}&year=${year}&month=${month}`;
+    ^^^^^^^^^^^^^^^^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'kpi_evaluation_bp.api_kpi_detail'. Did you mean 'kpi_evaluation_bp.kpi_dashboard' instead?
+[2026-02-19 22:27:30,491] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:27:57,926] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:29:50,204] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:29:53,539] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 69, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',
+    ...<7 lines>...
+        total_kpi_score=total_kpi_score
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 216, in block 'content'
+    style="width: 130px; height: 130px; border: 10px solid {% if total_score >= 100 %}#8b5cf6{% elif total_score >= 80 %}#3b82f6{% else %}#f59e0b{% endif %}; background: #fff;">
+    
+jinja2.exceptions.UndefinedError: 'total_score' is undefined
+[2026-02-19 22:34:38,708] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:34:41,650] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 69, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',
+    ...<7 lines>...
+        total_kpi_score=total_kpi_score
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 178, in block 'content'
+    style="width: 130px; height: 130px; border: 10px solid {% if total_score >= 100 %}#8b5cf6{% elif total_score >= 80 %}#3b82f6{% else %}#f59e0b{% endif %}; background: #fff;">
+    
+jinja2.exceptions.UndefinedError: 'total_score' is undefined
+[2026-02-19 22:35:31,760] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:35:33,816] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 69, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',
+    ...<7 lines>...
+        total_kpi_score=total_kpi_score
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 178, in block 'content'
+    style="width: 130px; height: 130px; border: 10px solid {% if total_score >= 100 %}#8b5cf6{% elif total_score >= 80 %}#3b82f6{% else %}#f59e0b{% endif %}; background: #fff;">
+    
+jinja2.exceptions.UndefinedError: 'total_score' is undefined
+[2026-02-19 22:35:35,953] ERROR in app:875 [KD010]: Exception on /kpi-eval/dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 69, in kpi_dashboard
+    return render_template(
+        'kpi_evaluation.html',
+    ...<7 lines>...
+        total_kpi_score=total_kpi_score
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\kpi_evaluation.html", line 178, in block 'content'
+    style="width: 130px; height: 130px; border: 10px solid {% if total_score >= 100 %}#8b5cf6{% elif total_score >= 80 %}#3b82f6{% else %}#f59e0b{% endif %}; background: #fff;">
+    
+jinja2.exceptions.UndefinedError: 'total_score' is undefined
+[2026-02-19 22:37:04,615] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-19 22:37:31,245] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-19 22:37:31,315] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")

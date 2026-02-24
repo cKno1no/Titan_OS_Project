@@ -1,441 +1,589 @@
 {% extends "base.html" %}
 
-{% block title %}Action Center | Titan OS{% endblock %}
+{% block title %}Cockpit | Titan OS{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* --- THEME COMPATIBLE STYLES --- */
+    /* ========================================================== */
+    /* 1. AMBIENT BACKGROUND & MESH GRADIENT                      */
+    /* ========================================================== */
+    body { background-color: #f1f5f9; position: relative; overflow-x: hidden; }
+    .ambient-blob {
+        position: fixed; filter: blur(80px); opacity: 0.5; z-index: -1;
+        border-radius: 50%; animation: float 15s infinite ease-in-out alternate;
+    }
+    .blob-1 { top: -5%; left: -5%; width: 400px; height: 400px; background: #c4b5fd; } 
+    .blob-2 { bottom: -10%; right: -5%; width: 500px; height: 500px; background: #bae6fd; animation-delay: -5s; } 
+    .blob-3 { top: 40%; left: 60%; width: 350px; height: 350px; background: #fde68a; animation-delay: -10s; } 
     
-    /* Header Area */
-    .greeting-title { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
-    .greeting-sub { color: var(--secondary); font-size: 0.95rem; }
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(50px, 30px) scale(1.1); }
+        100% { transform: translate(-30px, 50px) scale(0.9); }
+    }
 
-    /* Stat Cards */
-    .stat-card { 
-        background: var(--card-bg); border-radius: 20px; padding: 20px; 
-        box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); 
-        height: 100%; display: flex; align-items: center; transition: transform 0.2s; 
+    /* ========================================================== */
+    /* 2. GLASSMORPHISM & BENTO BOX CARDS                         */
+    /* ========================================================== */
+    .bento-card {
+        background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03); padding: 1.5rem; height: 100%;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        display: flex; flex-direction: column; overflow: hidden; position: relative;
     }
-    .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-    
-    .stat-icon-box { 
-        width: 56px; height: 56px; border-radius: 50%; 
-        display: flex; align-items: center; justify-content: center; 
-        margin-right: 18px; font-size: 1.5rem; flex-shrink: 0;
+    .bento-card:hover {
+        transform: translateY(-5px); box-shadow: 0 20px 40px rgba(100, 116, 139, 0.1); background: rgba(255, 255, 255, 0.85);
     }
+    .bento-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+    .bento-title { font-size: 1.1rem; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; margin: 0; display: flex; align-items: center; gap: 8px; }
     
-    .icon-primary { background-color: var(--input-bg); color: var(--primary); }
-    .icon-danger { background-color: rgba(227, 26, 26, 0.1); color: var(--danger); }
-    .icon-success { background-color: rgba(5, 205, 153, 0.1); color: var(--success); }
-    .icon-warning { background-color: rgba(255, 181, 71, 0.1); color: var(--warning); }
-    
-    .stat-label { color: var(--secondary); font-size: 0.85rem; font-weight: 600; margin-bottom: 2px; }
-    .stat-value { color: var(--text-dark); font-size: 1.5rem; font-weight: 800; line-height: 1; }
-    .stat-sub { font-size: 0.75rem; margin-top: 5px; }
+    .bento-scroll-area { flex-grow: 1; overflow-y: auto; overflow-x: hidden; padding-right: 5px; max-height: 280px; }
+    .bento-scroll-area::-webkit-scrollbar { width: 5px; }
+    .bento-scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .bento-scroll-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+    .bento-scroll-area:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); }
 
-    /* Accordion Custom */
-    .custom-accordion .accordion-item { 
-        border: 1px solid var(--border-color); background: var(--card-bg); 
-        border-radius: 20px !important; box-shadow: var(--shadow-sm); 
-        margin-bottom: 20px; overflow: hidden; 
+    /* ========================================================== */
+    /* 3. DATA VISUALIZATION                                      */
+    /* ========================================================== */
+    .progress-ring {
+        width: 120px; height: 120px; border-radius: 50%;
+        background: conic-gradient(#6366f1 var(--progress), #e2e8f0 0deg);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.05); margin: 0 auto; transition: --progress 1.5s ease-out;
     }
-    .custom-accordion .accordion-button { 
-        background-color: var(--card-bg); color: var(--text-dark); 
-        font-weight: 700; font-size: 1.1rem; padding: 20px 25px; box-shadow: none !important; 
-    }
-    .custom-accordion .accordion-button:not(.collapsed) { 
-        background-color: var(--input-bg); color: var(--primary); border-bottom: 1px solid var(--border-color);
-    }
-    .custom-accordion .accordion-body { padding: 0 25px 25px 25px; background-color: var(--card-bg); }
-
-    /* Lists */
-    .section-title { 
-        font-size: 0.85rem; font-weight: 700; color: var(--secondary); 
-        text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 15px; display: block; 
-    }
-    .clean-list { list-style: none; padding: 0; margin: 0; }
-    .clean-item { 
-        display: flex; align-items: center; padding: 12px 0; 
-        border-bottom: 1px solid var(--border-color); transition: background 0.2s; 
-    }
-    .clean-item:last-child { border-bottom: none; }
-    .clean-item:hover { background-color: var(--input-bg); border-radius: 12px; padding-left: 10px; padding-right: 10px;}
-    
-    .item-content { flex-grow: 1; margin-left: 15px; min-width: 0; }
-    .item-title { font-weight: 600; color: var(--text-dark); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .item-desc { color: var(--secondary); font-size: 0.8rem; }
-
-    /* Quick Actions */
-    .quick-actions { display: flex; gap: 10px; }
-    .btn-quick { 
-        background: var(--card-bg); border: 1px solid var(--border-color); 
-        color: var(--primary); font-weight: 600; padding: 8px 20px; 
-        border-radius: 12px; transition: all 0.2s ease; font-size: 0.95rem; 
-        box-shadow: var(--shadow-sm); display: inline-flex; align-items: center; text-decoration: none;
-    }
-    .btn-quick:hover { 
-        background: var(--primary); color: white !important; border-color: var(--primary); 
-        transform: translateY(-3px); 
+    .progress-ring-inner {
+        width: 90px; height: 90px; background: rgba(255,255,255,0.95); border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; color: #1e293b; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     
-    /* Group Header inside Accordion */
-    .group-header { transition: background-color 0.2s; background-color: var(--input-bg) !important; color: var(--text-dark) !important; }
-    .group-header:hover { background-color: var(--border-color) !important; }
+    .data-list { list-style: none; padding: 0; margin: 0; }
+    .data-item {
+        background: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 16px; padding: 12px 15px; margin-bottom: 10px;
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        transition: transform 0.2s, background 0.2s; cursor: pointer;
+    }
+    .data-item:hover { background: rgba(255,255,255,0.9); transform: scale(1.02); }
+    .data-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem;}
 
-    /* Hall of Fame */
-    .hall-of-fame-card {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
-        box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.5);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .hall-of-fame-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px -5px rgba(245, 158, 11, 0.7);
-    }
-    .shine-effect {
-        position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-        background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
-        transform: skewX(-25deg);
-        animation: shine 6s infinite;
-        pointer-events: none;
-    }
-    @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
-    
-    .btn-honor { background-color: white; color: #d97706 !important; transition: all 0.2s; border: none; }
-    .btn-honor:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    /* ========================================================== */
+    /* 4. ENTRANCE ANIMATIONS                                     */
+    /* ========================================================== */
+    .stagger-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
+    .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.2s; } .d-3 { animation-delay: 0.3s; }
+    .d-4 { animation-delay: 0.4s; } .d-5 { animation-delay: 0.5s; } .d-6 { animation-delay: 0.6s; }
+    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+    .glow-red { animation: glowRed 2s infinite alternate; }
+    @keyframes glowRed { from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); } to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); border-color: rgba(239, 68, 68, 0.5);} }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .header-area { flex-direction: column; align-items: flex-start !important; gap: 15px; }
-        .quick-actions { width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .btn-quick { justify-content: center; padding: 10px 5px; font-size: 0.8rem; text-align: center; }
-        .stat-card { padding: 15px; }
-        .clean-item .d-flex.justify-content-between { flex-direction: column; align-items: flex-start !important; }
-        .clean-item .d-flex.justify-content-between .text-end { text-align: left !important; margin-top: 5px; }
-        .hall-of-fame-card .card-body { flex-direction: column; text-align: center; gap: 15px; }
-        .hall-of-fame-card .icon-box-lg { margin-right: 0 !important; margin-bottom: 10px; }
+    /* Custom Header cho Modal */
+    .modal-header-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; border-radius: 1.5rem 1.5rem 0 0; padding: 1.5rem;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-    <div hx-boost="true"> <div class="header-area d-flex justify-content-between align-items-end mb-4">
-            <div>
-                <h1 class="greeting-title">Xin chào, {{ user.shortname }}! 👋</h1>
-                <p class="greeting-sub">Tổng quan công việc hôm nay ({{ now_date }}).</p>
-            </div>
-            <div class="quick-actions">
-                <a href="/nhaplieu" class="btn btn-quick"><i class="fas fa-plus me-2"></i> Báo cáo</a>
-                <a href="/task_dashboard" class="btn btn-quick"><i class="fas fa-check me-2"></i> Task</a>
-                <a href="/sales/sales_lookup" class="btn btn-quick"><i class="fas fa-search me-2"></i> Tra cứu</a>
-            </div>
-        </div>
+{% set user_dept = session.get('bo_phan', '') | upper %}
+{% set user_role = session.get('user_role', '') | upper %}
+{% set is_kho = 'KHO' in user_dept or 'LOGISTICS' in user_dept %}
+{% set is_acc = 'KE TOAN' in user_dept or 'TAI CHINH' in user_dept %}
+{% set is_sales = 'KINH DOANH' in user_dept or 'SALES' in user_dept %}
 
-        <div class="row g-4 mb-4">
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-icon-box icon-primary"><i class="fas fa-chart-bar"></i></div>
-                    <div>
-                        <div class="stat-label">Tiến độ Doanh số</div>
-                        <div class="stat-value">{{ sales_kpi.percent }}%</div>
-                        <div class="stat-sub text-success fw-bold">
-                            {{ sales_kpi.actual | format_tr }} / {{ sales_kpi.target | format_tr }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-icon-box icon-danger"><i class="fas fa-fire"></i></div>
-                    <div>
-                        <div class="stat-label">Việc cần làm ngay</div>
-                        <div class="stat-value">{{ tasks|length }}</div>
-                        <div class="stat-sub text-secondary">Tasks chưa hoàn thành</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-icon-box icon-warning"><i class="fas fa-shipping-fast"></i></div>
-                    <div>
-                        <div class="stat-label">Cần giao trong tháng</div>
-                        <div class="stat-value">{{ orders_stat }}</div>
-                        <div class="stat-sub text-secondary">Đơn hàng chưa hoàn tất</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-3 col-md-6">
-                <div class="stat-card">
-                    <div class="stat-icon-box icon-success"><i class="fas fa-wallet"></i></div>
-                    <div>
-                        <div class="stat-label">KH Quá hạn Nợ</div>
-                        <div class="stat-value">{{ overdue_debt|length }}</div>
-                        <div class="stat-sub text-secondary">Khách hàng (Top 20)</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="ambient-blob blob-1"></div>
+<div class="ambient-blob blob-2"></div>
+<div class="ambient-blob blob-3"></div>
 
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card h-100 border-0 position-relative overflow-hidden hall-of-fame-card">
-                    <div class="shine-effect"></div>
-                    <div class="card-body d-flex justify-content-between align-items-center p-4 text-white">
-                        <div class="d-flex align-items-center">
-                            <div class="icon-box-lg bg-white text-warning rounded-circle shadow-sm me-4 d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2rem;">
-                                <i class="fas fa-trophy"></i>
-                            </div>
+<div class="container-fluid py-4">
+
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-xl-8 stagger-up d-1 order-0">
+            <div class="bento-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9)); color: white; border: none; overflow: visible;">
+                <i class="fas fa-cube position-absolute text-white opacity-10" style="font-size: 15rem; right: -20px; top: -50px; z-index: 0;"></i>
+                
+                <div class="d-flex flex-column flex-md-row justify-content-between h-100 position-relative z-index-1 gap-4">
+                    <div class="d-flex flex-column justify-content-center flex-grow-1">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <img src="{{ dashboard_data.user_avatar }}" class="rounded-circle border border-2 border-white shadow-sm" style="width: 64px; height: 64px; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?background=random&color=fff&size=64&bold=true&name={{ session.user_shortname }}'">
                             <div>
-                                <h4 class="fw-bold mb-1">Đại Sảnh Danh Vọng & Kể Chuyện</h4>
-                                <p class="mb-1 opacity-90">Nơi vinh danh những nỗ lực thầm lặng và câu chuyện văn hóa.</p>
-                                <div class="d-inline-flex align-items-center mt-2 px-3 py-1 rounded-pill" style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3);">
-                                    <i class="fas fa-robot me-2 text-info"></i>
-                                    <span class="small fw-bold">Mở khóa AI Titan: <span class="text-warning">Đóng góp 3 câu chuyện</span></span>
+                                <h3 class="fw-bolder mb-0 tracking-tight text-white">Chào, {{ session.user_shortname }}! 👋</h3>
+                                <div class="badge bg-white text-primary rounded-pill px-3 mt-1 fw-bold shadow-sm">
+                                    <i class="fas fa-crown text-warning me-1"></i> Rank {{ dashboard_data.gamification.grade | default('D') }} 
                                 </div>
                             </div>
                         </div>
-                        <a href="{{ url_for('portal_bp.hall_of_fame_share') }}" class="btn btn-light text-warning fw-bold rounded-pill px-5 py-2 shadow-sm btn-honor">
-                            <i class="fas fa-pen-nib me-2"></i> Kể Chuyện Ngay
-                        </a>
+
+                        <div class="mt-2 mb-3 pe-md-4">
+                            <div class="d-flex justify-content-between text-white small fw-bold mb-1 opacity-90">
+                                <span><i class="fas fa-rocket text-warning me-1"></i> Tiến trình KPI Tháng</span>
+                                <span>{{ dashboard_data.gamification.total_score | default(0) }} / 100 Điểm</span>
+                            </div>
+                            <div class="progress" style="height: 12px; background-color: rgba(255,255,255,0.2); border-radius: 12px;">
+                                <div class="progress-bar bg-warning progress-bar-striped progress-bar-animated" role="progressbar" 
+                                     style="width: {{ [dashboard_data.gamification.total_score|default(0), 100]|min }}%; box-shadow: 0 0 12px rgba(251, 191, 36, 0.9);"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white bg-opacity-25 rounded-4 p-3 backdrop-blur border border-white border-opacity-25">
+                            <h6 class="fw-bold mb-1 text-uppercase small tracking-widest"><i class="fas fa-bolt text-warning me-2"></i>Titan AI Briefing</h6>
+                            <p class="mb-0 fs-6 lh-sm opacity-90">
+                                {% if dashboard_data.task_brief and dashboard_data.task_brief.overdue > 0 %}
+                                    <strong class="text-warning">Gấp:</strong> Có {{ dashboard_data.task_brief.overdue }} Task trễ hạn. Xử lý ngay để giữ điểm số!
+                                {% else %}
+                                    Lịch trình an toàn. Có {{ dashboard_data.task_brief.today | default(0) }} Task trong ngày.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-column justify-content-center gap-2 align-items-md-end flex-shrink-0">
+                        <a href="{{ url_for('task_bp.task_dashboard') }}" target="_blank" class="btn btn-light text-primary rounded-pill px-4 py-2 fw-bold shadow"><i class="fas fa-plus me-2"></i>Lên Plan Hôm Nay</a>
+                        <a href="{{ url_for('crm_bp.nhap_lieu') }}" target="_blank" class="btn btn-info text-white rounded-pill px-4 py-2 fw-bold shadow-sm"><i class="fas fa-edit me-2"></i>Viết CRM Nhanh</a>
+                        <a href="{{ url_for('kpi_evaluation_bp.kpi_dashboard') }}" target="_blank" class="btn btn-warning text-dark rounded-pill px-4 py-2 fw-bold shadow-sm mt-1"><i class="fas fa-chart-pie me-1"></i> Chi Tiết Điểm KPI</a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="accordion custom-accordion" id="portalAccordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
-                        <i class="fas fa-exclamation-circle me-3 text-danger"></i> BÁO ĐỘNG ĐỎ (Urgent)
-                    </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#portalAccordion">
-                    <div class="accordion-body">
-                        <div class="row">
-                            <div class="col-lg-6 border-end">
-                                <span class="section-title text-danger">🔥 Việc cần làm gấp</span>
-                                <ul class="clean-list">
-                                    {% for task in tasks %}
-                                    <li class="clean-item">
-                                        <div class="item-icon">
-                                            {% if task.Status == 'BLOCKED' %} <i class="fas fa-lock text-danger"></i>
-                                            {% elif task.Priority == 'HIGH' %} <i class="fas fa-star text-warning"></i>
-                                            {% else %} <i class="far fa-circle text-secondary"></i> {% endif %}
+        <div class="col-12 col-md-6 col-xl-4 stagger-up d-2 {% if is_acc %}order-1{% else %}order-2{% endif %}">
+            <div class="bento-card {% if (dashboard_data.task_brief.overdue > 0) or (dashboard_data.overdue_debt|length > 0) %}glow-red{% endif %}">
+                <div class="bento-header">
+                    <h5 class="bento-title"><span class="bg-danger text-white rounded p-1 me-1"><i class="fas fa-fire fa-fw"></i></span> Khẩn Cấp</h5>
+                </div>
+                <div class="bento-scroll-area d-flex flex-column justify-content-center">
+                    
+                    {% if dashboard_data.task_brief and dashboard_data.task_brief.overdue > 0 %}
+                    <div class="data-item text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalTasks">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="data-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div><h6 class="mb-0 fw-bold text-dark">Kỷ luật Task</h6><small class="text-muted">{{ dashboard_data.task_brief.overdue }} task trễ hạn</small></div>
+                        </div>
+                        <i class="fas fa-search-plus text-muted opacity-50"></i>
+                    </div>
+                    {% endif %}
+
+                    {% if dashboard_data.overdue_debt and dashboard_data.overdue_debt|length > 0 %}
+                    <div class="data-item text-decoration-none" data-bs-toggle="modal" data-bs-target="#modalDebt">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="data-icon bg-danger bg-opacity-10 text-danger"><i class="fas fa-wallet"></i></div>
+                            <div><h6 class="mb-0 fw-bold text-dark">Nợ Quá Hạn</h6><small class="text-muted">{{ dashboard_data.overdue_debt|length }} KH vi phạm</small></div>
+                        </div>
+                        <i class="fas fa-search-plus text-muted opacity-50"></i>
+                    </div>
+                    {% endif %}
+                    
+                    {% if (not dashboard_data.task_brief or dashboard_data.task_brief.overdue == 0) and (not dashboard_data.overdue_debt or dashboard_data.overdue_debt|length == 0) %}
+                    <div class="text-center text-success py-4">
+                        <i class="fas fa-shield-alt fa-3x mb-2 opacity-50"></i>
+                        <h6 class="fw-bold mb-0">Tuyệt vời! Không có cảnh báo.</h6>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-3 stagger-up d-3 {% if is_sales %}order-1{% elif is_kho %}order-5{% else %}order-3{% endif %}">
+            <div class="bento-card text-center justify-content-center">
+                <h5 class="bento-title justify-content-center mb-3 text-secondary">Mục Tiêu Tháng</h5>
+                <div class="progress-ring my-3" style="--progress: {{ dashboard_data.sales_kpi.percent|default(0) }}%;">
+                    <div class="progress-ring-inner">{{ dashboard_data.sales_kpi.percent|round(1) }}%</div>
+                </div>
+                <div class="fw-bold text-dark fs-5 mt-2">{{ dashboard_data.sales_kpi.actual | format_tr }}</div>
+                <small class="text-muted fw-semibold">Target: {{ dashboard_data.sales_kpi.target | format_tr }}</small>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 col-xl-5 stagger-up d-4 order-4">
+            <div class="bento-card">
+                <div class="bento-header mb-2">
+                    <h5 class="bento-title"><span class="bg-warning text-white rounded p-1 me-1"><i class="fas fa-star fa-fw"></i></span> Văn Hóa Titan</h5>
+                </div>
+                <div class="d-flex flex-column gap-3 mt-2">
+                    <div class="data-item p-3" style="background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(254, 243, 199, 0.5)); border-left: 4px solid #f59e0b;">
+                        <div style="min-width:0;">
+                            <span class="badge bg-danger rounded-pill pulse-animation mb-1">Tin mới</span>
+                            <h6 class="fw-bold text-dark mb-1 text-truncate">
+                                {% if dashboard_data.hall_of_fame %}{{ dashboard_data.hall_of_fame.author }} vinh danh {{ dashboard_data.hall_of_fame.target }}{% else %}Đại Sảnh Danh Vọng đang chờ{% endif %}
+                            </h6>
+                            <small class="text-muted d-block text-truncate">{% if dashboard_data.hall_of_fame %}"{{ dashboard_data.hall_of_fame.title }}"{% else %}Gieo một hạt mầm hạnh phúc.{% endif %}</small>
+                        </div>
+                        <a href="{{ url_for('portal_bp.hall_of_fame_share') }}" target="_blank" class="btn btn-outline-warning btn-sm rounded-circle bg-white shadow-sm flex-shrink-0" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-pen"></i></a>
+                    </div>
+                    <div class="data-item p-3" style="background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(220, 252, 231, 0.5)); border-left: 4px solid #10b981;">
+                        <div class="w-100 pe-3" style="min-width:0;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <h6 class="fw-bold text-dark mb-0 text-truncate"><i class="fas fa-graduation-cap text-success me-1"></i> Đào tạo</h6>
+                                <span class="fw-bold text-success small">{{ dashboard_data.training.progress|default(0) }}%</span>
+                            </div>
+                            <small class="text-muted d-block text-truncate">Nâng cao năng lực chuyên môn và kỹ năng quản lý.</small>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" style="width: {{ dashboard_data.training.progress|default(0) }}%;"></div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('training_bp.training_dashboard') }}" target="_blank" class="btn btn-outline-success btn-sm rounded-circle bg-white shadow-sm flex-shrink-0" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-play"></i></a>
+                    </div>
+                    <div class="data-item p-3" style="background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(224, 242, 254, 0.5)); border-left: 4px solid #0ea5e9;">
+                        <div class="w-100 pe-3" style="min-width:0;">
+                            <div class="d-flex justify-content-between mb-1">
+                                <h6 class="fw-bold text-dark mb-0 text-truncate"><i class="fas fa-users text-info me-1"></i> Đánh Giá Chéo</h6>
+                            </div>
+                            <small class="text-muted d-block">Ghi nhận tinh thần phối hợp của đồng nghiệp.</small>
+                        </div>
+                        <a href="/kpi-eval/peer-review" target="_blank" class="btn btn-outline-info btn-sm rounded-circle bg-white shadow-sm flex-shrink-0" style="width: 35px; height: 35px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4 stagger-up d-5 {% if is_kho %}order-1{% else %}order-5{% endif %}">
+            <div class="bento-card">
+                <div class="bento-header">
+                    <h5 class="bento-title"><span class="bg-primary text-white rounded p-1 me-1"><i class="fas fa-truck fa-fw"></i></span> Giao Hàng & Tồn Kho</h5>
+                </div>
+                <div class="bento-scroll-area">
+                    <ul class="data-list">
+                        {% if dashboard_data.pending_deliveries and dashboard_data.pending_deliveries|length > 0 %}
+                        <li class="data-item" data-bs-toggle="modal" data-bs-target="#modalDelivery">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="data-icon bg-primary bg-opacity-10 text-primary"><i class="fas fa-box"></i></div>
+                                <div><div class="fw-bold text-dark small">Đơn chờ giao</div><small class="text-muted">{{ dashboard_data.pending_deliveries|length }} nhóm đơn</small></div>
+                            </div>
+                            <i class="fas fa-search-plus text-primary fs-5"></i>
+                        </li>
+                        {% endif %}
+                        
+                        {% if dashboard_data.urgent_replenish and dashboard_data.urgent_replenish|length > 0 %}
+                        <li class="data-item" data-bs-toggle="modal" data-bs-target="#modalReplenish">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="data-icon bg-success bg-opacity-10 text-success"><i class="fas fa-cubes"></i></div>
+                                <div><div class="fw-bold text-dark small">Gợi ý dự phòng</div><small class="text-success fw-bold">{{ dashboard_data.urgent_replenish|length }} KH cần nhập</small></div>
+                            </div>
+                            <i class="fas fa-search-plus text-primary fs-5"></i>
+                        </li>
+                        {% endif %}
+                        
+                        {% if not dashboard_data.pending_deliveries and not dashboard_data.urgent_replenish %}
+                        <div class="text-center text-muted py-4 small">Kho vận hành ổn định.</div>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-8 stagger-up d-6 {% if is_sales %}order-4{% else %}order-6{% endif %}">
+            <div class="bento-card">
+                <div class="bento-header">
+                    <h5 class="bento-title"><span class="bg-info text-white rounded p-1 me-1"><i class="fas fa-chart-line fa-fw"></i></span> Phễu Kinh Doanh & CRM</h5>
+                    <ul class="nav nav-pills small fw-bold" id="bentoTab" role="tablist">
+                        <li class="nav-item"><a class="nav-link active rounded-pill px-3 py-1" data-bs-toggle="tab" href="#tab-quotes">Báo giá</a></li>
+                        <li class="nav-item"><a class="nav-link rounded-pill px-3 py-1 text-muted" data-bs-toggle="tab" href="#tab-crm">Nhật ký CRM</a></li>
+                    </ul>
+                </div>
+                
+                <div class="tab-content flex-grow-1" style="overflow: hidden;">
+                    <div class="tab-pane fade show active h-100" id="tab-quotes">
+                        <div class="row h-100">
+                            <div class="col-md-6 border-end border-light bento-scroll-area pe-3">
+                                <h6 class="text-muted small fw-bold text-uppercase mb-2">Báo giá chờ chốt</h6>
+                                <ul class="data-list">
+                                    {% if dashboard_data.active_quotes and dashboard_data.active_quotes|length > 0 %}
+                                    <li class="data-item p-3" data-bs-toggle="modal" data-bs-target="#modalQuotes">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="data-icon bg-info bg-opacity-10 text-info"><i class="fas fa-file-signature"></i></div>
+                                            <div><div class="fw-bold text-dark">Danh sách Báo giá</div><small class="text-muted">{{ dashboard_data.active_quotes|length }} KH đang chờ duyệt</small></div>
                                         </div>
-                                        <div class="item-content">
-                                            <a href="/task_dashboard?open={{ task.TaskID }}" class="item-title text-decoration-none">{{ task.Title }}</a>
-                                            <div class="item-desc">{{ task.ObjectID }} • {{ task.Status }}</div>
-                                        </div>
-                                        {% if task.IsNewUpdate == 1 %}
-                                            <span class="badge bg-danger rounded-pill ms-2">New</span>
-                                        {% endif %}
+                                        <i class="fas fa-search-plus text-primary fs-5"></i>
                                     </li>
                                     {% else %}
-                                    <p class="text-muted text-center my-3">Không có task gấp.</p>
-                                    {% endfor %}
+                                    <div class="text-center text-muted small py-3">Không có báo giá theo dõi.</div>
+                                    {% endif %}
                                 </ul>
                             </div>
-                            <div class="col-lg-6 ps-lg-4">
-                                <span class="section-title text-danger">💰 Công nợ Quá hạn (Top 20)</span>
-                                <ul class="clean-list mb-4">
-                                    {% for debt in overdue_debt %}
-                                    <li class="clean-item justify-content-between">
-                                        <div class="d-flex align-items-center" style="overflow: hidden;">
-                                            <i class="fas fa-exclamation-triangle text-warning me-3"></i>
-                                            <div style="min-width: 0;">
-                                                <div class="item-title">{{ debt.ObjectName|default('Không tên', true)|truncate(40) }}</div>
-                                                <div class="item-desc text-danger">Trễ {{ debt.ReDueDays }} ngày</div>
-                                            </div>
+                            
+                            <div class="col-md-6 bento-scroll-area ps-md-3 mt-3 mt-md-0">
+                                <h6 class="text-muted small fw-bold text-uppercase mb-2">Lịch Giao (+/- 30 ngày)</h6>
+                                <ul class="data-list">
+                                    {% if dashboard_data.orders_flow and dashboard_data.orders_flow|length > 0 %}
+                                    <li class="data-item p-3" data-bs-toggle="modal" data-bs-target="#modalOrdersFlow">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="data-icon bg-success bg-opacity-10 text-success"><i class="fas fa-calendar-check"></i></div>
+                                            <div><div class="fw-bold text-dark">Theo dõi Lịch giao</div><small class="text-muted">{{ dashboard_data.orders_flow|length }} đơn hàng sắp đến hạn</small></div>
                                         </div>
-                                        <div class="fw-bold text-dark ms-2">{{ debt.TotalOverdueDebt | format_tr }}</div>
+                                        <i class="fas fa-search-plus text-primary fs-5"></i>
                                     </li>
-                                    {% endfor %}
+                                    {% else %}
+                                    <div class="text-center text-muted small py-3">Không có lịch giao.</div>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingTwo">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-                        <i class="fas fa-exchange-alt me-3 text-primary"></i> DÒNG CHẢY KINH DOANH
-                    </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#portalAccordion">
-                    <div class="accordion-body">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <span class="section-title text-primary">📄 Báo giá (Follow-up)</span>
-                                <div class="accordion accordion-flush" id="accQuotes">
-                                    {% for group in active_quotes %}
-                                    <div class="group-item mb-2">
-                                        <div class="group-header p-2 rounded d-flex justify-content-between align-items-center" 
-                                             data-bs-toggle="collapse" data-bs-target="#q_{{ loop.index }}" style="cursor: pointer;">
-                                            <span class="fw-bold small" style="max-width: 80%;">{{ group.name|truncate(28) }}</span>
-                                            <span class="badge bg-white text-primary border rounded-pill">{{ group.count }}</span>
-                                        </div>
-                                        <div id="q_{{ loop.index }}" class="collapse mt-1 ps-2 border-start border-3 border-primary" data-bs-parent="#accQuotes">
-                                            <ul class="clean-list">
-                                                {% for q in group.details %}
-                                                <li class="clean-item py-2">
-                                                    <div class="item-content ms-0">
-                                                        <div class="d-flex justify-content-between">
-                                                            <div class="item-title text-primary small">{{ q.VoucherNo }}</div>
-                                                            <small class="text-dark fw-bold">{{ q.TotalAmount | format_tr }}</small>
-                                                        </div>
-                                                        <div class="item-desc small text-muted">
-                                                            {{ q.QuotationDate | format_date }}
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                {% endfor %}
-                                            </ul>
+                    <div class="tab-pane fade h-100" id="tab-crm">
+                        <div class="bento-scroll-area">
+                            <ul class="data-list">
+                                {% for r in dashboard_data.recent_reports %}
+                                <li class="data-item">
+                                    <div class="d-flex align-items-center gap-3" style="min-width:0;">
+                                        <div class="badge bg-light text-secondary border fw-bold">#{{ r.STT }}</div>
+                                        <div style="min-width:0;">
+                                            <div class="fw-bold text-dark text-truncate">{{ r['TEN DOI TUONG'] }}</div>
+                                            <div class="small text-muted text-truncate"><i class="far fa-clock me-1"></i>{{ r.NGAY | format_date }} - {{ r.MucDich }}</div>
                                         </div>
                                     </div>
-                                    {% endfor %}
+                                    <a href="/report_detail_page/{{ r.STT }}" target="_blank" class="btn btn-sm btn-light rounded-circle shadow-sm"><i class="fas fa-eye text-primary"></i></a>
+                                </li>
+                                {% else %}
+                                <div class="text-center text-muted py-5">
+                                    <i class="fas fa-clipboard-list fa-3x mb-2 opacity-25"></i><p>Chưa có báo cáo CRM tuần này.</p>
                                 </div>
-                            </div>
-
-                            <div class="col-lg-4 border-start border-end">
-                                <span class="section-title text-info">📦 Lịch Giao Hàng (+/- 30 ngày)</span>
-                                <div class="accordion accordion-flush" id="accOrders">
-                                    {% for group in orders_flow %}
-                                    <div class="group-item mb-2">
-                                        <div class="group-header p-2 rounded d-flex justify-content-between align-items-center" 
-                                             data-bs-toggle="collapse" data-bs-target="#o_{{ loop.index }}" style="cursor: pointer;">
-                                            <span class="fw-bold small" style="max-width: 80%;">{{ group.name|truncate(28) }}</span>
-                                            <span class="badge bg-white text-info border rounded-pill">{{ group.count }}</span>
-                                        </div>
-                                        <div id="o_{{ loop.index }}" class="collapse mt-1 ps-2 border-start border-3 border-info" data-bs-parent="#accOrders">
-                                            <ul class="clean-list">
-                                                {% for o in group.details %}
-                                                <li class="clean-item py-2">
-                                                    <div class="item-content">
-                                                        <div class="d-flex justify-content-between">
-                                                            <span class="item-title small">{{ o.VoucherNo }}</span>
-                                                            <span class="{{ 'text-danger fw-bold' if o.IsOverdue else 'text-muted' }} small">
-                                                                {{ o.DeliveryDate | format_date }}
-                                                            </span>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between">
-                                                            <small class="text-muted">Giá trị:</small>
-                                                            <span class="fw-bold text-dark small">{{ o.SaleAmount | format_tr }}</span>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                <span class="section-title text-secondary">🚚 LXH Chưa đi giao</span>
-                                <div class="accordion accordion-flush" id="accDelivery">
-                                    {% for group in pending_deliveries %}
-                                    <div class="group-item mb-2">
-                                        <div class="group-header p-2 rounded d-flex justify-content-between align-items-center" 
-                                             data-bs-toggle="collapse" data-bs-target="#d_{{ loop.index }}" style="cursor: pointer;">
-                                            <span class="fw-bold small" style="max-width: 80%;">{{ group.name|truncate(28) }}</span>
-                                            <span class="badge bg-white text-secondary border rounded-pill">{{ group.count }}</span>
-                                        </div>
-                                        <div id="d_{{ loop.index }}" class="collapse mt-1 ps-2 border-start border-3 border-secondary" data-bs-parent="#accDelivery">
-                                            <ul class="clean-list">
-                                                {% for d in group.details %}
-                                                <li class="clean-item py-2">
-                                                    <div class="item-icon">
-                                                        {% if d.IsOverdue %} <i class="fas fa-exclamation-circle text-danger small"></i>
-                                                        {% else %} <i class="fas fa-truck-loading text-secondary small"></i> {% endif %}
-                                                    </div>
-                                                    <div class="item-content">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <span class="item-title small">{{ d.VoucherNo }}</span>
-                                                            <span class="badge bg-light text-dark border" style="font-size: 0.65rem;">
-                                                            YC: {{ d.Request_Day | format_date }}
-                                                            </span>
-                                                        </div>
-                                                        <div class="d-flex justify-content-between mt-1">
-                                                            <small class="text-muted">KH Giao: 
-                                                                <span class="fw-bold {{ 'text-danger' if d.IsOverdue else 'text-primary' }}">
-                                                                    {{ d.Planned_Day | format_date }}
-                                                                </span>
-                                                            </small>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="headingThree">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
-                        <i class="fas fa-seedling me-3 text-success"></i> GỢI Ý & HOẠT ĐỘNG
-                    </button>
-                </h2>
-                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#portalAccordion">
-                    <div class="accordion-body">
-                        <div class="row">
-                            <div class="col-lg-6 border-end">
-                                <span class="section-title text-success">🌱 Gợi ý Dự phòng (Top 40)</span>
-                                <div class="accordion accordion-flush" id="accReplenish">
-                                    {% for group in urgent_replenish %}
-                                    <div class="group-item mb-2">
-                                        <div class="group-header p-2 rounded d-flex justify-content-between align-items-center" 
-                                             data-bs-toggle="collapse" data-bs-target="#r_{{ loop.index }}" style="cursor: pointer;">
-                                            <span class="fw-bold small" style="max-width: 80%;">{{ group.name|truncate(35) }}</span>
-                                            <span class="badge bg-white text-success border rounded-pill">{{ group.count }}</span>
-                                        </div>
-                                        <div id="r_{{ loop.index }}" class="collapse mt-1 ps-2 border-start border-3 border-success" data-bs-parent="#accReplenish">
-                                            <ul class="clean-list">
-                                                {% for item in group.details %}
-                                                <li class="clean-item justify-content-between py-2">
-                                                    <div>
-                                                        <div class="item-title text-primary small">{{ item.ItemName }}</div>
-                                                    </div>
-                                                    <div class="text-end">
-                                                        <span class="badge bg-success bg-opacity-25 text-success" style="font-size: 0.65rem;">Gợi ý: {{ item.QuantitySuggestion | format_number }}</span>
-                                                    </div>
-                                                </li>
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            <div class="col-lg-6 ps-lg-4">
-                                <span class="section-title text-secondary">🕒 Báo cáo Vừa làm</span>
-                                <ul class="clean-list">
-                                    {% for r in recent_reports %}
-                                    <li class="clean-item">
-                                        <div class="me-3 fw-bold text-success">#{{ r.STT }}</div>
-                                        <div class="item-content">
-                                            <div class="item-title">{{ r['TEN DOI TUONG'] }}</div>
-                                            <div class="item-desc">{{ r.NGAY }}</div>
-                                        </div>
-                                        <a href="/report_detail_page/{{ r.STT }}" class="btn btn-sm btn-light border"><i class="fas fa-eye"></i></a>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div> 
+        </div>
     </div>
+</div>
+
+<div class="modal fade" id="modalTasks" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header-custom d-flex justify-content-between">
+                <h5 class="modal-title fw-bold mb-0"><i class="fas fa-tasks me-2"></i>Chi Tiết Task Trễ Hạn / Khẩn Cấp</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr><th>Trạng Thái</th><th>Tiêu đề Task</th><th>Khách Hàng</th><th>Cập nhật</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for task in dashboard_data.tasks %}
+                            <tr>
+                                <td>
+                                    {% if task.Status == 'BLOCKED' %} <span class="badge bg-danger">Khóa</span>
+                                    {% elif task.Priority == 'HIGH' %} <span class="badge bg-warning text-dark">Cao</span>
+                                    {% else %} <span class="badge bg-secondary">Bình thường</span> {% endif %}
+                                </td>
+                                <td class="fw-bold"><a href="/task_dashboard?open={{ task.TaskID }}" target="_blank" class="text-decoration-none">{{ task.Title }}</a></td>
+                                <td>{{ task.ObjectID }}</td>
+                                <td class="small text-muted">{{ task.LastUpdated | format_date }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <a href="{{ url_for('task_bp.task_dashboard') }}" target="_blank" class="btn btn-primary rounded-pill px-4">Đi tới trang Quản lý Task <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDebt" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header-custom d-flex justify-content-between" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);">
+                <h5 class="modal-title fw-bold mb-0"><i class="fas fa-wallet me-2"></i>Danh Sách Nợ Quá Hạn</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr><th>Khách Hàng</th><th class="text-center">Số Ngày Trễ</th><th class="text-end">Dư Nợ Quá Hạn</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for debt in dashboard_data.overdue_debt %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ debt.ObjectName|default('Không tên', true) }}</td>
+                                <td class="text-center"><span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Trễ {{ debt.ReDueDays }} ngày</span></td>
+                                <td class="text-end fw-bolder text-danger">{{ debt.TotalOverdueDebt | format_tr }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <a href="{{ url_for('kpi_bp.ar_aging_dashboard') }}" target="_blank" class="btn btn-danger rounded-pill px-4">Xem báo cáo Công nợ <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalQuotes" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header-custom d-flex justify-content-between" style="background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);">
+                <h5 class="modal-title fw-bold mb-0"><i class="fas fa-file-signature me-2"></i>Báo Giá Đang Chờ</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr><th>Số Báo Giá</th><th>Khách Hàng</th><th>Ngày Lập</th><th class="text-end">Giá Trị</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for group in dashboard_data.active_quotes %}
+                                {% for q in group.details %}
+                                <tr>
+                                    <td class="fw-bold text-primary">{{ q.VoucherNo }}</td>
+                                    <td>{{ group.name }}</td>
+                                    <td>{{ q.QuotationDate | format_date }}</td>
+                                    <td class="text-end fw-bold">{{ q.TotalAmount | format_tr }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <a href="{{ url_for('approval_bp.quote_approval_dashboard') }}" target="_blank" class="btn btn-info text-white rounded-pill px-4">Tới Trang Phê Duyệt <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalOrdersFlow" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header-custom d-flex justify-content-between" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <h5 class="modal-title fw-bold mb-0"><i class="fas fa-calendar-check me-2"></i>Theo Dõi Lịch Giao</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr><th>Số Đơn (SO)</th><th>Khách Hàng</th><th>Ngày Hẹn Giao</th><th class="text-end">Giá Trị</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for group in dashboard_data.orders_flow %}
+                                {% for o in group.details %}
+                                <tr>
+                                    <td class="fw-bold text-success">{{ o.VoucherNo }}</td>
+                                    <td>{{ group.name }}</td>
+                                    <td>
+                                        <span class="{% if o.IsOverdue %}badge bg-danger{% else %}text-dark{% endif %}">
+                                            {{ o.DeliveryDate | format_date }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold">{{ o.SaleAmount | format_tr }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDelivery" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header-custom d-flex justify-content-between" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                <h5 class="modal-title fw-bold mb-0"><i class="fas fa-truck-loading me-2"></i>Chi Tiết Đơn Chờ Giao</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr><th>Số Lệnh / Đơn</th><th>Khách Hàng</th><th>Ngày Yêu Cầu</th><th>Ngày Kế Hoạch</th><th>Trạng Thái</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for group in dashboard_data.pending_deliveries %}
+                                {% for d in group.details %}
+                                <tr>
+                                    <td class="fw-bold text-primary">{{ d.VoucherNo }}</td>
+                                    <td>{{ group.name }}</td>
+                                    <td>{{ d.Request_Day | format_date }}</td>
+                                    <td>
+                                        <span class="{% if d.IsOverdue %}badge bg-danger{% else %}fw-bold text-dark{% endif %}">
+                                            {{ d.Planned_Day | format_date }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if d.IsOverdue %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Trễ hạn</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">Đang chờ</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <a href="{{ url_for('delivery_bp.delivery_dashboard') }}" target="_blank" class="btn btn-primary rounded-pill px-4">Đến bảng Điều vận <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalReplenish" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header-custom d-flex justify-content-between" style="background: linear-gradient(135deg, #10b981 0%, #047857 100%);">
+                <h5 class="modal-title fw-bold mb-0"><i class="fas fa-cubes me-2"></i>Gợi Ý Nhập Dự Phòng Tồn Kho</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small text-uppercase">
+                            <tr><th>Khách Hàng (Tên Rút Gọn)</th><th>Mặt Hàng (Item)</th><th class="text-end">Gợi Ý Nhập (SL)</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for group in dashboard_data.urgent_replenish %}
+                                {% for item in group.details %}
+                                <tr>
+                                    <td class="fw-bold">{{ group.name }}</td>
+                                    <td class="text-primary">{{ item.ItemName|default(item.InventoryName) }}</td>
+                                    <td class="text-end fw-bolder text-success">{{ item.QuantitySuggestion }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <a href="{{ url_for('lookup_bp.customer_replenishment_dashboard') }}" target="_blank" class="btn btn-success rounded-pill px-4">Tới trang Tồn kho dự phòng <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Xử lý hiệu ứng vòng tròn SVG chạy lúc mới load trang
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(() => {
+            const rings = document.querySelectorAll('.progress-ring');
+            rings.forEach(ring => {
+                let currentProg = ring.style.getPropertyValue('--progress');
+                ring.style.setProperty('--progress', '0%');
+                setTimeout(() => { ring.style.setProperty('--progress', currentProg); }, 100);
+            });
+        }, 500);
+    });
+</script>
 {% endblock %}

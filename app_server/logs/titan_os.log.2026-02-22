@@ -1,0 +1,56 @@
+[2026-02-22 01:38:40,016] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-22 01:48:32,264] ERROR in kpi_evaluation_bp:225 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 01:48:34,215] ERROR in kpi_evaluation_bp:225 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 01:48:35,768] ERROR in kpi_evaluation_bp:225 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 01:48:37,076] ERROR in kpi_evaluation_bp:225 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 01:48:38,178] ERROR in kpi_evaluation_bp:225 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 04:44:56,856] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-22 04:45:16,099] ERROR in portal_bp:49 [KD010]: Lỗi tải dữ liệu Portal: name 'session' is not defined
+[2026-02-22 04:45:16,390] ERROR in app:875 [KD010]: Exception on /portal [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\blueprints\portal_bp.py", line 54, in portal_dashboard
+    return render_template(
+        'portal_dashboard.html',
+    ...<2 lines>...
+        dashboard_data=dashboard_data                   # <-- ĐÃ SỬA GỌN GÀNG TẠI ĐÂY
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\portal_dashboard.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\portal_dashboard.html", line 114, in block 'content'
+    <i class="fas fa-crown text-warning me-1"></i> Rank {{ dashboard_data.gamification.grade | default('D') }}
+    
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'dict object' has no attribute 'gamification'
+[2026-02-22 05:00:49,724] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-22 06:00:34,227] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-22 06:02:04,963] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-22 06:09:38,439] ERROR in kpi_evaluation_bp:226 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 06:11:22,953] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-22 06:14:45,576] ERROR in kpi_evaluation_bp:238 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 06:14:49,059] ERROR in kpi_evaluation_bp:238 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 06:14:53,275] ERROR in kpi_evaluation_bp:238 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 06:14:55,144] ERROR in kpi_evaluation_bp:238 [KD010]: Lỗi lấy danh sách user chấm điểm: could not convert string to float: ''
+[2026-02-22 06:16:14,800] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-22 06:17:32,416] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.

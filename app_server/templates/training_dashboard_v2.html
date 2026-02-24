@@ -194,12 +194,12 @@
             mandatoryCourses: [], // Khôi phục mảng chứa khóa học bắt buộc
             categories: [
                 { id: 1, name: 'Kiến thức Sản phẩm', icon: '<i class="fas fa-box-open"></i>', bg: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&q=80', count: 0 },
-                { id: 2, name: 'Giới thiệu về STDD và năng lực cung cấp', icon: '<i class="fas fa-building"></i>', bg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80', count: 0 },
-                { id: 3, name: 'Kỹ năng mềm', icon: '<i class="fas fa-users"></i>', bg: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80', count: 0 },
-                { id: 4, name: 'Quy trình & Vận hành', icon: '<i class="fas fa-project-diagram"></i>', bg: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80', count: 0 },
-                { id: 5, name: 'Catalogue / Tra cứu', icon: '<i class="fas fa-book"></i>', bg: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&q=80', count: 0 },
-                { id: 6, name: 'Quy định & chính sách', icon: '<i class="fas fa-balance-scale"></i>', bg: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80', count: 0 },
-                { id: 7, name: 'Công cụ & biểu mẫu', icon: '<i class="fas fa-file-alt"></i>', bg: 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=500&q=80', count: 0 },
+                { id: 2, name: 'Kỹ thuật chuyên sâu', icon: '<i class="fas fa-microchip"></i>', bg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=500&q=80', count: 0 },
+                { id: 3, name: 'Giới thiệu về STDD và năng lực cung cấp', icon: '<i class="fas fa-building"></i>', bg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80', count: 0 },
+                { id: 4, name: 'Kỹ năng mềm', icon: '<i class="fas fa-users"></i>', bg: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80', count: 0 },
+                { id: 5, name: 'Quy trình & Vận hành', icon: '<i class="fas fa-project-diagram"></i>', bg: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80', count: 0 },
+                { id: 6, name: 'Công cụ & Catalogue', icon: '<i class="fas fa-book"></i>', bg: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&q=80', count: 0 },
+                { id: 7, name: 'Quy định & chính sách', icon: '<i class="fas fa-balance-scale"></i>', bg: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80', count: 0 },
                 { id: 8, name: 'Văn hóa & phát triển cá nhân', icon: '<i class="fas fa-seedling"></i>', bg: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80', count: 0 }
             ],
 
@@ -223,10 +223,11 @@
                                 }
                             });
                         }
-                        const target = this.categories.find(c => 
-                            c.name.toLowerCase() === catName.toLowerCase() || 
-                            catName.toLowerCase().includes(c.name.toLowerCase())
-                        );
+                        const target = this.categories.find(c => {
+                            const cleanUI = c.name.toLowerCase().replace(/\s+/g, ' ').trim();
+                            const cleanDB = catName.toLowerCase().replace(/\s+/g, ' ').trim();
+                            return cleanUI === cleanDB || cleanDB.includes(cleanUI) || cleanUI.includes(cleanDB);
+                        });
                         if(target) target.count = totalInCat;
                     }
                     

@@ -1,0 +1,50 @@
+[2026-02-18 04:16:42,484] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 04:18:08,917] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-18 04:40:58,280] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 04:41:10,072] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-18 04:41:13,251] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207)")
+[SQL: SELECT USERCODE, SHORTNAME, [BO PHAN] as Department FROM [dbo].[GD - NGUOI DUNG] WHERE [TRANG THAI] = N'Đang làm việc' OR [TRANG THAI] IS NULL ORDER BY [BO PHAN], SHORTNAME]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-18 05:05:35,976] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 05:06:40,405] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'Phanquyen'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT Phanquyen FROM [dbo].[GD - NGUOI DUNG] WHERE USERCODE=?]
+[parameters: ('KD010',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-18 05:07:05,198] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 05:09:05,758] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 05:27:35,566] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 05:30:16,480] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 05:34:01,185] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 05:38:58,680] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:06:19,273] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:07:01,661] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-18 18:13:33,252] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:16:51,824] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:25:13,464] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:30:13,293] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:34:13,375] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:40:11,146] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 18:41:20,071] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 19:42:33,706] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 19:42:47,515] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 19:42:47,616] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 19:44:50,659] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 19:44:50,724] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 21:47:51,890] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 21:55:55,355] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 21:55:55,426] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 21:56:11,279] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 21:56:11,345] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-18 21:56:59,387] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 21:56:59,505] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 22:02:03,645] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-18 22:03:29,280] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 22:03:29,342] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-18 22:04:03,083] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 22:04:03,208] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 22:04:54,143] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 22:04:54,205] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-18 22:05:18,498] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 22:05:18,562] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('01003', "[01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Warning: Null value is eliminated by an aggregate or other SET operation. (8153) (SQLExecDirectW); [01003] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208)")
+[2026-02-18 22:05:44,678] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OMEGA_STDD.dbo.GL2008'. (208) (SQLExecDirectW)")
+[2026-02-18 22:05:44,799] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")

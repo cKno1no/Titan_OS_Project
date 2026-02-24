@@ -7,6 +7,7 @@ import PyPDF2
 from datetime import datetime, timedelta
 import google.generativeai as genai
 from flask import current_app
+from flask import session
 
 class TrainingService:
     def __init__(self, db_manager, gamification_service):
@@ -68,15 +69,23 @@ class TrainingService:
         explanation = f"\n\n💡 *Giải thích: {row['Explanation']}*" if row['Explanation'] else ""
         return f"📚 **Kiến thức:**\n**Q:** _{row['Content']}_\n\n{ans_clean}{explanation}"
 
+    # =========================================================================
     # 2. PHÂN PHỐI CÂU HỎI (Cho Scheduler chạy định kỳ)
+    # =========================================================================
     def distribute_daily_questions(self):
         # Lấy 3 câu hỏi ngẫu nhiên
         sql_q = "SELECT TOP 3 ID, Content, OptionA, OptionB, OptionC, OptionD FROM TRAINING_QUESTION_BANK WHERE CorrectAnswer IS NOT NULL ORDER BY NEWID()"
         questions = self.db.get_data(sql_q)
         if not questions: return []
 
-        # Lấy danh sách user active
-        sql_u = "SELECT UserCode FROM [GD - NGUOI DUNG]" 
+        # [ĐÃ FIX]: Lọc danh sách user active (STDD, có bộ phận, khác Du học)
+        sql_u = """
+            SELECT UserCode 
+            FROM [GD - NGUOI DUNG] 
+            WHERE Division = 'STDD' 
+              AND [BO PHAN] IS NOT NULL 
+              AND LTRIM(RTRIM([BO PHAN])) != '9. DU HOC'
+        """ 
         users_data = self.db.get_data(sql_u)
         users = [u['UserCode'] for u in users_data]
         if not users: return []
@@ -89,7 +98,6 @@ class TrainingService:
         for idx, group in enumerate(user_groups):
             if idx >= len(questions): break
             q_id = questions[idx]['ID']
-            # Tìm trong hàm distribute_daily_questions
             mail_title = f"💡 Cơ hội nâng tầm tri thức lúc {datetime.now().strftime('%H:%M')}"
             mail_content = f"""
 <div class='p-2 text-center'>
@@ -104,119 +112,96 @@ class TrainingService:
             for user_code in group:
                 # Đánh dấu phiên cũ hết hạn
                 self.db.execute_non_query("UPDATE TRAINING_DAILY_SESSION SET Status='EXPIRED' WHERE UserCode=? AND Status='PENDING'", (user_code,))
-                # Tạo phiên mới (Hạn 4 tiếng)
+                # Tạo phiên mới (Hạn 10 phút)
                 expired_at = datetime.now() + timedelta(minutes=10)
                 self.db.execute_non_query("INSERT INTO TRAINING_DAILY_SESSION (UserCode, QuestionID, Status, ExpiredAt) VALUES (?, ?, 'PENDING', ?)", (user_code, q_id, expired_at))
                 # Gửi thông báo
                 self.db.execute_non_query("INSERT INTO TitanOS_Game_Mailbox (UserCode, Title, Content, CreatedTime, IsClaimed) VALUES (?, ?, ?, GETDATE(), 0)", (user_code, mail_title, mail_content))
                 messages_to_send.append({"user_code": user_code})
+                
         return messages_to_send
 
+    # =========================================================================
     # 3. LẤY TRẠNG THÁI CHALLENGE (Cho Frontend hiển thị)
-    
+    # =========================================================================
     def get_current_challenge_status(self, user_code):
-        """
-        Kiểm tra trạng thái Đấu trường của User.
-        Các trạng thái: DONE (Đã chấm), SUBMITTED (Chờ chấm), AVAILABLE (Đang làm), WAITING (Chưa tới giờ)
-        """
         now = datetime.now()
 
-        # 1. KIỂM TRA BÀI ĐÃ HOÀN THÀNH (Đã được AI chấm xong)
-        # [SỬA]: Lấy thêm UserAnswerContent, CorrectAnswer, Explanation, và EarnedXP
+        # [ĐÃ FIX]: Gộp thành 1 truy vấn để lấy phiên MỚI NHẤT
         try:
-             sql_done = """
+             sql_latest = """
                 SELECT TOP 1 
-                    S.SessionID, S.AIScore, S.AIFeedback, S.UserAnswerContent, S.EarnedXP,
-                    Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation
+                    S.SessionID, S.Status, S.ExpiredAt, S.AIScore, S.AIFeedback, S.UserAnswerContent, S.EarnedXP,
+                    Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation,
+                    Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD
                 FROM TRAINING_DAILY_SESSION S
                 JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
                 WHERE S.UserCode = ? 
-                AND S.Status = 'COMPLETED'
                 AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
                 ORDER BY S.SessionID DESC
             """
-             done_check = self.db.get_data(sql_done, (user_code,))
+             latest = self.db.get_data(sql_latest, (user_code,))
              has_earned_xp = True
         except Exception as e:
-             # Fallback nếu chưa tạo cột EarnedXP trong DB
-             print(f"Lỗi lấy trạng thái DONE (Có thể thiếu cột EarnedXP): {e}")
-             sql_done = """
+             # Fallback nếu DB chưa có cột EarnedXP
+             sql_latest = """
                 SELECT TOP 1 
-                    S.SessionID, S.AIScore, S.AIFeedback, S.UserAnswerContent,
-                    Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation
+                    S.SessionID, S.Status, S.ExpiredAt, S.AIScore, S.AIFeedback, S.UserAnswerContent,
+                    Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation,
+                    Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD
                 FROM TRAINING_DAILY_SESSION S
                 JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
                 WHERE S.UserCode = ? 
-                AND S.Status = 'COMPLETED'
                 AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
                 ORDER BY S.SessionID DESC
             """
-             done_check = self.db.get_data(sql_done, (user_code,))
+             latest = self.db.get_data(sql_latest, (user_code,))
              has_earned_xp = False
 
-        if done_check:
-            row = done_check[0]
-            return {
-                'status': 'DONE',
-                'question': row['QuestionContent'],
-                'user_answer': row['UserAnswerContent'],
-                'score': row['AIScore'], 
-                'feedback': row['AIFeedback'],
-                'correct_answer': row['CorrectAnswer'],
-                'explanation': row['Explanation'],
-                'earned_xp': row['EarnedXP'] if has_earned_xp else 0
-            }
+        if latest:
+            row = latest[0]
+            current_status = row['Status']
 
-        # 2. KIỂM TRA BÀI ĐÃ NỘP - CHỜ AI QUÉT CHẤM (Trạng thái SUBMITTED)
-        # [SỬA]: Lấy thêm UserAnswerContent và Question Content để hiển thị
-        sql_submitted = """
-            SELECT TOP 1 S.SessionID, S.UserAnswerContent, Q.Content as QuestionContent
-            FROM TRAINING_DAILY_SESSION S
-            JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
-            WHERE S.UserCode = ? AND S.Status = 'SUBMITTED'
-            AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
-            ORDER BY S.SessionID DESC
-        """
-        submitted_check = self.db.get_data(sql_submitted, (user_code,))
-        if submitted_check:
-             row = submitted_check[0]
-             return {
-                 'status': 'SUBMITTED',
-                 'question': row['QuestionContent'],
-                 'user_answer': row['UserAnswerContent']
-             }
-
-        # 3. KIỂM TRA PHIÊN ĐANG DIỄN RA (Có thể làm bài)
-        sql_available = """
-            SELECT TOP 1 S.SessionID, S.ExpiredAt, Q.Content, 
-                         Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD
-            FROM TRAINING_DAILY_SESSION S
-            JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
-            WHERE S.UserCode = ? AND S.Status = 'PENDING'
-        """
-        available_check = self.db.get_data(sql_available, (user_code,))
-        
-        if available_check:
-            row = available_check[0]
-            if row['ExpiredAt'] > now:
-                seconds_left = (row['ExpiredAt'] - now).total_seconds()
+            if current_status == 'COMPLETED':
                 return {
-                    'status': 'AVAILABLE',
-                    'session_id': row['SessionID'],
-                    'question': row['Content'],
-                    'options': {
-                        'A': row.get('OptionA'),
-                        'B': row.get('OptionB'),
-                        'C': row.get('OptionC'),
-                        'D': row.get('OptionD')
-                    },
-                    'seconds_left': int(seconds_left)
+                    'status': 'DONE',
+                    'question': row['QuestionContent'],
+                    'user_answer': row['UserAnswerContent'],
+                    'score': row['AIScore'], 
+                    'feedback': row['AIFeedback'],
+                    'correct_answer': row['CorrectAnswer'],
+                    'explanation': row['Explanation'],
+                    'earned_xp': row.get('EarnedXP', 0) if has_earned_xp else 0
                 }
-            else:
-                # Nếu đã hết hạn mà chưa làm thì chuyển trạng thái EXPIRED
-                self.db.execute_non_query("UPDATE TRAINING_DAILY_SESSION SET Status='EXPIRED' WHERE SessionID=?", (row['SessionID'],))
-        
-        # 4. TRẠNG THÁI CHỜ PHIÊN TIẾP THEO (WAITING)
+
+            elif current_status == 'SUBMITTED':
+                 return {
+                     'status': 'SUBMITTED',
+                     'question': row['QuestionContent'],
+                     'user_answer': row['UserAnswerContent']
+                 }
+
+            elif current_status == 'PENDING':
+                if row['ExpiredAt'] > now:
+                    seconds_left = (row['ExpiredAt'] - now).total_seconds()
+                    return {
+                        'status': 'AVAILABLE',
+                        'session_id': row['SessionID'],
+                        'question': row['QuestionContent'],
+                        'options': {
+                            'A': row.get('OptionA'),
+                            'B': row.get('OptionB'),
+                            'C': row.get('OptionC'),
+                            'D': row.get('OptionD')
+                        },
+                        'seconds_left': int(seconds_left)
+                    }
+                else:
+                    # Nếu bài mới phát nhưng nhân viên không làm và đã quá hạn
+                    self.db.execute_non_query("UPDATE TRAINING_DAILY_SESSION SET Status='EXPIRED' WHERE SessionID=?", (row['SessionID'],))
+                    # Rơi xuống logic WAITING bên dưới
+
+        # TRẠNG THÁI CHỜ PHIÊN TIẾP THEO (WAITING)
         current_time_str = now.strftime("%H:%M")
         if current_time_str < "08:10":
             next_slot = "08:10"
@@ -228,8 +213,6 @@ class TrainingService:
             next_slot = "08:10 (Sáng mai)"
 
         return {'status': 'WAITING', 'next_slot': next_slot}
-
-    # 4. CHẤM ĐIỂM DAILY (Khi user submit)
     
     def submit_answer(self, user_code, session_id, user_answer):
         """Hàm ghi nhận câu trả lời và chuyển sang trạng thái chờ AI chấm."""
@@ -451,8 +434,61 @@ class TrainingService:
             
         return material
 
+    # =========================================================================
+    # [NEW] KIỂM TRA GIỚI HẠN REQUEST API CHO PHÒNG HỌC
+    # =========================================================================
+    def _check_ai_rate_limit(self, user_code):
+        from flask import session # Đảm bảo lấy được role
+        user_role = session.get('user_role', '').strip().upper()
+        
+        base_limit = 20  
+        bonus_per_level = 2
+        
+        if user_role == 'ADMIN':
+            max_limit = base_limit * 100  
+        else:
+            try:
+                stats = self.db.get_data("SELECT Level FROM TitanOS_UserStats WHERE UserCode = ?", (user_code,))
+                level = int(stats[0]['Level']) if stats else 1
+            except:
+                level = 1
+            max_limit = base_limit + (level * bonus_per_level)
+
+        redis_client = current_app.redis_client
+        if not redis_client: return True, max_limit, 0 
+            
+        today_str = datetime.now().strftime('%Y%m%d')
+        # Dùng chung key limit với Chatbot để tổng hợp số lượt dùng toàn hệ thống
+        key = f"ai_limit:chatbot:{today_str}:{user_code}"
+        
+        try:
+            current_usage = redis_client.get(key)
+            current_usage = int(current_usage) if current_usage else 0
+            
+            if current_usage >= max_limit: return False, max_limit, current_usage
+                
+            pipe = redis_client.pipeline()
+            pipe.incr(key)
+            if current_usage == 0: pipe.expire(key, 86400)
+            pipe.execute()
+            
+            return True, max_limit, current_usage + 1
+        except Exception:
+            return True, max_limit, 0
+
     # 10. AI TUTOR (Chatbot học tập)
     def chat_with_document(self, material_id, user_question):
+
+        user_code = session.get('user_code')
+        
+        # --- [THÊM MỚI] CHECK RATE LIMIT ---
+        is_allowed, max_limit, current_usage = self._check_ai_rate_limit(user_code)
+        if not is_allowed:
+            return {
+                "text": f"⚡ Bạn đã dùng hết giới hạn AI hôm nay ({max_limit}/{max_limit} lượt). Hãy cày cấp để được tăng giới hạn vào ngày mai nhé!", 
+                "page": None
+            }
+        # ------------------------------------
         sql = "SELECT FilePath FROM TRAINING_MATERIALS WHERE MaterialID = ?"
         data = self.db.get_data(sql, (material_id,))
         if not data: return {"text": "Tài liệu không tồn tại.", "page": None}
@@ -783,5 +819,74 @@ class TrainingService:
 
         except Exception as e:
             print(f"❌ Lỗi SQL process_pending_grading: {e}")
+
+    
+    def request_teaching(self, user_code, material_id):
+        try:
+            # 1. Kiểm tra hạn mức tuần
+            query_check = """
+                SELECT COUNT(*) as RequestCount FROM dbo.TRAINING_REQUEST_LOGS 
+                WHERE UserCode = ? AND RequestDate >= DATEADD(day, -7, GETDATE())
+            """
+            result_check = self.db.get_data(query_check, (user_code,))
+            count = result_check[0]['RequestCount'] if result_check else 0
+            if count >= 3:
+                return False, "Sếp đã hết lượt đề nghị trong tuần này (tối đa 3)."
+
+            # 2. Lưu log đề nghị (Ghi nhận vào SQL thành công như hình sếp chụp)
+            self.db.execute_non_query(
+                "INSERT INTO dbo.TRAINING_REQUEST_LOGS (CourseID, UserCode, RequestDate, IsDone) VALUES (?, ?, GETDATE(), 0)", 
+                (material_id, user_code)
+            )
+
+            # 3. Lấy danh sách người yêu cầu để chuẩn bị nội dung Task
+            # FIX: Tên biến request_list phải khớp với logic phía dưới
+            query_list = """
+                SELECT L.UserCode, U.SHORTNAME, L.RequestDate
+                FROM dbo.TRAINING_REQUEST_LOGS L
+                JOIN [GD - NGUOI DUNG] U ON L.UserCode = U.USERCODE
+                WHERE L.CourseID = ? AND L.IsDone = 0
+                ORDER BY L.RequestDate DESC
+            """
+            request_list = self.db.get_data(query_list, (material_id,)) # Đã có request_list
+            total_req = len(request_list)
+
+            # 4. Logic tạo TASK (Ngưỡng 4 người)
+            if total_req > 0 and total_req % 4 == 0:
+                mat_info = self.db.get_data("SELECT FileName FROM TRAINING_MATERIALS WHERE MaterialID = ?", (material_id,))
+                file_name = mat_info[0]['FileName'] if mat_info else f"Tài liệu {material_id}"
+                
+                # FIX: Tạo chuỗi danh sách người yêu cầu an toàn
+                requesters_str = ", ".join([f"{r['SHORTNAME']}" for r in request_list[:5]])
+                # FIX: Lấy ngày yêu cầu gần nhất an toàn
+                last_date_obj = request_list[0]['RequestDate']
+                last_req_str = last_date_obj.strftime('%d/%m/%Y %H:%M') if last_date_obj else "N/A"
+
+                admin_supervisor = "GD001" 
+                task_title = f"📢 DẠY TRỰC TIẾP: {file_name}"
+                task_detail = (
+                    f"📌 BÀI HỌC: {file_name} (ID: {material_id})\n"
+                    f"👤 YÊU CẦU ({total_req} người): {requesters_str}...\n"
+                    f"📅 GẦN NHẤT: {last_req_str}\n\n"
+                    f"Hệ thống tự động tạo task vì đủ nhóm 4 người đề nghị."
+                )
+                
+                from flask import current_app
+                current_app.task_service.create_new_task(
+                    user_code='SYSTEM', 
+                    title=task_title,
+                    supervisor_code=admin_supervisor,
+                    task_type='DAO_TAO',
+                    detail_content=task_detail,
+                    object_id=str(material_id)
+                )
+            
+            return True, "Gửi đề nghị thành công!"
+
+        except Exception as e:
+            from flask import current_app
+            current_app.logger.error(f"Lỗi request_teaching: {str(e)}")
+            # Trả về lỗi chi tiết để sếp biết vướng ở đâu
+            return False, f"Lỗi phía máy chủ: {str(e)}"
     
     

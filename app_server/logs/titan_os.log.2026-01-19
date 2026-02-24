@@ -1,0 +1,141 @@
+[2026-01-19 08:33:12,632] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 08:39:53,725] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 08:39:59,022] ERROR in app:875 [KD010]: Exception on /ceo_cockpit [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 41, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 89, in decorated_function
+    user = getattr(g, 'user', None)
+                   ^
+NameError: name 'g' is not defined
+[2026-01-19 08:45:57,001] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 08:46:01,022] ERROR in app:875 [KD010]: Exception on /ceo_cockpit [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 100, in decorated_function
+    user = getattr(g, 'user', None)
+                   ^
+NameError: name 'g' is not defined
+[2026-01-19 08:46:02,616] ERROR in app:875 [KD010]: Exception on /ceo_cockpit [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 100, in decorated_function
+    user = getattr(g, 'user', None)
+                   ^
+NameError: name 'g' is not defined
+[2026-01-19 08:46:03,102] ERROR in app:875 [KD010]: Exception on /ceo_cockpit [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 100, in decorated_function
+    user = getattr(g, 'user', None)
+                   ^
+NameError: name 'g' is not defined
+[2026-01-19 08:46:31,830] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 08:46:39,743] ERROR in app:875 [KD010]: Exception on /dashboard [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 100, in decorated_function
+    user = getattr(g, 'user', None)
+                   ^
+NameError: name 'g' is not defined
+[2026-01-19 08:47:53,684] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 08:48:04,644] ERROR in app:875 [KD010]: Exception on /ceo_cockpit [GET]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 129, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\executive_bp.py", line 40, in ceo_cockpit_page
+    return render_template(
+        'ceo_cockpit.html',
+    ...<2 lines>...
+        user_context=user_context
+    )
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\ceo_cockpit.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 163, in top-level template code
+    {% include 'components/_chatbot_widget.html' %}
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\components\_chatbot_widget.html", line 2, in top-level template code
+    {% set can_use_bot = (user_context.role == 'ADMIN') or (user_context.can('USE_CHATBOT')) or (user_level >= 5) %}
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\utils.py", line 92, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'None' has no attribute 'can'
+[2026-01-19 08:51:56,688] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 08:52:27,873] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OT2101'. (208) (SQLExecDirectW)")
+[2026-01-19 08:52:35,316] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OT2101'. (208) (SQLExecDirectW)")
+[2026-01-19 08:52:52,228] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OT2101'. (208) (SQLExecDirectW)")
+[2026-01-19 08:53:20,805] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'OT2101'. (208) (SQLExecDirectW)")
+[2026-01-19 11:49:22,368] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 12:07:46,694] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-19 12:07:55,379] INFO in executive_service:38 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-19 12:08:19,264] INFO in executive_service:30 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)

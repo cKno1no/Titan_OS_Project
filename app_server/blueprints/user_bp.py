@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for, flash, current_app
-from utils import login_required, permission_required
+from utils import login_required, permission_required, record_activity, get_user_ip # Thêm record_activity, get_user_ip
 import config
 import pandas as pd # <--- [THÊM] Import thư viện này để xử lý lỗi ngày tháng
+from datetime import datetime, date
+
 
 user_bp = Blueprint('user_bp', __name__)
 
@@ -225,6 +227,7 @@ def get_mailbox():
         current_app.logger.error(f"Lỗi lấy hòm thư: {e}")
         return jsonify([]) # Trả về mảng rỗng thay vì lỗi 500
 
+
 @user_bp.route('/api/mailbox/claim', methods=['POST'])
 @login_required
 def claim_mail():
@@ -235,13 +238,17 @@ def claim_mail():
     try:
         conn = current_app.db_manager.get_transaction_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT Total_XP, Total_Coins FROM TitanOS_Game_Mailbox WHERE MailID=? AND UserCode=? AND IsClaimed=0", (mail_id, user_code))
+        
+        # [FIXED] Bổ sung thêm cột Title vào câu truy vấn
+        cursor.execute("SELECT Total_XP, Total_Coins, Title FROM TitanOS_Game_Mailbox WHERE MailID=? AND UserCode=? AND IsClaimed=0", (mail_id, user_code))
         mail = cursor.fetchone()
         if not mail:
             conn.rollback()
             return jsonify({'success': False, 'msg': 'Thư không tồn tại hoặc đã nhận.'})
             
         xp, coins = mail[0] or 0, mail[1] or 0
+        # Định nghĩa biến mail_title
+        mail_title = mail[2] or "Hộp thư hệ thống"
         
         cursor.execute("SELECT Level, CurrentXP, TotalCoins FROM TitanOS_UserStats WHERE UserCode=?", (user_code,))
         stats = cursor.fetchone()
@@ -276,6 +283,16 @@ def claim_mail():
         cursor.execute("UPDATE TitanOS_Game_Mailbox SET IsClaimed=1, ClaimedTime=GETDATE() WHERE MailID=?", (mail_id,))
         
         conn.commit()
+
+        # --- GHI LOG NHẬN THƯỚNG ---
+        ip = get_user_ip()
+        log_msg = f"Nhận thư '{mail_title}' (+{xp} XP, +{coins} Coins)"
+        if level_up:
+            log_msg += f" -> Thăng cấp lên Level {new_lvl}!"
+            
+        # [FIXED] Dùng hàm ghi log chuẩn xác
+        current_app.db_manager.write_audit_log(user_code, 'CLAIM_MAILBOX', 'INFO', log_msg, ip)
+        
         return jsonify({'success': True, 'level_up': level_up, 'new_level': new_lvl, 'coins_earned': coins})
         
     except Exception as e:
@@ -302,3 +319,76 @@ def api_use_rename_card():
         session['user_shortname'] = new_nickname
         
     return jsonify(result)
+
+# Bổ sung vào user_bp.py
+
+@user_bp.route('/admin/audit_logs', methods=['GET'])
+@login_required
+def audit_logs_dashboard():
+    """Giao diện Mắt Thần - Chỉ Admin mới được vào"""
+    if session.get('user_role', '').strip().upper() != config.ROLE_ADMIN:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    db = current_app.db_manager
+    today = date.today().strftime('%Y-%m-%d')
+    
+    # 1. Lấy 4 chỉ số KPI tổng quan trong ngày (SỬA CreatedAt -> [Timestamp])
+    stats = {}
+    try:
+        stats['total_today'] = db.get_data("SELECT COUNT(1) as Cnt FROM dbo.AUDIT_LOGS WHERE CAST([Timestamp] AS DATE) = ?", (today,))[0]['Cnt']
+        
+        stats['alerts'] = db.get_data("SELECT COUNT(1) as Cnt FROM dbo.AUDIT_LOGS WHERE CAST([Timestamp] AS DATE) = ? AND Severity IN ('WARNING', 'CRITICAL')", (today,))[0]['Cnt']
+        
+        stats['failed_logins'] = db.get_data("SELECT COUNT(1) as Cnt FROM dbo.AUDIT_LOGS WHERE CAST([Timestamp] AS DATE) = ? AND ActionType = 'LOGIN_FAILED'", (today,))[0]['Cnt']
+        
+        stats['active_users'] = db.get_data("SELECT COUNT(DISTINCT UserCode) as Cnt FROM dbo.AUDIT_LOGS WHERE CAST([Timestamp] AS DATE) = ?", (today,))[0]['Cnt']
+    except Exception as e:
+        current_app.logger.error(f"Lỗi lấy Audit Stats: {e}")
+        stats = {'total_today': 0, 'alerts': 0, 'failed_logins': 0, 'active_users': 0}
+
+    return render_template('audit_dashboard.html', stats=stats)
+
+
+@user_bp.route('/api/admin/logs/stream', methods=['GET'])
+@login_required
+def api_stream_logs():
+    """API Tra cứu Mắt thần - Chế độ Review (Hỗ trợ lọc thời gian)"""
+    if session.get('user_role', '').strip().upper() != config.ROLE_ADMIN:
+        return jsonify([]), 403
+        
+    # Nâng limit lên 500 vì sếp xem 2-3 ngày/lần
+    limit = int(request.args.get('limit', 500)) 
+    severity_filter = request.args.get('severity', '') 
+    user_filter = request.args.get('user', '')
+    date_from = request.args.get('date_from', '')
+    date_to = request.args.get('date_to', '')
+    
+    query = "SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, [Timestamp] AS CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1 "
+    params = [limit]
+    
+    if severity_filter:
+        query += " AND Severity = ?"
+        params.append(severity_filter)
+        
+    if user_filter:
+        query += " AND (UserCode LIKE ? OR Details LIKE ?)"
+        params.extend([f"%{user_filter}%", f"%{user_filter}%"])
+        
+    # Thêm bộ lọc Ngày tháng
+    if date_from:
+        query += " AND CAST([Timestamp] AS DATE) >= ?"
+        params.append(date_from)
+    if date_to:
+        query += " AND CAST([Timestamp] AS DATE) <= ?"
+        params.append(date_to)
+        
+    query += " ORDER BY [Timestamp] DESC"
+    
+    logs = current_app.db_manager.get_data(query, tuple(params))
+    
+    # Chuẩn hóa ngày tháng
+    for log in logs:
+        if log.get('CreatedAt'):
+            log['CreatedAt'] = log['CreatedAt'].strftime('%H:%M:%S %d/%m/%Y')
+            
+    return jsonify(logs)

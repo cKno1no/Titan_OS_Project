@@ -605,6 +605,12 @@ def profit_analysis_dashboard():
     salesman_list = []
     if is_admin:
         salesman_list = db_manager.get_data("SELECT USERCODE, SHORTNAME FROM [GD - NGUOI DUNG] WHERE [BO PHAN] LIKE '%KINH DOANH%'")
+    
+    try:
+        from utils import get_user_ip
+        db_manager.write_audit_log(user_code, 'VIEW_PROFIT_ANALYSIS', 'WARNING', "Truy cập báo cáo Phân tích Lợi nhuận", get_user_ip())
+    except Exception as e:
+        current_app.logger.error(f"Lỗi ghi log: {e}")
 
     return render_template(
         'profit_dashboard.html',

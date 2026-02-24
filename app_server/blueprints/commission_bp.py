@@ -4,6 +4,7 @@ from flask import Blueprint, render_template, request, jsonify, session, current
 from utils import login_required, permission_required 
 from datetime import datetime
 import config
+from utils import get_user_ip
 
 commission_bp = Blueprint('commission_bp', __name__)
 
@@ -46,6 +47,8 @@ def api_create_proposal():
         
         # [MỚI] Lấy Recipients (Lúc tạo mới thường rỗng, nhưng cứ trả về cho chuẩn)
         recipients = service.get_proposal_recipients(ma_so) or []
+        
+        db_manager.write_audit_log(session.get('user_code'), 'CREATE_COMMISSION', 'INFO', f"Tạo phiếu đề xuất HH mới: {ma_so}", get_user_ip())
 
         return jsonify({
             'success': True, 
@@ -92,7 +95,8 @@ def api_add_contact_manual():
         # [MỚI] Trả về danh sách Recipients mới nhất để vẽ bảng
         recipients = service.get_proposal_recipients(ma_so)
         master = db_manager.get_data(f"SELECT DOANH_SO_CHON, GIA_TRI_CHI FROM {config.TABLE_COMMISSION_MASTER} WHERE MA_SO = ?", (ma_so,))
-        
+
+        db_manager.write_audit_log(session.get('user_code'), 'ADD_COMMISSION_PAYEE', 'WARNING', f"Thêm thủ công người nhận ({data.get('contact_name')} - {data.get('amount')}đ) vào phiếu {ma_so}", get_user_ip())
         return jsonify({
             'success': True, 
             'master': master[0],
@@ -109,4 +113,6 @@ def api_submit_proposal():
     service = CommissionService(db_manager)
     data = request.json
     result = service.submit_to_payment_request(data.get('ma_so'), session.get('user_code'))
+    if result.get('success'):
+        db_manager.write_audit_log(session.get('user_code'), 'SUBMIT_COMMISSION', 'CRITICAL', f"Trình duyệt phiếu HH: {data.get('ma_so')}", get_user_ip())
     return jsonify(result)

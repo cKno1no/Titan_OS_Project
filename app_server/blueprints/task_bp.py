@@ -384,3 +384,4 @@ def api_task_recent_updates():
     except Exception as e:
         current_app.logger.error(f"LỖI API GET RECENT UPDATES: {e}")
         return jsonify({'error': 'Lỗi khi tải cập nhật gần nhất.'}), 500
+

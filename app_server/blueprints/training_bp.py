@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request, session, current_app, redirect, url_for, flash
-from utils import login_required
+from utils import login_required, record_activity, get_user_ip
+import urllib.parse  # <-- THÊM DÒNG NÀY ĐỂ FIX LỖI URLLIB
 
 training_bp = Blueprint('training_bp', __name__)
 
@@ -103,6 +104,15 @@ def api_submit_quiz():
         data.get('material_id'), 
         data.get('answers')
     )
+
+    # --- THÊM LOG Ở ĐÂY ---
+    if res.get('success'):
+        ip = get_user_ip()
+        score = res.get('score', 0)
+        passed = "Đạt" if res.get('passed') else "Không đạt"
+        # SỬA DÒNG NÀY:
+        current_app.db_manager.write_audit_log(user_code, 'QUIZ_SUBMITTED', 'INFO', f"Nộp bài Quiz {material_id} - Điểm: {score} ({passed})", ip)
+
     return jsonify(res)
 
 # ==============================================================================
@@ -129,11 +139,25 @@ def submit_game_answer():
     """Nộp bài Daily Challenge"""
     user_code = session.get('user_code')
     data = request.json
+    
+    # Khai báo rõ các biến trước khi gọi hàm
+    session_id = data.get('session_id')
+    answer = data.get('answer')
+    
+    # Gọi service xử lý nộp bài
     result = current_app.training_service.submit_answer(
         user_code, 
-        data.get('session_id'), 
-        data.get('answer')
+        session_id, 
+        answer
     )
+
+    # --- THÊM LOG Ở ĐÂY ---
+    if result.get('success'):
+        ip = get_user_ip()
+        is_correct = "Đúng" if result.get('correct') else "Sai"
+        # SỬA DÒNG NÀY:
+        current_app.db_manager.write_audit_log(user_code, 'DAILY_CHALLENGE', 'INFO', f"Tham gia Daily Challenge {session_id} - Kết quả: {is_correct}", ip)
+
     return jsonify(result)
 
 @training_bp.route('/api/training/search', methods=['GET'])
@@ -199,3 +223,18 @@ def category_detail_page(category_name):
         courses=courses_flat,
         sub_categories=sub_categories
     )
+
+# FIX LỖI TẠI ĐÂY: Thay @task_bp bằng @training_bp
+@training_bp.route('/api/training/request-teaching', methods=['POST'])
+@login_required
+def api_request_teaching():
+    """Đề nghị giảng dạy trực tiếp"""
+    data = request.json
+    material_id = data.get('material_id')
+    user_code = session.get('user_code')
+    
+    # Gọi hàm request_teaching từ training_service
+    success, message = current_app.training_service.request_teaching(user_code, material_id)
+    
+    return jsonify({'success': success, 'message': message})
+

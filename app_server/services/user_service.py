@@ -13,11 +13,18 @@ class UserService:
     # =========================================================================
     
     def get_all_users(self, division=None): 
+    
+        # Nếu không truyền division, mặc định lấy theo cổng đang chạy (từ config)
+        if not division and hasattr(config, 'DIVISION'):
+            division = config.DIVISION
+            
         params = []
+        # [FIXED]: Lọc loại bỏ NULL và 9.DU HOC
         query = f"""
             SELECT USERCODE, USERNAME, SHORTNAME, ROLE, [CAP TREN], [BO PHAN], [CHUC VU], [Division], [CreatedDate]
             FROM {config.TEN_BANG_NGUOI_DUNG}
-            WHERE 1=1
+            WHERE [BO PHAN] IS NOT NULL AND [BO PHAN] <> '9.DU HOC'
+            ORDER BY SHORTNAME
         """
         if division:
             query += " AND [Division] = ?"

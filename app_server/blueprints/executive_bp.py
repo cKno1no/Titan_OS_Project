@@ -36,7 +36,13 @@ def ceo_cockpit_page():
                 g.user = user_context # Gán ngược lại cho các hàm sau dùng
         except Exception as e:
             current_app.logger.error(f"Fail-safe load user error: {e}")
-
+    
+    try:
+        from utils import get_user_ip
+        current_app.db_manager.write_audit_log(session.get('user_code', 'UNKNOWN'), 'VIEW_CEO_COCKPIT', 'CRITICAL', "Truy cập bảng điều khiển CEO Cockpit", get_user_ip())
+    except Exception as e:
+        pass
+    
     return render_template(
         'ceo_cockpit.html',
         current_year=today.year,

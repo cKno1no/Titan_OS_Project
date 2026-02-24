@@ -1,0 +1,30 @@
+[2026-02-11 11:57:01,994] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-11 12:01:16,951] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 12:13:50,140] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 12:29:02,664] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 12:39:56,547] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 13:08:32,645] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): Can't reconnect until invalid transaction is rolled back.  Please rollback() fully before proceeding (Background on this error at: https://sqlalche.me/e/20/8s2b)
+[2026-02-11 13:08:38,761] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-11 14:32:10,582] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 14:57:58,576] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 15:07:07,780] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 15:07:23,969] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-11 15:12:17,080] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 15:57:29,693] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 16:01:49,176] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 17:21:00,047] ERROR in db_manager:105 [System]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'TitanOS_Training_DailyQuestions'. (208) (SQLExecDirectW)")
+[SQL: 
+            SELECT s.SessionID, s.UserCode, s.UserAnswer, q.QuestionText, q.StandardAnswer
+            FROM TRAINING_DAILY_SESSION s
+            JOIN TitanOS_Training_DailyQuestions q ON s.QuestionID = q.QuestionID
+            WHERE s.Status = 'SUBMITTED' 
+              AND s.Score IS NULL
+              AND s.ExpiredAt <= GETDATE()
+        ]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-11 21:09:19,353] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 21:09:46,608] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 21:10:03,146] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 21:10:12,154] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-11 21:22:39,110] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-11 23:06:31,798] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.

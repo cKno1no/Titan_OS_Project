@@ -1,0 +1,151 @@
+[2026-01-21 13:47:28,897] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-21 13:49:06,464] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 14:00:25,933] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 14:01:39,099] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'stf240kv', 'intent': 'customer_list'}
+[2026-01-21 14:03:27,758] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'stf240kv', 'intent': 'customer_list'}
+[2026-01-21 14:04:05,521] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'STF240KV', 'months': 24.0, 'intent': 'history_check', 'customer_name': 'TÔN HOA SEN'}
+[2026-01-21 14:04:33,075] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'STF240KV', 'months': 24.0, 'intent': 'price_check', 'customer_name': 'A0007-DTCL'}
+[2026-01-21 14:05:39,689] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'STF240KV', 'months': 1.0, 'intent': 'status_check', 'customer_name': 'A0007-DTCL'}
+[2026-01-21 14:06:37,251] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'intent': 'status_check', 'customer_name': 'Tanamaz'}
+[2026-01-21 14:07:29,498] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '220rv'}
+[2026-01-21 14:08:16,122] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': 'ab3703'}
+[2026-01-21 14:08:37,723] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'AB3703', 'months': 36.0, 'intent': 'history_check'}
+[2026-01-21 14:09:41,295] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'AB3703', 'months': 60.0, 'intent': 'price_check'}
+[2026-01-21 14:11:28,540] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '230rv', 'months': 60.0, 'intent': 'history_check'}
+[2026-01-21 14:14:17,851] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '240kv', 'intent': 'status_check', 'customer_name': 'A0007-DTCL'}
+[2026-01-21 14:22:59,153] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '6205ZZCM', 'intent': 'customer_list'}
+[2026-01-21 14:23:27,421] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '6205ZZCM', 'months': 60.0, 'intent': 'history_check'}
+[2026-01-21 14:24:43,848] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'months': 60.0, 'intent': 'status_check'}
+[2026-01-21 14:27:49,850] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'months': 60.0, 'intent': 'history_check'}
+[2026-01-21 14:30:20,221] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 14:30:55,400] INFO in chatbot_service:328 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-21 14:30:56,822] INFO in chatbot_service:993 [KD010]: ✅ Auto-tagged Story 89: #Mentorship, #Leadership, #Guidance
+[2026-01-21 14:52:19,485] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 14:54:07,817] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'intent': 'check_export_invoice', 'customer_name': 'sunsco'}
+[2026-01-21 14:54:11,850] ERROR in chatbot_service:349 [KD010]: ❌ Function Error: Lỗi thực thi hàm lookup_sales_flow: NaTType does not support strftime
+[2026-01-21 14:58:02,415] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 14:59:05,368] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Sunsco'}
+[2026-01-21 14:59:05,429] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'RefNo02'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'Quantity'. (207); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: 
+            SELECT TOP 5 
+                M.VoucherNo, M.ActualDeliveryDate, M.DeliveryStatus, 
+                M.Planned_Day,
+                O.RefNo02, D.Notes, D.InventoryID, D.Quantity,
+                ISNULL(I.InventoryName, D.InventoryID) as InventoryName
+            FROM [CRM_STDD].[dbo].[Delivery_Weekly] M
+            LEFT JOIN [OMEGA_STDD].[dbo].[OT2302] O ON M.VoucherID = O.VoucherID
+            LEFT JOIN [OMEGA_STDD].[dbo].[OT2302] D ON M.VoucherID = D.VoucherID
+            LEFT JOIN [OMEGA_STDD].[dbo].[IT1302] I ON D.InventoryID = I.InventoryID
+            WHERE M.ObjectID = ?
+         AND M.VoucherDate >= DATEADD(month, -3, GETDATE()) ORDER BY M.VoucherDate DESC]
+[parameters: ('A0011-DTCL',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-21 15:00:29,709] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:00:40,679] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'intent': 'check_export_invoice', 'customer_name': 'Sunsco'}
+[2026-01-21 15:01:31,449] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Sunsco'}
+[2026-01-21 15:01:31,500] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'RefNo02'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: 
+            SELECT TOP 5 
+                M.VoucherNo, M.ActualDeliveryDate, M.DeliveryStatus, 
+                M.Planned_Day,
+                O.RefNo02, D.Notes, D.InventoryID, D.ActualQuantity,
+                ISNULL(I.InventoryName, D.InventoryID) as InventoryName
+            FROM [CRM_STDD].[dbo].[Delivery_Weekly] M
+            LEFT JOIN [OMEGA_STDD].[dbo].[OT2302] O ON M.VoucherID = O.VoucherID
+            LEFT JOIN [OMEGA_STDD].[dbo].[OT2302] D ON M.VoucherID = D.VoucherID
+            LEFT JOIN [OMEGA_STDD].[dbo].[IT1302] I ON D.InventoryID = I.InventoryID
+            WHERE M.ObjectID = ?
+         AND M.VoucherDate >= DATEADD(month, -3, GETDATE()) ORDER BY M.VoucherDate DESC]
+[parameters: ('A0011-DTCL',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-21 15:02:36,902] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:02:44,494] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'sunsco'}
+[2026-01-21 15:03:04,871] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'sunsco'}
+[2026-01-21 15:03:22,875] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '22224 K C3 NSK'}
+[2026-01-21 15:06:22,085] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:06:32,070] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'sunsco'}
+[2026-01-21 15:06:32,180] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'OrderQuantity'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: 
+            SELECT TOP 5 
+                M.VoucherNo, M.ActualDeliveryDate, M.DeliveryStatus, 
+                M.Planned_Day,
+                O.RefNo02, D.Notes, D.InventoryID,
+                ISNULL(D.OrderQuantity, 0) as Quantity, -- [FIX] Alias về 'Quantity'
+                ISNULL(I.InventoryName, D.InventoryID) as InventoryName
+            FROM [CRM_STDD].[dbo].[Delivery_Weekly] M
+            LEFT JOIN [OMEGA_STDD].[dbo].[OT2301] O ON M.VoucherID = O.VoucherID
+            LEFT JOIN [OMEGA_STDD].[dbo].[OT2302] D ON M.VoucherID = D.VoucherID
+            LEFT JOIN [OMEGA_STDD].[dbo].[IT1302] I ON D.InventoryID = I.InventoryID
+            WHERE M.ObjectID = ?
+         AND M.VoucherDate >= DATEADD(month, -3, GETDATE()) ORDER BY M.VoucherDate DESC]
+[parameters: ('A0011-DTCL',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-21 15:07:07,937] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:07:17,779] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Sunsco'}
+[2026-01-21 15:09:29,478] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'C0207-KHVL'}
+[2026-01-21 15:14:19,281] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'months': 60.0, 'intent': 'customer_list'}
+[2026-01-21 15:15:07,357] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220rv', 'intent': 'check_price_history'}
+[2026-01-21 15:17:03,256] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220rv', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-21 15:17:46,029] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220rv', 'intent': 'check_price_history', 'customer_name': 'vina kyoei'}
+[2026-01-21 15:34:00,800] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:34:18,751] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220rv', 'intent': 'check_price_history'}
+[2026-01-21 15:34:57,456] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'AB3703', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-21 15:36:01,568] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '240kv', 'intent': 'check_price_history'}
+[2026-01-21 15:39:26,459] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'ab0307', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-21 15:42:49,169] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:44:44,830] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:44:54,640] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '240kv', 'intent': 'check_price_history'}
+[2026-01-21 15:46:00,723] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'product_keywords': '220RV', 'customer_name': 'Vina Kyoei'}
+[2026-01-21 15:46:29,588] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220RV', 'months': 36.0, 'intent': 'check_export_invoice', 'customer_name': 'Vina Kyoei'}
+[2026-01-21 15:58:51,050] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 15:59:01,810] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220RV', 'months': 36.0, 'intent': 'check_export_invoice', 'customer_name': 'VINA KYOEI'}
+[2026-01-21 16:02:37,692] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'ab3703', 'months': 60.0, 'intent': 'check_export_invoice', 'customer_name': 'vina kyoei'}
+[2026-01-21 16:03:01,406] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 16:03:20,118] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'AB3037', 'months': 36.0, 'intent': 'check_export_invoice', 'customer_name': 'vina kyoei'}
+[2026-01-21 16:03:51,657] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'AB3703', 'months': 60.0, 'intent': 'check_export_invoice', 'customer_name': 'VINA KYOEI'}
+[2026-01-21 16:07:47,171] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180KV', 'months': 60.0, 'intent': 'check_export_invoice', 'customer_name': 'A0011-DTCL'}
+[2026-01-21 16:08:49,049] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'AB1108', 'months': 60.0, 'intent': 'check_export_invoice', 'customer_name': 'A0011-DTCL'}
+[2026-01-21 16:16:59,604] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-21 17:21:21,600] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-21 17:21:46,939] ERROR in app:875 [KD010]: Exception on /analysis/comparison [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 129, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\executive_bp.py", line 104, in comparison_dashboard
+    return render_template(
+        'comparison_dashboard.html',
+    ...<4 lines>...
+        user_context=user_context
+    )
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\comparison_dashboard.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 121, in top-level template code
+    {% block header %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\base.html", line 192, in block 'header'
+    {% if user_context.role == 'ADMIN' or user_context.can('THEME_DARK') %}
+    ^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\utils.py", line 92, in from_obj
+    if hasattr(obj, "jinja_pass_arg"):
+       ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'None' has no attribute 'can'

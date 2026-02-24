@@ -1,0 +1,91 @@
+[2026-01-10 13:52:11,081] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 13:56:57,217] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 18:59:46,588] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 18:59:56,379] ERROR in app:875 [KD060]: Exception on /sales_order_approval [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 41, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 105, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\approval_bp.py", line 82, in sales_order_approval_dashboard
+    orders_for_review = order_approval_service.get_orders_for_approval(
+        user_code,
+    ...<2 lines>...
+        date_to_str
+    )
+  File "D:\CRM STDD\sales_order_approval_service.py", line 114, in get_orders_for_approval
+    processed_order = self._check_approval_criteria(order, user_code)
+  File "D:\CRM STDD\sales_order_approval_service.py", line 181, in _check_approval_criteria
+    if voucher_type == 'SO' and sale_amount >= limit_so:
+                                               ^^^^^^^^
+UnboundLocalError: cannot access local variable 'limit_so' where it is not associated with a value
+[2026-01-10 19:00:39,053] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 19:05:56,828] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 19:07:45,845] ERROR in app:875 [KD064]: Exception on /assistant [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 41, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\chat_bp.py", line 100, in chat_assistant_page
+    flash(f"⛔ Bạn chưa đủ điều kiện truy cập (Level {user_level}/5). Hãy cày thêm XP!", "warning")
+    ^^^^^
+NameError: name 'flash' is not defined. Did you mean: 'hash'?
+[2026-01-10 19:08:14,751] ERROR in app:875 [KD064]: Exception on /assistant [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 41, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\chat_bp.py", line 100, in chat_assistant_page
+    flash(f"⛔ Bạn chưa đủ điều kiện truy cập (Level {user_level}/5). Hãy cày thêm XP!", "warning")
+    ^^^^^
+NameError: name 'flash' is not defined. Did you mean: 'hash'?
+[2026-01-10 19:13:03,461] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 19:13:20,204] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-10 19:13:42,672] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Mentor', 'titan_name': 'Đông'}
+[2026-01-10 19:19:13,250] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'takako'}
+[2026-01-10 19:19:55,899] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 19:53:01,977] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 19:54:26,079] ERROR in app:875 [KD010]: Exception on /hall-of-fame/share [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\blueprints\portal_bp.py", line 114, in hall_of_fame_share
+    users = gamification_service.get_all_users_for_select()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'GamificationService' object has no attribute 'get_all_users_for_select'
+[2026-01-10 19:56:58,437] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-10 19:57:06,215] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'HIENTHI'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'FULLNAME'. (207)")
+[SQL: SELECT USERCODE, SHORTNAME, FULLNAME FROM [GD - NGUOI DUNG] WHERE HIENTHI = 1 ORDER BY SHORTNAME]
+(Background on this error at: https://sqlalche.me/e/20/f405)

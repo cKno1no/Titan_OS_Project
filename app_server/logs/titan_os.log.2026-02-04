@@ -1,0 +1,7 @@
+[2026-02-04 09:05:00,338] ERROR in db_manager:105 [System]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'IsActive'. (207) (SQLExecDirectW)")
+[SQL: SELECT UserCode FROM [GD - NGUOI DUNG] WHERE IsActive=1]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-04 14:47:00,117] ERROR in db_manager:105 [System]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'IsActive'. (207) (SQLExecDirectW)")
+[SQL: SELECT UserCode FROM [GD - NGUOI DUNG] WHERE IsActive=1]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-04 16:07:48,721] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.

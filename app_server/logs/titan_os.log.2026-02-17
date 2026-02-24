@@ -1,0 +1,36 @@
+[2026-02-17 12:58:28,728] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-17 12:59:44,371] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-17 13:01:24,223] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-17 13:05:22,358] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207)")
+[SQL: 
+            SELECT USERCODE, SHORTNAME, [BO PHAN] as Department 
+            FROM [dbo].[GD - NGUOI DUNG] 
+            WHERE [TRANG THAI] = N'Đang làm việc' OR [TRANG THAI] IS NULL
+            ORDER BY [BO PHAN], SHORTNAME
+        ]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-17 13:05:33,141] ERROR in db_manager:194 [KD010]: Lỗi execute_sp_multi: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'dbo.TitanOS_XP_Log'. (208) (SQLExecDirectW)")
+[2026-02-17 13:05:34,407] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207)")
+[SQL: 
+            SELECT USERCODE, SHORTNAME, [BO PHAN] as Department 
+            FROM [dbo].[GD - NGUOI DUNG] 
+            WHERE [TRANG THAI] = N'Đang làm việc' OR [TRANG THAI] IS NULL
+            ORDER BY [BO PHAN], SHORTNAME
+        ]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-17 13:25:08,745] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207)")
+[SQL: 
+            SELECT USERCODE, SHORTNAME, [BO PHAN] as Department 
+            FROM [dbo].[GD - NGUOI DUNG] 
+            WHERE [TRANG THAI] = N'Đang làm việc' OR [TRANG THAI] IS NULL
+            ORDER BY [BO PHAN], SHORTNAME
+        ]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-17 13:25:10,567] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'TRANG THAI'. (207)")
+[SQL: 
+            SELECT USERCODE, SHORTNAME, [BO PHAN] as Department 
+            FROM [dbo].[GD - NGUOI DUNG] 
+            WHERE [TRANG THAI] = N'Đang làm việc' OR [TRANG THAI] IS NULL
+            ORDER BY [BO PHAN], SHORTNAME
+        ]
+(Background on this error at: https://sqlalche.me/e/20/f405)

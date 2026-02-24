@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 # --- CẤU HÌNH ---
 load_dotenv()
-API_KEY = 
+API_KEY = "AIzaSyBLi_xp5bSdRXC8jpveV_mgumrushjZqBA" # Hoặc lấy từ env
 
 db_server = os.getenv('DB_SERVER')
 db_name = os.getenv('DB_NAME')

@@ -1,0 +1,10 @@
+[2026-01-24 10:26:12,734] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-24 10:26:23,972] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-24 10:51:39,630] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-24 10:53:49,988] INFO in budget_service:15 [KD010]: WARNING: send_notification_email not found in utils.py
+[2026-01-24 10:53:49,990] INFO in budget_service:228 [KD010]: 📧 Notification sent to pdong@stdvn.com
+[2026-01-24 11:22:22,023] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-24 11:24:46,748] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-24 11:27:23,998] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-24 11:33:01,850] INFO in chatbot_service:418 [KD004]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'Kraft'}
+[2026-01-24 11:33:12,100] INFO in chatbot_service:418 [KD004]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}

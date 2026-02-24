@@ -4,99 +4,116 @@
 
 {% block content %}
 <style>
-    /* Chế độ Focus: Ẩn Header/Sidebar/Footer của Base Layout để tập trung học */
+    /* Chế độ Focus: Ẩn Header/Sidebar/Footer */
     .page-header, .sidebar, .main-footer, .navbar { display: none !important; }
     .container-fluid { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
-    body { overflow: hidden; background: #2b2d31; } 
+    body { overflow: hidden; background: #2b2d31; font-family: 'Inter', sans-serif; } 
     
-    /* Tùy chỉnh Scrollbar cho đẹp */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #555; }
+    .study-wrapper { display: flex; height: 100vh; width: 100vw; }
+    .viewer-column { flex-grow: 1; display: flex; flex-direction: column; background: #525659; position: relative; }
+    .sidebar-column { width: 400px; min-width: 400px; background: white; border-left: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
 
-    /* Các class phụ trợ */
-    .hover-bg-light:hover { background-color: #f8f9fa; }
-    .cursor-pointer { cursor: pointer; }
-    
-    /* CSS cho vòng tròn tiến độ (Circular Progress) */
-    .circular-chart { display: block; margin: 0 auto; max-width: 80%; max-height: 250px; }
+    .study-toolbar { background: #333639; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+
+    /* CSS cho vòng tròn tiến độ */
+    .circular-chart { width: 40px; height: 40px; }
     .circle-bg { fill: none; stroke: #eee; stroke-width: 3.8; }
-    .circle { 
-        fill: none; 
-        stroke-width: 2.8; 
-        stroke-linecap: round; 
-        animation: progress 1s ease-out forwards; 
-        stroke: #0d6efd; 
-        transition: stroke-dasharray 0.3s; 
-    }
+    .circle { fill: none; stroke-width: 2.8; stroke-linecap: round; stroke: #0d6efd; transition: stroke-dasharray 0.3s; }
+    
+    #chat-history { background: #f8f9fa; scroll-behavior: smooth; }
+    .msg-bubble { padding: 12px 16px; border-radius: 15px; font-size: 0.9rem; line-height: 1.5; max-width: 90%; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .msg-ai { background: white; border: 1px solid #dee2e6; color: #212529; }
+    .msg-user { background: #0d6efd; color: white; margin-left: auto; }
+    
+    /* Quiz Option Styling */
+    .quiz-option { cursor: pointer; transition: all 0.2s; border: 1px solid #dee2e6; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; }
+    .quiz-option:hover { background-color: #f8f9fa; border-color: #0d6efd; }
+    .quiz-option.active { background-color: #e7f1ff; border-color: #0d6efd; font-weight: bold; }
 </style>
 
-<div class="d-flex h-100vh w-100">
-    
-    <div class="flex-grow-1 position-relative bg-dark d-flex flex-column" style="height: 100vh;">
-        <div class="bg-secondary text-white p-2 d-flex justify-content-between align-items-center shadow-sm z-10">
-            <a href="/training/course/{{ material.CourseID }}" class="btn btn-sm btn-dark border-0">
-                <i class="fas fa-arrow-left me-1"></i> Trở về khóa học
-            </a>
-            <span class="fw-bold small text-truncate" style="max-width: 400px;">{{ material.FileName }}</span>
+<div class="study-wrapper" x-data="studyRoom()">
+    <div class="viewer-column">
+        <div class="study-toolbar">
             <div class="d-flex align-items-center">
+                <a href="/training/course/{{ material.CourseID }}" class="btn btn-sm btn-dark border-0 me-3"><i class="fas fa-arrow-left"></i></a>
+                <div class="d-flex flex-column">
+                    <span class="fw-bold small text-white text-truncate" style="max-width: 300px;">{{ material.FileName }}</span>
+                    <small class="text-muted" style="font-size: 0.7rem;">ID: {{ material.MaterialID }}</small>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center" x-show="isPdf">
                 <button class="btn btn-sm btn-dark mx-1" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i></button>
-                <span class="mx-2 small user-select-none">Trang <span id="page_num">1</span> / <span id="page_count">--</span></span>
+                <span class="mx-2 small">Trang <span id="page_num">1</span> / <span id="page_count">--</span></span>
                 <button class="btn btn-sm btn-dark mx-1" onclick="changePage(1)"><i class="fas fa-chevron-right"></i></button>
             </div>
+            
+            <button class="btn btn-sm btn-outline-light border-0" onclick="toggleFullScreen()"><i class="fas fa-expand"></i></button>
         </div>
 
-        <div id="pdf-container" class="flex-grow-1 overflow-auto d-flex justify-content-center p-4" style="background: #525659;">
-            <canvas id="the-canvas" class="shadow-lg"></canvas>
+        <div id="material-viewport" class="flex-grow-1 overflow-auto d-flex justify-content-center p-4">
+            <div id="pdf-wrapper" x-show="isPdf">
+                <canvas id="the-canvas" class="shadow-lg"></canvas>
+            </div>
+            <div id="ppt-wrapper" x-show="!isPdf" class="w-100 h-100">
+                <iframe id="ppt-viewer" src="" width="100%" height="100%" frameborder="0"></iframe>
+            </div>
         </div>
     </div>
 
-    <div class="bg-white border-start d-flex flex-column shadow-lg position-relative" style="width: 400px; height: 100vh; min-width: 350px;">
-        
-        <div class="p-3 border-bottom bg-light d-flex align-items-center justify-content-between">
+    <div class="sidebar-column">
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between bg-light">
             <div class="d-flex align-items-center">
-                <div class="avatar bg-gradient-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
-                    <i class="fas fa-robot"></i>
-                </div>
+                <div class="avatar bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;"><i class="fas fa-robot"></i></div>
                 <div>
-                    <h6 class="m-0 fw-bold text-dark">Titan Tutor</h6>
-                    <small class="text-success" style="font-size: 0.7rem;"><i class="fas fa-circle me-1"></i>Online</small>
+                    <h6 class="m-0 fw-bold">Titan Tutor</h6>
+                    <small class="text-success" style="font-size: 0.7rem;"><i class="fas fa-circle me-1"></i>Đang Online</small>
                 </div>
             </div>
-            <div class="position-relative d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                 <svg viewBox="0 0 36 36" class="circular-chart text-primary w-100 h-100">
+            <div class="position-relative d-flex align-items-center justify-content-center">
+                 <svg viewBox="0 0 36 36" class="circular-chart">
                     <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     <path class="circle" id="prog-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                 </svg>
-                <span class="position-absolute small fw-bold" id="read-percent">0%</span>
+                <span class="position-absolute small fw-bold" id="read-percent" style="font-size: 0.65rem;">0%</span>
             </div>
         </div>
 
-        <div id="chat-history" class="flex-grow-1 p-3 overflow-auto" style="background: #f8f9fa;">
-            <div class="d-flex mb-3">
-                <div class="bg-white p-3 rounded-3 shadow-sm border" style="max-width: 90%;">
-                    <p class="m-0 small">Chào <strong>{{ session.get('shortname') }}</strong>! Mình là trợ lý AI. Mình đã đọc hiểu toàn bộ tài liệu này.</p>
-                    <div class="mt-2 pt-2 border-top">
-                        <p class="small text-muted mb-1">Gợi ý:</p>
-                        <button onclick="sendQuick('Tóm tắt tài liệu này')" class="btn btn-xs btn-outline-primary rounded-pill mb-1" style="font-size: 0.75rem;">📝 Tóm tắt ý chính</button>
-                        <button onclick="sendQuick('5 câu hỏi ôn tập')" class="btn btn-xs btn-outline-primary rounded-pill mb-1" style="font-size: 0.75rem;">❓ Đặt câu hỏi ôn tập</button>
-                        <button onclick="sendQuick('Quy trình này áp dụng khi nào?')" class="btn btn-xs btn-outline-primary rounded-pill mb-1" style="font-size: 0.75rem;">💡 Ứng dụng thực tế</button>
-                    </div>
+        <div id="chat-history" class="flex-grow-1 p-3 overflow-auto">
+            <div class="msg-bubble msg-ai shadow-sm">
+                <p class="m-0 small">Chào sếp <strong>{{ session.get('shortname') }}</strong>! Dưới đây là 3 câu hỏi để sếp ôn tập nhanh bài học này:</p>
+                <div class="mt-3 pt-2 border-top">
+                    <button onclick="sendQuick('Tóm tắt 3 ý chính quan trọng nhất')" class="btn btn-sm btn-outline-primary rounded-pill mb-2 w-100 text-start" style="font-size: 0.75rem;">1. 📝 Tóm tắt 3 ý quan trọng nhất</button>
+                    <button onclick="sendQuick('Ứng dụng thực tế bài học này tại công ty')" class="btn btn-sm btn-outline-primary rounded-pill mb-2 w-100 text-start" style="font-size: 0.75rem;">2. 💡 Ứng dụng thực tế tại STD&D</button>
+                    <button onclick="sendQuick('Đặt 3 câu hỏi trắc nghiệm ôn tập nhanh')" class="btn btn-sm btn-outline-primary rounded-pill mb-2 w-100 text-start" style="font-size: 0.75rem;">3. ❓ Tự kiểm tra kiến thức nhanh</button>
                 </div>
             </div>
         </div>
 
-        <div class="p-3 bg-light border-top">
-            <button id="btn-take-quiz" class="btn btn-warning w-100 fw-bold rounded-pill shadow-sm mb-3" onclick="openQuizModal()" disabled>
-                <i class="fas fa-lock me-2"></i> Hoàn thành bài học để mở Test
-            </button>
-
-            <div class="input-group">
-                <input type="text" id="user-input" class="form-control border-end-0 rounded-start-pill ps-3 bg-white" placeholder="Hỏi Titan về tài liệu..." onkeydown="if(event.key==='Enter') sendMessage()">
-                <button class="btn btn-white border border-start-0 rounded-end-pill" onclick="sendMessage()">
-                    <i class="fas fa-paper-plane text-primary"></i>
+        <div class="p-3 bg-white border-top">
+            <div class="p-3 mb-2 bg-info bg-opacity-10 border border-info border-opacity-25 rounded-3 mx-3" x-data="{ remainingRequests: 3 }">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-chalkboard-teacher text-info me-2"></i>
+                    <span class="small fw-bold text-dark">Cần giảng viên hướng dẫn?</span>
+                </div>
+                <p class="text-muted" style="font-size: 0.75rem; line-height: 1.3;">
+                    Nếu nội dung này quá khó, sếp có thể đề nghị một buổi dạy trực tiếp (Tối đa 3 lượt/tuần).
+                </p>
+                <button class="btn btn-sm btn-info w-100 text-white fw-bold rounded-pill shadow-sm" 
+                        @click="requestTeaching({{ material.MaterialID }})"
+                        :disabled="remainingRequests <= 0">
+                    <i class="fas fa-paper-plane me-1"></i> Gửi đề nghị giảng dạy
                 </button>
+                <div class="text-center mt-1">
+                    <small class="text-muted" style="font-size: 0.65rem;">Sếp còn <strong x-text="remainingRequests"></strong> lượt trong tuần</small>
+                </div>
+            </div>
+            <button id="btn-take-quiz" class="btn btn-warning w-100 fw-bold rounded-pill shadow-sm mb-3 py-2" onclick="openQuizModal()" disabled>
+                <i class="fas fa-lock me-2"></i> Hoàn thành >90% để mở Quiz
+            </button>
+            <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                <input type="text" id="user-input" class="form-control border-0 ps-3 bg-white" placeholder="Hỏi Titan về tài liệu..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="btn btn-white border-0" onclick="sendMessage()"><i class="fas fa-paper-plane text-primary"></i></button>
             </div>
         </div>
     </div>
@@ -105,8 +122,8 @@
 <div class="modal fade" id="quizModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content rounded-4 border-0">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title fw-bold"><i class="fas fa-file-signature me-2"></i>Bài kiểm tra: {{ material.FileName }}</h5>
+            <div class="modal-header bg-primary text-white py-3">
+                <h5 class="modal-title fw-bold"><i class="fas fa-file-signature me-2"></i>Sát hạch: {{ material.FileName }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             
@@ -114,263 +131,203 @@
                 <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
                 <div>
                     <strong>Quy định liêm chính học thuật:</strong><br>
-                    Vui lòng trả lời bằng chính kiến thức bạn đã học. <br>
-                    <span class="text-danger fw-bold">Hạn chế sử dụng ChatGPT/Google để sao chép đáp án.</span>
-                    AI sẽ phát hiện nếu câu trả lời quá giống văn mẫu.
+                    Vui lòng trả lời bằng chính kiến thức đã học. AI sẽ phát hiện nếu câu trả lời quá giống văn mẫu hoặc sao chép từ GPT.
                 </div>
             </div>
 
-            <div class="modal-body bg-light p-4" id="quiz-body">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2">Đang tải đề thi từ ngân hàng câu hỏi...</p>
-                </div>
+            <div id="quiz-body" class="modal-body bg-light p-4">
+                <div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Đang thiết lập đề thi...</p></div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer border-0 bg-light px-4 pb-4">
                 <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Nộp bài</button>
+                <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" onclick="submitQuiz()" id="btn-submit-quiz" disabled>Nộp bài & Chấm điểm</button>
             </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-    // --- 1. CẤU HÌNH VÀ BIẾN TOÀN CỤC ---
-    const pdfUrl = "{{ material.WebPath }}";
     const materialId = {{ material.MaterialID }};
     const userCode = "{{ session.get('user_code') }}";
     const userName = "{{ session.get('shortname') }}";
-    
-    let pdfDoc = null,
-        pageNum = {{ material.last_page or 1 }},
-        pageRendering = false,
-        pageNumPending = null,
-        scale = 1.3, // Tỷ lệ zoom mặc định
-        canvas = document.getElementById('the-canvas'),
-        ctx = canvas.getContext('2d');
-    
-    // Biến lưu trữ cho Quiz
+    const filePath = "{{ material.WebPath }}";
+    const fileExt = filePath.split('.').pop().toLowerCase();
+    const isPdf = (fileExt === 'pdf');
+
     let quizData = [];
     let userAnswers = {};
 
-    // --- 2. BẢO MẬT (CHỐNG IN & CLICK PHẢI) ---
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.addEventListener('keydown', function(e) {
-        // Chặn Ctrl+P (Print) và Ctrl+S (Save)
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's')) {
-            e.preventDefault();
-            Swal.fire('Cảnh báo bảo mật', 'Tài liệu nội bộ. Vui lòng không in hoặc lưu!', 'warning');
+    function studyRoom() { return { isPdf: isPdf } }
+
+    window.onload = function() {
+        if (isPdf) { initPDF(); } 
+        else {
+            const officeViewer = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(window.location.origin + rawPath)}`;
+            document.getElementById('ppt-viewer').src = officeViewer;
+            updateUIProgress(100);
         }
-    });
+    };
 
-    // --- 3. XỬ LÝ HIỂN THỊ PDF ---
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-    // Tải PDF
-    pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc_) {
-        pdfDoc = pdfDoc_;
-        document.getElementById('page_count').textContent = pdfDoc.numPages;
-        renderPage(pageNum);
-    }).catch(err => {
-        console.error("Lỗi PDF:", err);
-        Swal.fire('Lỗi tải tài liệu', 'Không tìm thấy file hoặc file bị lỗi.', 'error');
-    });
-
-    // Hàm render từng trang
-    function renderPage(num) {
-        pageRendering = true;
-        
-        // 3.1. Cập nhật thanh tiến độ (Progress Circle)
-        if (pdfDoc) {
-            let percent = Math.round((num / pdfDoc.numPages) * 100);
-            document.getElementById('read-percent').textContent = percent + '%';
-            document.getElementById('prog-circle').setAttribute('stroke-dasharray', `${percent}, 100`);
-            
-            // 3.2. Logic Mở khóa bài kiểm tra (Unlock Quiz)
-            const btnQuiz = document.getElementById('btn-take-quiz');
-            // Điều kiện: Đọc đến trang cuối HOẶC đã đọc > 90%
-            if (num >= pdfDoc.numPages - 1 || percent >= 90) { 
-                btnQuiz.disabled = false;
-                btnQuiz.innerHTML = '<i class="fas fa-file-signature me-2"></i> Làm bài kiểm tra';
-                btnQuiz.classList.remove('btn-warning');
-                btnQuiz.classList.add('btn-success', 'animate__animated', 'animate__pulse', 'animate__infinite');
-            }
-        }
-
-        // 3.3. Gọi API lưu tiến độ ngầm
-        saveProgress(num);
-
-        // 3.4. Vẽ PDF lên Canvas
-        pdfDoc.getPage(num).then(function(page) {
-            var viewport = page.getViewport({scale: scale});
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            var renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
-            var renderTask = page.render(renderContext);
-
-            // Chờ render xong để vẽ Watermark đè lên
-            renderTask.promise.then(function() {
-                pageRendering = false;
-                
-                // --- VẼ WATERMARK BẢO MẬT ---
-                ctx.save();
-                ctx.globalAlpha = 0.1; // Độ trong suốt thấp (mờ)
-                ctx.font = "bold 30px Arial";
-                ctx.fillStyle = "red";
-                ctx.rotate(-35 * Math.PI / 180); // Xoay chéo
-                
-                const wmText = `${userCode} - ${userName}`;
-                
-                // Vẽ lặp lại kín trang
-                for (let x = -300; x < canvas.width; x += 350) {
-                    for (let y = -300; y < canvas.height; y += 250) {
-                        ctx.fillText(wmText, x, y);
-                    }
-                }
-                ctx.restore();
-                // -----------------------------
-
-                if (pageNumPending !== null) {
-                    renderPage(pageNumPending);
-                    pageNumPending = null;
-                }
-            });
+    // --- LOGIC ĐỀ NGHỊ GIẢNG DẠY ---
+    async function requestTeaching(materialId) {
+        const result = await Swal.fire({
+            title: 'Gửi đề nghị giảng dạy?',
+            text: "Hệ thống sẽ tổng hợp nhu cầu và báo cáo tới Ban Giám Đốc khi đủ số lượng.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý gửi'
         });
 
-        // Cập nhật số trang hiển thị
+        if (!result.isConfirmed) return;
+
+        try {
+            const res = await fetch('/api/training/request-teaching', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ material_id: materialId })
+            });
+            
+            // Kiểm tra nếu response không ok (lỗi 500, 404...)
+            if (!res.ok) throw new Error('Server response not ok');
+
+            const data = await res.json();
+            
+            if (data.success) {
+                await Swal.fire('Thành công!', data.message, 'success');
+                
+                // CẬP NHẬT UI AN TOÀN: Tìm nút có chứa biến remainingRequests
+                // Cách này đơn giản và khó lỗi hơn
+                const requestBox = document.querySelector('[x-data*="remainingRequests"]');
+                if (requestBox && requestBox.__x) {
+                    requestBox.__x.$data.remainingRequests--;
+                }
+                
+                return; // Dừng hàm để không hiện lỗi giả
+            } else {
+                Swal.fire('Thông báo', data.message, 'warning');
+            }
+        } catch (e) {
+            console.error("Lỗi thực tế:", e);
+            Swal.fire('Lỗi kết nối', 'Máy chủ không phản hồi hoặc lỗi script. (Kiểm tra Console)', 'error');
+        }
+    }
+
+    // --- PDF ENGINE ---
+    let pdfDoc = null, pageNum = {{ material.last_page or 1 }}, pageRendering = false, canvas = document.getElementById('the-canvas'), ctx = canvas.getContext('2d');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    function initPDF() {
+        pdfjsLib.getDocument(filePath).promise.then(function(pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            document.getElementById('page_count').textContent = pdfDoc.numPages;
+            renderPage(pageNum);
+        }).catch(err => {
+            console.error("Lỗi PDF:", err);
+            document.getElementById('material-viewport').innerHTML = '<div class="alert alert-danger">Lỗi tải file. Kiểm tra đường dẫn: ' + rawPath + '</div>';
+        });
+    }
+
+    function renderPage(num) {
+        pageRendering = true;
+        let percent = Math.round((num / pdfDoc.numPages) * 100);
+        updateUIProgress(percent);
+        saveProgress(num);
+        pdfDoc.getPage(num).then(function(page) {
+            let viewport = page.getViewport({scale: 1.5});
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            page.render({canvasContext: ctx, viewport: viewport}).promise.then(function() {
+                pageRendering = false;
+                applyWatermark();
+            });
+        });
         document.getElementById('page_num').textContent = num;
     }
 
-    function queueRenderPage(num) {
-        if (pageRendering) {
-            pageNumPending = num;
-        } else {
-            renderPage(num);
+    function applyWatermark() {
+        ctx.save(); ctx.globalAlpha = 0.1; ctx.font = "20px Arial"; ctx.fillStyle = "red"; ctx.rotate(-45 * Math.PI / 180);
+        for (let i = -10; i < 10; i++) { for (let j = -10; j < 10; j++) { ctx.fillText(`${userCode} - ${userName}`, i * 400, j * 300); } }
+        ctx.restore();
+    }
+
+    function updateUIProgress(percent) {
+        document.getElementById('read-percent').textContent = percent + '%';
+        document.getElementById('prog-circle').setAttribute('stroke-dasharray', `${percent}, 100`);
+        if (percent >= 90) {
+            const btn = document.getElementById('btn-take-quiz');
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-unlock me-2"></i> Làm bài kiểm tra';
+            btn.classList.replace('btn-warning', 'btn-success');
         }
     }
 
-    // Chuyển trang Next/Prev
-    function changePage(offset) {
-        if (pageNum + offset >= 1 && pageNum + offset <= pdfDoc.numPages) {
-            pageNum += offset;
-            queueRenderPage(pageNum);
-        }
-    }
-
-    // Lưu tiến độ đọc vào DB
-    function saveProgress(page) {
-        fetch('/api/training/progress', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ material_id: materialId, page: page })
-        });
-    }
-
-    // --- 4. XỬ LÝ QUIZ (TRẮC NGHIỆM + TỰ LUẬN) ---
-    
-    // Mở Modal và tải đề
+    // --- QUIZ LOGIC (KHÔI PHỤC LOGIC TRÁO CÂU 1/5 CỦA SẾP) ---
     function openQuizModal() {
         const modal = new bootstrap.Modal(document.getElementById('quizModal'));
         modal.show();
         loadQuiz();
     }
 
-    // Tải danh sách câu hỏi
     function loadQuiz() {
         const body = document.getElementById('quiz-body');
+        userAnswers = {}; // Reset câu trả lời
         
         fetch('/api/quiz/get', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ material_id: materialId })
-        })
-        .then(r => r.json())
-        .then(questions => {
+        }).then(r => r.json()).then(questions => {
             quizData = questions;
-            userAnswers = {}; // Reset câu trả lời
-            
             if (questions.length === 0) {
-                body.innerHTML = `<div class="text-center p-4"><i class="fas fa-check-circle text-success fa-3x mb-3"></i><h5>Chưa có bài kiểm tra cho tài liệu này.</h5><p>Sếp đã hoàn thành việc đọc!</p></div>`;
-                document.getElementById('btn-submit-quiz').style.display = 'none';
+                body.innerHTML = '<div class="text-center"><h5>Chưa có bài kiểm tra cho tài liệu này.</h5></div>';
                 return;
             }
-            
-            let html = '';
-            questions.forEach((q, index) => {
-                // Kiểm tra loại câu hỏi: Nếu OptionA có dữ liệu -> Trắc nghiệm, ngược lại -> Tự luận
-                const isMCQ = q.OptionA && q.OptionA.trim() !== "";
-                
-                html += `
-                <div class="card mb-4 border-0 shadow-sm">
-                    <div class="card-body">
-                        <h6 class="fw-bold text-primary mb-3">
-                            <span class="badge bg-primary me-2">Câu ${index + 1}</span> 
-                            ${q.Content}
-                        </h6>`;
-                
-                if (isMCQ) {
-                    // Render Trắc nghiệm (Radio buttons)
-                    html += `
-                        <div class="mt-2">
-                            ${renderOption(q.ID, 'A', q.OptionA)}
-                            ${renderOption(q.ID, 'B', q.OptionB)}
-                            ${renderOption(q.ID, 'C', q.OptionC)}
-                            ${renderOption(q.ID, 'D', q.OptionD)}
-                        </div>`;
-                } else {
-                    // Render Tự luận (Textarea)
-                    html += `
-                        <div class="mt-2">
-                            <textarea class="form-control bg-white" rows="4" 
-                                placeholder="Nhập câu trả lời của bạn..." 
-                                oninput="inputText(this, ${q.ID})"></textarea>
-                            <small class="text-muted fst-italic mt-2 d-block"><i class="fas fa-pen-fancy me-1"></i> Trả lời tự luận (AI sẽ chấm điểm)</small>
-                        </div>`;
-                }
-
-                html += `</div></div>`;
-            });
-            body.innerHTML = html;
-            document.getElementById('btn-submit-quiz').disabled = false;
+            renderQuizUI();
         });
     }
 
-    // Helper render đáp án trắc nghiệm
-    function renderOption(qId, key, text) {
-        if (!text) return '';
-        return `
-        <div class="form-check mb-2 p-3 border rounded-3 hover-bg-light cursor-pointer" onclick="document.getElementById('opt_${qId}_${key}').click()">
-            <input class="form-check-input" type="radio" name="q_${qId}" id="opt_${qId}_${key}" value="${key}" onchange="selectAnswer(${qId}, '${key}')">
-            <label class="form-check-label w-100 cursor-pointer" for="opt_${qId}_${key}">
-                <strong>${key}.</strong> ${text}
-            </label>
-        </div>`;
+    function renderQuizUI() {
+        const body = document.getElementById('quiz-body');
+        let html = '';
+        quizData.forEach((q, i) => {
+            const isMCQ = q.OptionA && q.OptionA.trim() !== "";
+            html += `<div class="card mb-3 border-0 shadow-sm"><div class="card-body">
+                <h6 class="fw-bold text-primary">Câu ${i+1}: ${q.Content}</h6>`;
+            if (isMCQ) {
+                ['A','B','C','D'].forEach(opt => {
+                    if (q['Option'+opt]) {
+                        html += `<div class="quiz-option" id="q${q.ID}_${opt}" onclick="selectAnswer(${q.ID}, '${opt}')">
+                            <span class="me-2 fw-bold">${opt}.</span> ${q['Option'+opt]}
+                        </div>`;
+                    }
+                });
+            } else {
+                html += `<textarea class="form-control" rows="3" oninput="userAnswers[${q.ID}] = this.value" placeholder="Trả lời tự luận tại đây..."></textarea>`;
+            }
+            html += `</div></div>`;
+        });
+        body.innerHTML = html;
+        document.getElementById('btn-submit-quiz').disabled = false;
     }
 
-    // Lưu đáp án user chọn/nhập
-    function selectAnswer(qId, val) { userAnswers[qId] = val; }
-    function inputText(el, qId) { userAnswers[qId] = el.value.trim(); }
+    function selectAnswer(qId, opt) {
+        userAnswers[qId] = opt;
+        document.querySelectorAll(`[id^="q${qId}_"]`).forEach(el => el.classList.remove('active'));
+        document.getElementById(`q${qId}_${opt}`).classList.add('active');
+    }
 
-    // Nộp bài
     function submitQuiz() {
-        // Validate: Phải làm hết
         if (Object.keys(userAnswers).length < quizData.length) {
-            Swal.fire('Chưa làm xong', 'Sếp vui lòng trả lời hết các câu hỏi.', 'warning');
+            Swal.fire('Chú ý', 'Sếp vui lòng hoàn thành tất cả câu hỏi.', 'warning');
             return;
         }
-
-        // Disable nút để tránh spam
+        
         const btn = document.getElementById('btn-submit-quiz');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> AI đang chấm...';
+        btn.disabled = true; 
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> AI đang chấm bài...';
 
-        // Gửi về Server
         fetch('/api/quiz/submit', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -381,90 +338,62 @@
             if (res.passed) {
                 Swal.fire({
                     title: 'Đạt yêu cầu! 🎉',
-                    html: `Lần thi thứ <b>${res.attempt}</b>.<br>Điểm: <b>${res.score}/${res.total}</b>.<br>Đã ghi nhận hoàn thành!`,
+                    html: `Lần thi thứ <b>${res.attempt}</b>.<br>Điểm: <b>${res.score}/${res.total}</b>.<br>Ghi nhận hoàn thành bài học!`,
                     icon: 'success'
                 }).then(() => location.reload());
             } else {
+                // LOGIC TỰ ĐỘNG SWAP CÂU MỚI NGAY LẬP TỨC
                 Swal.fire({
                     title: 'Chưa đạt',
-                    html: `Lần thi thứ <b>${res.attempt}</b>.<br>Điểm: <b>${res.score}/${res.total}</b>.<br>Bạn cần đúng ít nhất 4/5 câu.<br><br><b>Hệ thống sẽ đổi 1 câu hỏi mới trong lần thi sau.</b> Hãy ôn lại bài kỹ hơn!`,
-                    icon: 'warning'
+                    html: `Lần thi thứ <b>${res.attempt}</b>.<br>Điểm: <b>${res.score}/${res.total}</b>.<br>Bạn cần đúng ít nhất 4/5 câu.<br><br><span class="text-danger">Hệ thống đang đổi 1 câu hỏi mới...</span>`,
+                    icon: 'error'
+                }).then(() => {
+                    // Tự động tải lại bộ câu hỏi mới (API sẽ trả về 4 câu cũ + 1 câu mới)
+                    loadQuiz(); 
+                    // Reset trạng thái nút
+                    btn.disabled = false; 
+                    btn.innerHTML = 'Nộp bài & Chấm điểm';
+                    // Cuộn lên đầu Modal để Sếp thấy câu hỏi mới
+                    document.getElementById('quizModal').querySelector('.modal-body').scrollTop = 0;
                 });
-                // Reset nút nộp bài
-                btn.disabled = false;
-                btn.innerHTML = 'Nộp bài';
             }
         })
         .catch(err => {
             console.error(err);
-            Swal.fire('Lỗi', 'Có lỗi xảy ra khi chấm bài.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = 'Nộp bài';
+            Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối máy chủ chấm bài.', 'error');
+            btn.disabled = false; 
+            btn.innerHTML = 'Nộp bài & Chấm điểm';
         });
     }
 
-    // --- 5. CHAT LOGIC (TITAN TUTOR) ---
-    function sendQuick(text) {
-        document.getElementById('user-input').value = text;
-        sendMessage();
-    }
-
+    // --- AI TUTOR ---
     async function sendMessage() {
         const input = document.getElementById('user-input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        // Hiện tin nhắn user
-        addBubble('user', text);
-        input.value = '';
-        
-        // Hiện typing
-        const typingId = addBubble('bot', '<i class="fas fa-ellipsis-h fa-beat"></i>');
-
+        const text = input.value.trim(); if (!text) return;
+        addBubble('user', text); input.value = '';
+        const typingId = addBubble('ai', '<i class="fas fa-spinner fa-spin"></i> Titan Tutor đang suy nghĩ...');
         try {
-            const res = await fetch('/api/library/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    material_id: materialId, 
-                    question: text 
-                })
-            });
+            const res = await fetch('/api/library/chat', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ material_id: materialId, question: text }) });
             const data = await res.json();
-            
             document.getElementById(typingId).remove();
-            addBubble('bot', data.text);
-
-            // Nếu AI trả về trang -> Jump tới trang đó
-            if (data.page) {
-                pageNum = data.page;
-                queueRenderPage(pageNum);
-            }
-
-        } catch (e) {
-            console.error(e);
-            document.getElementById(typingId).remove();
-            addBubble('bot', '❌ Lỗi kết nối AI.');
-        }
+            addBubble('ai', marked.parse(data.text));
+        } catch (e) { document.getElementById(typingId).innerHTML = '❌ Lỗi kết nối AI.'; }
     }
 
-    function addBubble(role, htmlContent) {
+    function sendQuick(text) { document.getElementById('user-input').value = text; sendMessage(); }
+    
+    function addBubble(role, content) {
         const history = document.getElementById('chat-history');
         const id = 'msg-' + Date.now();
-        
-        const align = role === 'user' ? 'justify-content-end' : '';
-        const bg = role === 'user' ? 'bg-primary text-white' : 'bg-white border';
-        
-        const html = `
-        <div class="d-flex mb-3 ${align}" id="${id}">
-            <div class="${bg} p-3 rounded-3 shadow-sm" style="max-width: 90%; font-size: 0.9rem;">
-                ${htmlContent}
-            </div>
-        </div>`;
-        
-        history.insertAdjacentHTML('beforeend', html);
-        history.scrollTop = history.scrollHeight;
-        return id;
+        history.insertAdjacentHTML('beforeend', `<div class="msg-bubble msg-${role}" id="${id}">${content}</div>`);
+        history.scrollTop = history.scrollHeight; return id;
     }
+
+    function saveProgress(page) { fetch('/api/training/progress', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ material_id: materialId, page: page }) }); }
+    function changePage(offset) { if (!pdfDoc || pageRendering) return; if (pageNum + offset >= 1 && pageNum + offset <= pdfDoc.numPages) { pageNum += offset; renderPage(pageNum); } }
+    function toggleFullScreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { document.exitFullscreen(); } }
+    
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    window.onbeforeprint = () => false;
 </script>
 {% endblock %}

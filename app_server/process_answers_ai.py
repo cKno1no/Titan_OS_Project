@@ -6,7 +6,7 @@ import os
 from collections import defaultdict
 
 # --- CẤU HÌNH ---
-API_KEY = 
+API_KEY = "AIzaSyBLi_xp5bSdRXC8jpveV_mgumrushjZqBA" # Hoặc lấy từ env
 
 db_server = os.getenv('DB_SERVER')
 db_name = os.getenv('DB_NAME')

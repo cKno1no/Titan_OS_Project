@@ -1,0 +1,160 @@
+[2026-02-23 11:30:19,823] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 11:30:44,991] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-23 12:02:39,908] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 12:04:15,458] ERROR in app:875 [KD010]: Exception on /kpi-eval/api/evaluate [POST]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_evaluation_bp.py", line 117, in evaluate_kpi
+    record_activity(executor, 'KPI_CALC', f"Chốt điểm KPI cho {target_user} (Tháng {month}/{year})", ip)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: record_activity() takes 1 positional argument but 4 were given
+[2026-02-23 12:10:28,548] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 12:10:55,490] ERROR in user_bp:293 [KD010]: Lỗi Claim Mail: name 'mail_title' is not defined
+[2026-02-23 12:12:19,137] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-23 12:25:18,997] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 12:26:07,444] INFO in chatbot_service:514 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông', 'tag_filter': 'Lãnh đạo'}
+[2026-02-23 12:32:07,290] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 12:32:16,559] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT COUNT(1) as Cnt FROM dbo.AUDIT_LOGS WHERE CAST(CreatedAt AS DATE) = ?]
+[parameters: ('2026-02-23',)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:16,561] ERROR in user_bp:348 [KD010]: Lỗi lấy Audit Stats: list index out of range
+[2026-02-23 12:32:16,999] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:21,988] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:26,993] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:32,383] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:37,371] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:42,358] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:47,361] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:52,376] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:32:57,371] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:02,363] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:07,362] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:12,368] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:17,363] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:22,384] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:27,371] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:41,423] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:41,992] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:46,992] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:52,395] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:33:57,470] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:02,480] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:07,369] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:12,369] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:17,368] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:22,384] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:27,364] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:32,367] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:37,367] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:42,363] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:47,364] ERROR in db_manager:105 [KD010]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'CreatedAt'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+[SQL: SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1  ORDER BY CreatedAt DESC]
+[parameters: (100,)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-02-23 12:34:52,812] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 12:40:12,215] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 12:46:25,011] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-23 12:48:02,415] INFO in executive_service:21 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_2)
+[2026-02-23 13:29:19,765] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 21:03:18,311] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-23 21:03:27,232] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-23 21:05:05,989] INFO in kpi_bp:62 [KD010]: CACHE HIT: sales_dash_KD010_def_from_def_to_all
+[2026-02-23 21:47:39,527] INFO in chatbot_service:514 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Khách hàng chê vòng bi dòng Explorer của SKF giá quá cao so với hàng NSK. Tôi phải thuyết phục bằng những luận điểm nào?'}

@@ -32,7 +32,6 @@ def portal_dashboard():
         # current_app.logger.info(f"PORTAL CACHE MISS: {cache_key}")
         
         portal_service = current_app.portal_service
-        # db_manager = current_app.db_manager (Không dùng thì bỏ qua)
 
         user_code = session.get('user_code')
         bo_phan = session.get('bo_phan', '').strip().upper()
@@ -42,7 +41,7 @@ def portal_dashboard():
             # Gọi Service (Query nặng)
             dashboard_data = portal_service.get_all_dashboard_data(user_code, bo_phan, role)
             
-            # Lưu vào Redis trong 3 tiếng (300 giây)
+            # Lưu vào Redis trong 3 tiếng (10800 giây)
             if dashboard_data:
                 current_app.cache.set(cache_key, dashboard_data, timeout=10800)
                 
@@ -51,24 +50,12 @@ def portal_dashboard():
             dashboard_data = {} # Trả về rỗng để không crash trang
 
     # 3. RENDER TEMPLATE
-    # Kết hợp dữ liệu từ Cache (dashboard_data) và dữ liệu thực (session, datetime)
+    # [QUAN TRỌNG NHẤT]: Truyền thẳng object dashboard_data sang HTML
     return render_template(
         'portal_dashboard.html',
         user=session,                                   # Luôn lấy session hiện tại
         now_date=datetime.now().strftime('%d/%m/%Y'),   # Luôn lấy giờ hiện tại
-        
-        # Sử dụng .get() để an toàn hơn nếu cache cũ thiếu key
-        sales_kpi=dashboard_data.get('sales_kpi'),
-        tasks=dashboard_data.get('tasks'),
-        # approvals=dashboard_data.get('approvals'), <-- Đã xóa theo code cũ
-        orders_stat=dashboard_data.get('orders_stat'),
-        overdue_debt=dashboard_data.get('overdue_debt'),
-        active_quotes=dashboard_data.get('active_quotes'),
-        pending_deliveries=dashboard_data.get('pending_deliveries'),
-        orders_flow=dashboard_data.get('orders_flow'),
-        recent_reports=dashboard_data.get('recent_reports'),
-        urgent_replenish=dashboard_data.get('urgent_replenish'),
-        errors=dashboard_data.get('errors') 
+        dashboard_data=dashboard_data                   # <-- ĐÃ SỬA GỌN GÀNG TẠI ĐÂY
     )
 
 # ---------------------------------------------------------

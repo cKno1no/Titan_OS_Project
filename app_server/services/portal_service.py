@@ -85,22 +85,37 @@ class PortalService:
             data['errors']['connection'] = f"Lỗi kết nối DB: {str(e)}"
             return data
 
+        # --- LẤY AVATAR TỪ DB ---
+        # --- LẤY AVATAR TỪ DB ---
+        try:
+            cursor.execute("SELECT AvatarUrl FROM dbo.TitanOS_UserProfile WHERE LTRIM(RTRIM(UserCode)) = ?", (user_code,))
+            ava_res = cursor.fetchone()
+            data['user_avatar'] = ava_res[0] if ava_res and ava_res[0] else f"https://ui-avatars.com/api/?background=random&color=fff&size=80&bold=true&name={user_code}"
+        except Exception:
+            data['user_avatar'] = f"https://ui-avatars.com/api/?background=random&color=fff&size=80&bold=true&name={user_code}"
         # --- 1. KPI: DOANH SỐ ---
         try:
             cursor.execute(f"SELECT SUM([DK]) FROM {config.CRM_DTCL} WHERE [Nam]=? AND [PHU TRACH DS]=?", (current_year, user_code))
             row = cursor.fetchone()
             monthly_target = (safe_float(row[0]) / 12) if row and row[0] else 0
             
-            # [CONFIG]: ACC_PHAI_THU_KH (13111), ACC_DOANH_THU (511%)
-            cursor.execute(f"""
-                SELECT SUM(ConvertedAmount) FROM {config.ERP_GIAO_DICH} 
-                WHERE SalesManID=? AND TranMonth=? AND TranYear=? 
-                AND DebitAccountID='{config.ACC_PHAI_THU_KH}' 
-                AND CreditAccountID LIKE '{config.ACC_DOANH_THU}'
-            """, (user_code, current_month, current_year))
+            if is_thu_ky:
+                # Tính theo EmployeeID trong bảng OT2001 (OT2001 JOIN GT9000)
+                cursor.execute(f"""
+                    SELECT SUM(H.ConvertedAmount) FROM {config.ERP_GIAO_DICH} H
+                    INNER JOIN {config.ERP_OT2001} O ON H.OrderID = O.SOrderID
+                    WHERE O.EmployeeID=? AND H.TranMonth=? AND H.TranYear=? 
+                    AND H.DebitAccountID='{config.ACC_PHAI_THU_KH}' AND H.CreditAccountID LIKE '{config.ACC_DOANH_THU}'
+                """, (user_code, current_month, current_year))
+            else:
+                cursor.execute(f"""
+                    SELECT SUM(ConvertedAmount) FROM {config.ERP_GIAO_DICH} 
+                    WHERE SalesManID=? AND TranMonth=? AND TranYear=? 
+                    AND DebitAccountID='{config.ACC_PHAI_THU_KH}' AND CreditAccountID LIKE '{config.ACC_DOANH_THU}'
+                """, (user_code, current_month, current_year))
+
             row = cursor.fetchone()
             actual_sales = safe_float(row[0]) if row and row[0] else 0
-            
             percent = (actual_sales / monthly_target * 100) if monthly_target > 0 else 0
             data['sales_kpi'] = {'actual': actual_sales, 'target': monthly_target, 'percent': round(percent, 1)}
         except Exception as e:
@@ -306,5 +321,106 @@ class PortalService:
         # Vì đây là Raw Connection lấy từ pool, .close() sẽ trả nó về pool.
         if conn:
             conn.close()
+        
+        # =========================================================
+        # [NEW] KÉO DỮ LIỆU HALL OF FAME (BẢNG VÀNG)
+        # =========================================================
+        try:
+            # Tùy chỉnh tên bảng Hall of Fame thực tế của bạn (Ví dụ: TitanOS_HallOfFame)
+            hof_query = """
+                SELECT TOP 1 TargetUser, Title, AuthorUser 
+                FROM dbo.TitanOS_HallOfFame 
+                ORDER BY CreatedAt DESC
+            """
+            cursor.execute(hof_query)
+            hof_res = cursor.fetchone()
+            if hof_res:
+                data['hall_of_fame'] = {
+                    'target': hof_res[0],
+                    'title': hof_res[1],
+                    'author': hof_res[2]
+                }
+            else:
+                data['hall_of_fame'] = None
+        except Exception as e:
+            data['errors']['hof'] = str(e)
+            data['hall_of_fame'] = None
+
+        # =========================================================
+        # [NEW] KÉO DỮ LIỆU TRAINING (HỌC TẬP)
+        # =========================================================
+        try:
+            # Lấy khóa học đang học dở gần nhất của User
+            # Giả định cấu trúc bảng Training của bạn
+            train_query = """
+                SELECT TOP 1 C.CourseName, E.ProgressPct, C.XPReward
+                FROM dbo.TitanOS_CourseEnrollment E
+                INNER JOIN dbo.TitanOS_Courses C ON E.CourseID = C.CourseID
+                WHERE E.UserCode = ? AND E.Status = 'IN_PROGRESS'
+                ORDER BY E.LastAccessed DESC
+            """
+            cursor.execute(train_query, (user_code,))
+            train_res = cursor.fetchone()
+            if train_res:
+                data['training'] = {
+                    'course_name': train_res[0],
+                    'progress': int(train_res[1]),
+                    'xp': train_res[2]
+                }
+            else:
+                data['training'] = None
+        except Exception as e:
+            data['errors']['training'] = str(e)
+            data['training'] = None
+
+        # ... (Bên trong hàm get_portal_data, ngay sau khi kéo dữ liệu user) ...
+        
+        # --- [NEW] KÉO DỮ LIỆU KPI TỔNG QUAN (GAMIFICATION) ---
+        try:
+            current_year = datetime.now().year
+            current_month = datetime.now().month
+            
+            # Lấy tổng điểm KPI tháng hiện tại
+            kpi_query = """
+                SELECT SUM(WeightedScore) as TotalScore 
+                FROM dbo.KPI_MONTHLY_RESULT 
+                WHERE UserCode = ? AND EvalYear = ? AND EvalMonth = ?
+            """
+            cursor.execute(kpi_query, (user_code, current_year, current_month))
+            kpi_res = cursor.fetchone()
+            total_score = float(kpi_res[0]) if kpi_res and kpi_res[0] else 0
+            
+            # Xếp hạng
+            grade = 'D'
+            if total_score >= 101: grade = 'S'
+            elif total_score >= 86: grade = 'A'
+            elif total_score >= 76: grade = 'B'
+            elif total_score >= 61: grade = 'C'
+            
+            data['gamification'] = {
+                'total_score': round(total_score, 1),
+                'grade': grade,
+                'target_left': round(max(0, 100 - total_score), 1)
+            }
+        except Exception as e:
+            data['errors']['gamification'] = str(e)
+
+        # --- [NEW] KÉO TASK TÌNH TRẠNG KHẨN CẤP ---
+        try:
+            task_query = """
+                SELECT 
+                    SUM(CASE WHEN TaskDate < CAST(GETDATE() AS DATE) AND Status != 'Completed' THEN 1 ELSE 0 END) as Overdue,
+                    SUM(CASE WHEN TaskDate = CAST(GETDATE() AS DATE) THEN 1 ELSE 0 END) as Today
+                FROM dbo.Task_Master 
+                WHERE UserCode = ?
+            """
+            cursor.execute(task_query, (user_code,))
+            task_res = cursor.fetchone()
+            data['task_brief'] = {
+                'overdue': int(task_res[0]) if task_res and task_res[0] else 0,
+                'today': int(task_res[1]) if task_res and task_res[1] else 0
+            }
+        except Exception as e:
+             data['errors']['task_brief'] = str(e)
             
         return data

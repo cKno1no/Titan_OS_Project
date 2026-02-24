@@ -9,7 +9,7 @@ from PIL import Image
 
 # --- CẤU HÌNH ---
 load_dotenv()
-API_KEY = 
+API_KEY = "AIzaSyBLi_xp5bSdRXC8jpveV_mgumrushjZqBA" # Hoặc lấy từ env
 
 db_server = os.getenv('DB_SERVER')
 db_name = os.getenv('DB_NAME')
@@ -42,48 +42,76 @@ def clean_json_string(text):
         return text[s:e+1]
     return "{}"
 
+
+
+
 def audit_expert_content(row):
-    """
-    AI đóng vai trò 'Người duyệt cuối' (Approver).
-    Chỉ sửa CorrectAnswer nếu sai nghiêm trọng.
-    Chủ yếu tập trung bổ sung Explanation.
-    """
     q_code = row.QuestionCode
     
-    # 1. Tìm ảnh
-    image_path = os.path.join(IMAGE_BASE_DIR, f"{q_code}.jpg")
+    # 1. Tìm ảnh (Hỗ trợ nhiều định dạng ảnh)
     img_obj = None
     has_image = False
-    if os.path.exists(image_path):
-        try:
-            img_obj = Image.open(image_path)
-            has_image = True
-        except: pass
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.JPG', '.PNG']
+    
+    for ext in valid_extensions:
+        temp_path = os.path.join(IMAGE_BASE_DIR, f"{q_code}{ext}")
+        if os.path.exists(temp_path):
+            try:
+                img_obj = Image.open(temp_path)
+                has_image = True
+                print(f"   🖼️ Đã tìm thấy và đính kèm ảnh: {q_code}{ext}")
+                break
+            except Exception as e:
+                print(f"   ⚠️ Lỗi đọc ảnh {temp_path}: {e}")
 
-    # 2. Prompt "Bảo vệ Chuyên gia"
+    # --- GHÉP NỘI DUNG CÂU HỎI VÀ TẤT CẢ CÁC OPTION (A đến F) ---
+    full_question = row.Content or ""
+    if hasattr(row, 'OptionA') and row.OptionA: full_question += f"\n- {row.OptionA}"
+    if hasattr(row, 'OptionB') and row.OptionB: full_question += f"\n- {row.OptionB}"
+    if hasattr(row, 'OptionC') and row.OptionC: full_question += f"\n- {row.OptionC}"
+    if hasattr(row, 'OptionD') and row.OptionD: full_question += f"\n- {row.OptionD}"
+    if hasattr(row, 'OptionE') and row.OptionE: full_question += f"\n- {row.OptionE}"
+    if hasattr(row, 'OptionF') and row.OptionF: full_question += f"\n- {row.OptionF}"
+
+    # --- TÍNH TOÁN SỐ TỪ CỦA ĐÁP ÁN HIỆN TẠI (Để báo cho AI biết) ---
+    current_answer = str(row.CorrectAnswer) if row.CorrectAnswer else ""
+    word_count = len(current_answer.split())
+
+    # 2. Prompt (Thêm Rule Giữ nguyên & Kiểm tra độ dài 300 từ)
     prompt = f"""
-    Bạn là Chuyên gia Kỹ thuật cấp cao.
+    Bạn là Kỹ sư Trưởng đang rà soát lại đáp án thi nghiệp vụ của công ty.
     
-    CÂU HỎI: {row.Content}
-    ĐÁP ÁN HIỆN TẠI (Được tổng hợp từ các kỹ sư giỏi nhất): 
-    "{row.CorrectAnswer}"
+    CÂU HỎI ĐẦY ĐỦ: 
+    {full_question}
     
-    {'[HÃY NHÌN ẢNH ĐÍNH KÈM ĐỂ ĐỐI CHIẾU]' if has_image else ''}
+    ĐÁP ÁN HIỆN TẠI ĐANG LƯU TRONG HỆ THỐNG (Độ dài: {word_count} từ): 
+    "{current_answer}"
+    
+    {'[HÃY NHÌN ẢNH ĐÍNH KÈM ĐỂ ĐỐI CHIẾU MÃ SỐ TRONG HÌNH VỚI TEXT CỦA CÂU HỎI]' if has_image else ''}
     
     NHIỆM VỤ CỦA BẠN:
-    1. Đánh giá ĐÁP ÁN HIỆN TẠI:
-       - Nếu nó đúng về mặt kỹ thuật/logic (dù diễn đạt chưa hoàn hảo): HÃY GIỮ NGUYÊN.
-       - Chỉ sửa nếu nó SAI KIẾN THỨC CƠ BẢN hoặc TRÁI NGƯỢC VỚI HÌNH ẢNH.
+    1. Đánh giá ĐÁP ÁN HIỆN TẠI. 
+       - YÊU CẦU QUAN TRỌNG: Nếu đáp án hiện tại ĐÚNG về mặt kỹ thuật/logic (dù diễn đạt chưa hoàn hảo) VÀ có độ dài DƯỚI 300 từ: HÃY GIỮ NGUYÊN (đặt is_wrong = false).
+       
+       - Bạn PHẢI đánh dấu là CẦN SỬA LẠI (is_wrong = true) NẾU rơi vào 1 trong 3 trường hợp sau:
+         + Trường hợp 1: Kiến thức kỹ thuật bị sai hoặc KHÔNG KHỚP với thông tin trong hình ảnh.
+         + Trường hợp 2: CÂU HỎI YÊU CẦU SỐ LIỆU CỤ THỂ, SO SÁNH THÔNG SỐ NHƯNG đáp án hiện tại lại trả lời lý thuyết suông, không có con số.
+         + Trường hợp 3: ĐÁP ÁN QUÁ DÀI (Trên 300 từ). Đáp án này ({word_count} từ) đang quá dài, lê thê, không phù hợp để làm đáp án chấm điểm thi. Cần tóm tắt lại.
     
-    2. Viết GIẢI THÍCH (Explanation):
-       - Nếu cột giải thích đang trống, hãy viết 1 đoạn ngắn (dưới 30 từ) giải thích tại sao đáp án đó đúng.
-       - Nếu đã có giải thích, hãy chuốt lại cho hay hơn.
+    2. NẾU BẠN CHỌN is_wrong = true, hãy tạo "new_answer" tuân thủ NGHIÊM NGẶT các quy tắc sau:
+       - BIẾN THÀNH ĐÁP ÁN MẪU: súc tích (Dưới 150-200 từ). Hãy nhớ người thi chỉ có tối đa 10 phút để tự gõ đáp án này.
+       - ĐI THẲNG VÀO TRỌNG TÂM. TUYỆT ĐỐI KHÔNG viết các câu mở bài luyên thuyên như "Dựa trên phân tích hình ảnh...", "Theo tiêu chuẩn...", "Đáp án chính xác là...".
+       - NẾU LÀ CÂU HỎI GHÉP HÌNH / TÌM MÃ: CHỈ liệt kê kết quả dạng gạch đầu dòng ngắn gọn nhất (Ví dụ: Hình 1: Mã A, Hình 2: Mã B). KHÔNG giải thích dài dòng kẻ bảng nếu đề không yêu cầu.
+       - NẾU LÀ CÂU HỎI KỸ THUẬT (Như P4 vs P6): Trả lời trực tiếp số liệu (Ví dụ: "P4 có độ đảo tâm 2.5µm, P6 là 6µm. P4 chính xác hơn").
+       
+    3. Viết GIẢI THÍCH (Explanation):
+       - Phần giải thích chi tiết, lập luận tại sao lại chọn đáp án đó hãy để dành viết vào mục "explanation" này (dưới 100 từ).
        
     OUTPUT JSON:
     {{
-        "is_wrong": true/false,           // Có sai nghiêm trọng không?
-        "new_answer": "...",              // Chỉ điền nếu is_wrong=true. Nếu đúng, để null hoặc rỗng.
-        "explanation": "..."              // Nội dung giải thích bổ sung
+        "is_wrong": true/false,
+        "new_answer": "...",
+        "explanation": "..."
     }}
     """
     
@@ -97,17 +125,21 @@ def audit_expert_content(row):
         print(f"   ❌ Lỗi AI: {e}")
         return None
 
+
 def main():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    print("🕵️ BẮT ĐẦU AUDIT (FIXED VERSION)...")
+    print("🕵️ BẮT ĐẦU AUDIT ĐÒI HỎI CAO KỸ THUẬT (BỎ QUA ASSESSMENT)...")
     
+    # --- LỆNH SQL ĐÃ ĐƯỢC CẬP NHẬT ---
+    # 1. Lấy đủ các cột OptionA, B, C, D
+    # 2. Bỏ qua các câu hỏi có Category là 'Assessment'
     sql = """
-        SELECT ID, QuestionCode, Content, CorrectAnswer, Explanation 
+        SELECT ID, QuestionCode, Content, OptionA, OptionB, OptionC, OptionD, OptionE, OptionF, CorrectAnswer, Explanation 
         FROM TRAINING_QUESTION_BANK 
         WHERE CorrectAnswer IS NOT NULL 
-        AND len(CorrectAnswer) > 5
+        AND (Category IS NULL OR Category <> 'Assessment')
         ORDER BY ID DESC
     """
     questions = cursor.execute(sql).fetchall()
@@ -129,19 +161,17 @@ def main():
             if res.get('is_wrong') == True:
                 raw_new_ans = res.get('new_answer')
                 
-                # [FIX QUAN TRỌNG] Xử lý nếu AI trả về dict/list thay vì string
+                # Xử lý an toàn nếu AI trả về dict/list thay vì string
                 if isinstance(raw_new_ans, (dict, list)):
-                    # Cố gắng lấy text nếu có, hoặc convert sang string
                     if isinstance(raw_new_ans, dict) and 'text' in raw_new_ans:
                         new_ans = str(raw_new_ans['text'])
                     else:
-                        new_ans = json.dumps(raw_new_ans, ensure_ascii=False) # Convert object thành string JSON
+                        new_ans = json.dumps(raw_new_ans, ensure_ascii=False)
                 else:
                     new_ans = str(raw_new_ans) if raw_new_ans else ""
 
-                # Chỉ update nếu có nội dung và khác cũ
                 if new_ans and new_ans.strip() != "" and new_ans != row.CorrectAnswer:
-                    print(f"   ⚠️ PHÁT HIỆN SAI KỸ THUẬT -> Sửa lại.")
+                    print(f"   ⚠️ PHÁT HIỆN SAI KỸ THUẬT/THIẾU SỐ LIỆU -> Sửa lại.")
                     cursor.execute("UPDATE TRAINING_QUESTION_BANK SET CorrectAnswer = ? WHERE ID = ?", (new_ans, row.ID))
                     count_fixed += 1
                     needs_update = True
@@ -150,7 +180,6 @@ def main():
 
             # 2. Xử lý Explanation
             raw_expl = res.get('explanation')
-            # Tương tự, fix lỗi type cho Explanation
             if isinstance(raw_expl, (dict, list)):
                 new_expl = json.dumps(raw_expl, ensure_ascii=False)
             else:

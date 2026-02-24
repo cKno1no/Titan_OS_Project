@@ -1,0 +1,34 @@
+[2026-01-28 10:40:37,983] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 11:29:20,632] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 11:34:38,383] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 11:34:53,605] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-28 11:55:12,437] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 11:56:26,915] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:00:47,225] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:01:19,161] INFO in chatbot_service:446 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'công dụng biến tần ngành bao bì'}
+[2026-01-28 12:01:19,163] ERROR in chatbot_service:465 [KD010]: ❌ Function Error: Lỗi thực thi hàm lookup_internal_knowledge: 'ChatbotService' object has no attribute 'training_service'
+[2026-01-28 12:05:11,626] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:05:32,845] INFO in chatbot_service:450 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'công dụng biến tần ngành in bao bì'}
+[2026-01-28 12:07:55,334] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:08:07,771] INFO in chatbot_service:450 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Miền nhiệt độ làm việc vòng bi đũa NSK loại rế ET EM EW'}
+[2026-01-28 12:16:24,275] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:16:41,586] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'miền nhiệt độ làm việc của bi đũa'}
+[2026-01-28 12:21:02,111] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:21:25,404] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'miền nhiệt độ làm việc của bi đũa'}
+[2026-01-28 12:21:54,247] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'miền nhiệt độ làm việc của bi đũa'}
+[2026-01-28 12:22:14,818] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'công dụng của biến tần trong ngành in bao bì'}
+[2026-01-28 12:28:40,562] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 12:29:11,105] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'miền nhiệt độ của bi đũa'}
+[2026-01-28 12:29:26,301] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'biến tần trong ngành in bao bì có công dụng gì?'}
+[2026-01-28 12:30:20,019] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Biến tần thường sẽ được lắp ở đâu trong nhà máy này?'}
+[2026-01-28 12:32:25,262] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Đây là hình ảnh của một loại gasket đặc biệt của Garlock, để làm kín van hơi cho nhà máy thực phẩm. Bạn có thể đoán được 2 loại vật liệu trong gasket này không?'}
+[2026-01-28 12:32:58,580] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'giá trị khe hở trong hướng kính của bạc đạn này (khi chưa lắp)'}
+[2026-01-28 12:33:25,360] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Định nghĩa tuổi thọ vòng bi? Nêu 4 yếu tố ảnh hưởng tới tuổi thọ của vòng bi?'}
+[2026-01-28 13:11:21,099] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 13:24:42,498] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 13:34:20,192] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 13:47:10,879] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-28 13:50:00,030] ERROR in db_manager:105 [System]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'IsActive'. (207) (SQLExecDirectW)")
+[SQL: SELECT UserCode FROM [GD - NGUOI DUNG] WHERE IsActive = 1]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-28 13:53:18,219] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.

@@ -1,0 +1,118 @@
+[2026-01-22 11:27:59,752] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-22 11:28:49,607] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220kve', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-22 11:38:31,831] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220KVE', 'intent': 'check_export_invoice'}
+[2026-01-22 11:39:55,587] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'product_keywords': 'stf240kve', 'customer_name': 'A0007-DTCL'}
+[2026-01-22 11:40:30,763] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'STF240KVE', 'months': 60.0, 'intent': 'check_price_history', 'customer_name': 'A0007-DTCL'}
+[2026-01-22 11:49:53,731] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 11:50:19,002] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'stf240kv', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-22 11:51:12,292] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'stf240kv', 'months': 36.0, 'intent': 'check_price_history', 'customer_name': 'Hoa Sen'}
+[2026-01-22 11:51:26,589] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_customer_overview | Args: {'customer_name': 'A0007-DTCL'}
+[2026-01-22 11:51:46,234] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'stf240kv', 'months': 36.0, 'intent': 'check_price_history', 'customer_name': 'A0007-DTCL'}
+[2026-01-22 11:55:23,461] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 11:55:45,391] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '240kve', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-22 11:56:18,634] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'STF240KVE3304E1GBS-02', 'months': 60.0, 'intent': 'customer_list'}
+[2026-01-22 11:58:31,548] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'months': 60.0, 'intent': 'customer_list'}
+[2026-01-22 11:58:59,334] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'months': 60.0, 'intent': 'customer_list'}
+[2026-01-22 12:00:07,778] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '32206', 'months': 36.0, 'intent': 'customer_list'}
+[2026-01-22 12:00:42,716] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '6205zzcm', 'months': 36.0, 'intent': 'customer_list'}
+[2026-01-22 12:01:27,338] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '22309', 'months': 36.0, 'intent': 'customer_list'}
+[2026-01-22 12:05:59,723] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 12:18:17,268] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'intent': 'customer_list'}
+[2026-01-22 12:18:30,639] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'months': 60.0, 'intent': 'customer_list'}
+[2026-01-22 12:19:15,103] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'oring', 'months': 60.0, 'intent': 'check_price_history', 'customer_name': 'Tây Nam'}
+[2026-01-22 12:19:50,221] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'oring', 'months': 60.0, 'intent': 'check_price_history', 'customer_name': 'A0002-DTCL'}
+[2026-01-22 12:20:27,608] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'seal', 'months': 60.0, 'intent': 'check_price_history', 'customer_name': 'TAY NAM'}
+[2026-01-22 12:20:37,914] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'seal', 'months': 60.0, 'intent': 'check_price_history', 'customer_name': 'A0002-DTCL'}
+[2026-01-22 12:21:19,224] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': 'bạc đạn', 'months': 60.0, 'intent': 'check_price_history', 'customer_name': 'TAY NAM'}
+[2026-01-22 12:22:47,630] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Tanamaz'}
+[2026-01-22 12:23:21,393] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'KISWIRE VIET NAM'}
+[2026-01-22 12:24:34,969] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: check_replenishment | Args: {'customer_name': 'KISWIRE VIET NAM'}
+[2026-01-22 12:38:03,529] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 13:20:19,344] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 13:23:47,066] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 13:23:59,774] INFO in chatbot_service:330 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 13:52:53,009] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 13:53:06,684] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 13:53:33,511] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Vui vẻ', 'titan_name': 'STDD'}
+[2026-01-22 13:53:44,139] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 13:54:46,026] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông'}
+[2026-01-22 13:55:01,401] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng'}
+[2026-01-22 13:55:04,501] INFO in chatbot_service:1150 [KD010]: ✅ Auto-tagged Story 79: #Leadership, #Multitasking, #PositiveAttitude
+[2026-01-22 13:55:05,195] INFO in chatbot_service:1150 [KD010]: ✅ Auto-tagged Story 91: #ÁKhôi, #CanhNgọ, #NgựaChiến
+[2026-01-22 13:55:33,510] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng', 'tag_filter': 'Đa Năng'}
+[2026-01-22 13:55:45,052] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng', 'tag_filter': 'ĐaNăng'}
+[2026-01-22 13:57:25,514] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thọ'}
+[2026-01-22 13:58:30,376] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng'}
+[2026-01-22 13:58:55,380] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng', 'tag_filter': 'Reliability'}
+[2026-01-22 14:00:08,215] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 14:00:21,587] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông', 'tag_filter': 'BusinessSkills'}
+[2026-01-22 14:00:43,692] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Guidance', 'titan_name': 'Sếp Đông'}
+[2026-01-22 14:00:58,478] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Guidance', 'titan_name': 'Sếp Đông'}
+[2026-01-22 14:01:12,668] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông', 'tag_filter': 'Dedication (Tận tâm)'}
+[2026-01-22 14:02:15,766] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 14:02:32,724] INFO in chatbot_service:378 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Leadership', 'titan_name': 'Sếp Đông'}
+[2026-01-22 14:24:05,319] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 14:24:41,128] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông', 'tag_filter': 'Lãnh đạo'}
+[2026-01-22 14:25:24,934] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông', 'tag_filter': 'Leadership'}
+[2026-01-22 14:26:07,348] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Phương Đông'}
+[2026-01-22 14:26:41,095] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Phương Đông', 'tag_filter': 'Leadership'}
+[2026-01-22 14:34:30,397] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 14:34:46,435] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông'}
+[2026-01-22 14:35:20,101] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Tận tâm', 'titan_name': 'Sếp Đông'}
+[2026-01-22 14:36:32,807] INFO in chatbot_service:416 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông'}
+[2026-01-22 14:58:34,305] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 14:59:34,384] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông'}
+[2026-01-22 15:00:12,466] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Phương Đông', 'tag_filter': 'Leadership'}
+[2026-01-22 15:04:45,806] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 15:05:00,230] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Phương Đông'}
+[2026-01-22 15:05:54,001] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng'}
+[2026-01-22 15:06:27,848] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Tận tâm', 'titan_name': 'Thu Hằng'}
+[2026-01-22 15:12:20,934] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 15:12:36,194] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Phương Đông'}
+[2026-01-22 15:13:28,511] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Phương Đông', 'tag_filter': 'Leadership'}
+[2026-01-22 15:14:33,233] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'Kraft'}
+[2026-01-22 15:14:40,880] INFO in chatbot_service:415 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-01-22 15:30:44,599] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 15:31:34,817] INFO in chatbot_service:426 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 15:32:15,882] INFO in chatbot_service:426 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Anh Phương Đông', 'tag_filter': 'Leadership'}
+[2026-01-22 15:41:18,075] ERROR in chatbot_service:470 [KD010]: ⚠️ Text Response Error: Invalid operation: The `response.text` quick accessor requires the response to contain a valid `Part`, but none were returned. The candidate's [finish_reason](https://ai.google.dev/api/generate-content#finishreason) is 1.
+[2026-01-22 15:41:45,611] INFO in chatbot_service:426 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6204dducm'}
+[2026-01-22 15:43:03,587] INFO in chatbot_service:426 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-01-22 15:55:36,105] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 15:55:47,605] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'selection_index': 3.0, 'customer_name': 'VINA KRAFT'}
+[2026-01-22 15:55:57,826] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Tanamaz'}
+[2026-01-22 15:56:31,163] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Leadership', 'titan_name': 'Nguyễn Phương Đông'}
+[2026-01-22 16:02:58,842] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-22 16:03:23,269] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-01-22 16:03:48,379] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Tanamaz'}
+[2026-01-22 16:04:09,640] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'STDD'}
+[2026-01-22 16:04:54,989] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kve', 'intent': 'check_price_history'}
+[2026-01-22 16:05:10,018] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kve', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-22 16:05:24,969] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220kv', 'intent': 'check_price_history'}
+[2026-01-22 16:05:50,735] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '220kv', 'months': 60.0, 'intent': 'check_price_history'}
+[2026-01-22 16:06:29,637] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 16:06:53,630] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Thu Hằng'}
+[2026-01-22 16:07:26,925] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Đông'}
+[2026-01-22 16:07:57,051] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Kỹ thuật', 'titan_name': 'Nguyễn Phương Đông'}
+[2026-01-22 16:13:01,702] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '750X75X304.8', 'intent': 'check_price_history'}
+[2026-01-22 16:13:22,843] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '750X75X304.8', 'months': 72.0, 'intent': 'check_price_history'}
+[2026-01-22 16:16:48,444] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Vina Kraft'}
+[2026-01-22 16:17:35,701] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'tanamaz'}
+[2026-01-22 16:19:50,101] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'Tananamaz'}
+[2026-01-22 16:20:52,623] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'C0008-KHTN'}
+[2026-01-22 16:33:34,630] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: check_daily_briefing | Args: {'scope': 'week'}
+[2026-01-22 16:56:59,535] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 16:57:00,281] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 95: #Technical, #Leadership, #Dedication
+[2026-01-22 16:57:03,575] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 96: #Dedication, #Versatility, #Leadership
+[2026-01-22 17:03:20,863] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 17:03:22,423] ERROR in chatbot_service:1134 [KD010]: Titan Story Error: Could not convert `part.function_call` to text.
+[2026-01-22 17:03:49,489] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 17:03:50,463] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 95: #Dedication, #Leadership, #Technical
+[2026-01-22 17:08:38,262] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Ân'}
+[2026-01-22 17:08:41,101] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 97: #TechnicalExpertise, #Leadership, #ProblemSolver
+[2026-01-22 17:10:19,364] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'tag_filter': 'Innovative', 'titan_name': 'Hoàng Ân'}
+[2026-01-22 17:11:33,213] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Hoàng Nam'}
+[2026-01-22 17:11:36,065] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 50: #TechnicalExpertise, #Proactive, #CustomerFocus
+[2026-01-22 17:11:37,016] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 63: #Growth, #Challenge, #NewBeginnings
+[2026-01-22 17:11:37,805] INFO in chatbot_service:1156 [KD010]: ✅ Auto-tagged Story 92: #Growth, #Challenge, #NewBeginnings
+[2026-01-22 17:12:53,271] INFO in chatbot_service:417 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Nguyễn Hoàng Nam', 'tag_filter': 'Growth'}

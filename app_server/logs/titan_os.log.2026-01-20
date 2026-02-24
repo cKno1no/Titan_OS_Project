@@ -1,0 +1,184 @@
+[2026-01-20 12:21:11,048] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 12:47:06,326] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 12:47:11,379] ERROR in app:875 [KD010]: Exception on /login [POST]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 170, in decorated_function
+    response = f(*args, **kwargs)
+  File "D:\CRM STDD\app.py", line 200, in login
+    return redirect(url_for('executive_bp.ceo_cockpit_dashboard'))
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\helpers.py", line 239, in url_for
+    return current_app.url_for(
+           ~~~~~~~~~~~~~~~~~~~^
+        endpoint,
+        ^^^^^^^^^
+    ...<4 lines>...
+        **values,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'executive_bp.ceo_cockpit_dashboard'. Did you mean 'executive_bp.ceo_cockpit_page' instead?
+[2026-01-20 12:47:33,772] INFO in executive_service:38 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-20 12:49:51,569] INFO in executive_service:38 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-20 12:51:01,890] INFO in executive_service:38 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-20 12:51:46,354] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 12:52:35,089] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 12:52:45,446] INFO in executive_service:38 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-20 12:52:59,067] INFO in executive_service:30 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)
+[2026-01-20 12:58:47,414] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 12:58:57,971] INFO in executive_service:30 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)
+[2026-01-20 12:59:10,550] ERROR in app:875 [KD010]: Exception on /login [POST]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 170, in decorated_function
+    response = f(*args, **kwargs)
+  File "D:\CRM STDD\app.py", line 200, in login
+    return redirect(url_for('executive_bp.ceo_cockpit_dashboard'))
+                    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\helpers.py", line 239, in url_for
+    return current_app.url_for(
+           ~~~~~~~~~~~~~~~~~~~^
+        endpoint,
+        ^^^^^^^^^
+    ...<4 lines>...
+        **values,
+        ^^^^^^^^^
+    )
+    ^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1121, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1110, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+        endpoint,
+    ...<3 lines>...
+        force_external=_external,
+    )
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\werkzeug\routing\map.py", line 924, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'executive_bp.ceo_cockpit_dashboard'. Did you mean 'executive_bp.ceo_cockpit_page' instead?
+[2026-01-20 13:01:16,895] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 13:01:30,790] INFO in executive_service:30 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)
+[2026-01-20 13:06:31,928] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'Tây Nam'}
+[2026-01-20 13:07:11,132] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Tanamaz'}
+[2026-01-20 13:08:27,181] ERROR in app:875 [KD010]: Exception on /inventory_aging [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 129, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_bp.py", line 360, in inventory_aging_dashboard
+    filtered_data, totals = inventory_service.get_inventory_aging_data(
+                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        item_filter_term,
+        ^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        i05id_filter
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "D:\CRM STDD\sales_service.py", line 466, in get_inventory_aging_data
+    i04_code = i04_map.get(row['InventoryID'], 'KHÁC')
+                           ~~~^^^^^^^^^^^^^^^
+KeyError: 'InventoryID'
+[2026-01-20 13:14:42,691] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 13:15:01,623] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-20 13:17:36,604] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 13:17:48,185] INFO in executive_service:21 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)
+[2026-01-20 13:31:24,878] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 13:31:37,762] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-20 13:32:16,891] ERROR in app:875 [KD010]: Exception on /inventory_aging [GET]
+Traceback (most recent call last):
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\utils.py", line 129, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\kpi_bp.py", line 378, in inventory_aging_dashboard
+    return render_template(
+        'inventory_aging.html',
+    ...<12 lines>...
+        kpi_clc_value=totals['total_clc_value'] / DIVISOR
+    )
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\CRM STDD\templates\inventory_aging.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "D:\CRM STDD\templates\base.html", line 213, in top-level template code
+    {% block content %}{% endblock %}
+    ^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\templates\inventory_aging.html", line 96, in block 'content'
+    {% include 'partials/_inventory_table_rows.html' %}
+    ^^^^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\kd010.STD\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: partials/_inventory_table_rows.html
+[2026-01-20 13:34:22,727] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 13:35:23,053] INFO in executive_service:21 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)
+[2026-01-20 13:39:14,917] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 13:39:38,853] INFO in executive_service:21 [KD010]: CEO Cockpit: HIT Global Cache (ceo_cockpit_data_2026_1)
+[2026-01-20 13:49:52,211] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 14:00:29,505] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 14:16:23,970] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Tanamaz'}
+[2026-01-20 14:16:24,030] INFO in delivery_service:326 [KD010]: --- DEBUG DELIVERY: Object ID=C0008-KHTN, Days=7
+[2026-01-20 14:16:24,041] INFO in delivery_service:333 [KD010]: --- DEBUG: Không có data từ SQL
+[2026-01-20 14:16:46,404] INFO in chatbot_service:305 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': 'STF240', 'customer_name': 'hoa sen'}
+[2026-01-20 14:28:15,592] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 14:29:12,808] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 14:36:23,264] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-20 14:48:42,864] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.

@@ -1,0 +1,25 @@
+[2026-01-30 10:19:16,111] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 10:29:35,061] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 10:29:47,521] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-30 10:31:00,041] ERROR in db_manager:105 [System]: Lỗi get_data (Hybrid): (pyodbc.ProgrammingError) ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'IsActive'. (207) (SQLExecDirectW)")
+[SQL: SELECT UserCode FROM [GD - NGUOI DUNG] WHERE IsActive = 1]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+[2026-01-30 10:33:11,278] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 10:36:17,349] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 10:49:03,292] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 11:19:39,744] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 11:32:34,473] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 11:36:56,581] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-30 11:48:44,270] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 11:50:52,085] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-01-30 12:07:45,381] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'quy trình lắp bạc đạn'}
+[2026-01-30 12:07:53,066] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Khe hở trong (độ rơ) của bạc đạn nghĩa là gì? CM, C2, C3, CN có kích thước tương quan khác nhau như thế nào?'}
+[2026-01-30 12:08:13,984] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'lắp bạc đạn như nào?'}
+[2026-01-30 12:08:41,494] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'câu 5000'}
+[2026-01-30 12:08:48,014] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Tiếng Hoa, câu "tôi ham (thích) học hỏi" nói như thế nào?'}
+[2026-01-30 12:09:04,091] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'câu 1200'}
+[2026-01-30 12:09:24,723] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'phớt labyrinth'}
+[2026-01-30 12:09:30,175] INFO in chatbot_service:453 [KD010]: 🤖 AI Calling Tool: lookup_internal_knowledge | Args: {'search_query': 'Môi phớt có tác dụng gì? Khi nào thì bạn nên tư vấn khách dùng phớt 2 môi thay cho 1 môi?'}
+[2026-01-30 12:15:17,919] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 12:20:33,056] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-30 12:39:50,248] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.

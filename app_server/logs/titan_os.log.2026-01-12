@@ -1,0 +1,4 @@
+[2026-01-12 15:24:48,085] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-01-12 15:25:34,651] INFO in sales_order_approval_service:45 [KD075]: === DEBUG APPROVAL === User: KD075 | Role: STANDARD | IsAdmin: False
+[2026-01-12 15:25:34,652] INFO in sales_order_approval_service:106 [KD075]: === DEBUG SQL === Params: ['2026-01-05', '2026-01-12', 'KD075', 'KD075']
+[2026-01-12 15:25:34,709] INFO in sales_order_approval_service:110 [KD075]: === DEBUG RESULT === Found 0 orders.

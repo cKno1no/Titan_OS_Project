@@ -1,0 +1,86 @@
+[2026-02-24 03:39:22,798] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 03:39:29,263] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-24 03:45:28,886] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 03:52:46,891] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 03:52:55,447] INFO in chatbot_service:611 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'Kraft'}
+[2026-02-24 03:53:01,630] INFO in chatbot_service:611 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-02-24 03:55:36,044] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 03:58:19,219] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:03:49,092] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:06:32,658] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:10:40,996] INFO in chatbot_service:730 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'Kraft'}
+[2026-02-24 04:15:42,471] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:16:09,386] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:18:07,505] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:18:20,321] INFO in chatbot_service:514 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-02-24 04:18:31,239] INFO in chatbot_service:514 [KD010]: 🤖 AI Calling Tool: get_titan_stories | Args: {'titan_name': 'Sếp Đông', 'tag_filter': 'Lãnh đạo'}
+[2026-02-24 04:25:21,337] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:25:28,054] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-02-24 04:25:39,603] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: check_delivery_status | Args: {'customer_name': 'Tanamaz'}
+[2026-02-24 04:26:07,887] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'quy định nghỉ phép'}
+[2026-02-24 04:26:07,889] INFO in chatbot_service:311 [KD010]: 📚 AI đang quét tài liệu nội bộ với từ khóa: quy định nghỉ phép
+[2026-02-24 04:29:35,655] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'Vina Kraft'}
+[2026-02-24 04:30:22,487] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'Takako'}
+[2026-02-24 04:32:17,332] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180rv', 'intent': 'check_export_invoice'}
+[2026-02-24 04:32:30,397] INFO in chatbot_service:498 [KD010]: 🤖 AI Calling Tool: lookup_sales_flow | Args: {'product_keywords': '180kv', 'intent': 'check_export_invoice'}
+[2026-02-24 04:40:33,098] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:55:27,473] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 04:55:51,662] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: check_product_info | Args: {'product_keywords': '6205', 'customer_name': 'VINA KRAFT'}
+[2026-02-24 04:56:04,069] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'Takako'}
+[2026-02-24 04:56:14,208] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: analyze_customer_deep_dive | Args: {'customer_name': 'Takako'}
+[2026-02-24 04:57:05,976] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: check_customer_overview | Args: {'customer_name': 'Takako'}
+[2026-02-24 04:57:29,211] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: summarize_customer_report | Args: {'customer_name': 'Takako'}
+[2026-02-24 04:57:48,022] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'quy định nghỉ phép'}
+[2026-02-24 04:57:48,024] INFO in chatbot_service:213 [KD010]: 📚 AI đang quét RAG: quy định nghỉ phép
+[2026-02-24 04:58:11,150] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: check_daily_briefing | Args: {'scope': 'today'}
+[2026-02-24 05:00:04,180] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'quy định nghỉ phép'}
+[2026-02-24 05:00:04,182] INFO in chatbot_service:213 [KD010]: 📚 AI đang quét RAG: quy định nghỉ phép
+[2026-02-24 05:00:30,281] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'tính lương'}
+[2026-02-24 05:00:30,282] INFO in chatbot_service:213 [KD010]: 📚 AI đang quét RAG: tính lương
+[2026-02-24 05:01:34,277] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'bạc đạn dây chuyền cán'}
+[2026-02-24 05:01:34,280] INFO in chatbot_service:213 [KD010]: 📚 AI đang quét RAG: bạc đạn dây chuyền cán
+[2026-02-24 05:02:18,380] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'phớt cho bạc đạn cán'}
+[2026-02-24 05:02:18,384] INFO in chatbot_service:213 [KD010]: 📚 AI đang quét RAG: phớt cho bạc đạn cán
+[2026-02-24 05:03:34,052] INFO in chatbot_service:166 [KD010]: 🤖 AI Calling Tool: search_company_documents | Args: {'search_query': 'phớt thủy lực'}
+[2026-02-24 05:03:34,054] INFO in chatbot_service:213 [KD010]: 📚 AI đang quét RAG: phớt thủy lực
+[2026-02-24 12:04:22,086] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 12:04:33,817] INFO in executive_service:26 [KD010]: CEO Cockpit: MISS Cache -> Calculating DB...
+[2026-02-24 12:57:55,034] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 14:59:54,680] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 15:47:45,276] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 15:51:01,488] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 15:57:26,274] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 16:00:35,605] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 16:14:24,326] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 16:44:26,799] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 16:45:41,550] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 16:57:47,189] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 16:58:59,333] ERROR in app:875 [KD010]: Exception on /api/training/request-teaching [POST]
+Traceback (most recent call last):
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\ASUS TUF F15\AppData\Local\Programs\Python\Python314\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\CRM STDD\utils.py", line 52, in decorated_function
+    return f(*args, **kwargs)
+  File "D:\CRM STDD\blueprints\training_bp.py", line 237, in api_request_teaching
+    success, message = current_app.training_service.request_teaching(user_code, material_id)
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\CRM STDD\services\training_service.py", line 829, in request_teaching
+    count = self.db.get_data(query_check, (user_code,))[0][0]
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+[2026-02-24 17:00:17,232] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 17:11:03,363] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 17:13:21,941] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 17:21:37,295] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 17:26:05,080] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 17:29:17,313] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 17:50:03,124] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 19:50:09,407] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
+[2026-02-24 19:52:17,170] INFO in logger_setup:56 [System]: Titan OS Startup: Hệ thống Logging đã kích hoạt.
