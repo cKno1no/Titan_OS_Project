@@ -32,7 +32,7 @@ class ChatbotService:
         from services.customer_analysis_service import CustomerAnalysisService
         self.analysis_service = CustomerAnalysisService(db_manager) 
 
-        api_key = "AIzaSyBLi_xp5bSdRXC8jpveV_mgumrushjZqBA"
+        api_key = "x"
         if api_key: genai.configure(api_key=api_key)
 
         self.skill_mapping = {
