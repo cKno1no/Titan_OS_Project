@@ -1,0 +1,553 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Hiệu Suất Cá Nhân{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+        --glass-bg: rgba(255, 255, 255, 0.95);
+        --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    body { background-color: #f3f4f6; }
+
+    .profile-header {
+        background: var(--primary-gradient);
+        padding-top: 2rem;
+        padding-bottom: 7rem; 
+        margin-bottom: 0;     
+        color: white;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+        border-bottom-left-radius: 3rem;
+        border-bottom-right-radius: 3rem;
+        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+        opacity: 0.08;
+        z-index: -1;
+    }
+
+    .user-avatar-xl {
+        width: 110px; height: 110px;
+        border-radius: 50%;
+        border: 4px solid rgba(255,255,255,0.3); 
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        object-fit: cover;
+        background: #fff;
+        backdrop-filter: blur(5px);
+    }
+
+    .floating-container {
+        margin-top: -5rem; 
+        position: relative;
+        z-index: 10;       
+        padding-bottom: 2rem;
+    }
+
+    .score-summary-card {
+        background: #ffffff;
+        border-radius: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255,255,255,0.8);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    .score-summary-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15);
+    }
+
+    .grade-badge {
+        font-size: 4rem; font-weight: 900; line-height: 1; letter-spacing: -2px;
+        background: -webkit-linear-gradient(45deg, #3b82f6, #8b5cf6);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .grade-SS { background: -webkit-linear-gradient(45deg, #d946ef, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(217, 70, 239, 0.3)); }
+    .grade-S  { background: -webkit-linear-gradient(45deg, #8b5cf6, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.3)); }
+    .grade-D  { background: -webkit-linear-gradient(45deg, #ef4444, #f87171); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .custom-progress {
+        height: 12px; background-color: #f3f4f6; border-radius: 99px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .custom-progress-bar {
+        height: 100%; border-radius: 99px; background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .criteria-item {
+        background: white; border-radius: 1rem; margin-bottom: 0.8rem; border: 1px solid #f3f4f6; transition: all 0.2s; position: relative;
+        cursor: pointer;
+    }
+    .criteria-item:hover {
+        border-color: #d1d5db; transform: translateX(5px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    
+    .criteria-icon {
+        width: 48px; height: 48px; background: #f8fafc; color: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+
+    .swal2-actions {
+        margin-top: 1.5rem !important;
+        padding-bottom: 1rem !important;
+    }
+
+    .swal2-confirm.btn-primary {
+        background: var(--primary-gradient) !important;
+        border: none !important;
+    }
+
+    .swal2-popup {
+        padding: 1.5rem !important;
+    }
+
+    /* Hiệu ứng mờ nền cho chuyên nghiệp */
+    .swal2-backdrop-show {
+        backdrop-filter: blur(4px);
+    }
+    .fab-admin {
+        position: fixed; bottom: 2rem; right: 2rem; z-index: 100; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4); padding: 0.8rem 1.5rem; transition: transform 0.2s;
+    }
+    .fab-admin:hover { transform: scale(1.05); }
+    
+    #kpiDetailTable th { font-weight: 600; border-bottom-width: 2px; }
+    .table-warning { background-color: #fff3cd !important; }
+</style>
+
+<div class="profile-header px-4">
+    <div class="d-flex justify-content-between align-items-center container-fluid" style="position: relative; z-index: 20;">
+        <div class="d-flex align-items-center gap-3">
+            <div class="bg-white bg-opacity-20 p-2 rounded-3 backdrop-blur">
+                <i class="fas fa-chart-line fa-lg"></i>
+            </div>
+            <div>
+                <h5 class="mb-0 fw-bold text-white" style="letter-spacing: 0.5px;">PERFORMANCE</h5>
+                <p class="mb-0 text-white text-opacity-75" style="font-size: 0.8rem;">Review & Grow</p>
+            </div>
+        </div>
+        
+        <form method="GET" action="{{ url_for('kpi_evaluation_bp.kpi_dashboard') }}" class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill backdrop-blur border border-white border-opacity-10 align-items-center">
+            <select name="month" class="form-select form-select-sm border-0 bg-transparent text-white fw-bold shadow-none" style="width: auto; cursor: pointer;" onchange="this.form.submit()">
+                {% for m in range(1, 13) %}
+                <option value="{{ m }}" {% if m == selected_month %}selected{% endif %} class="text-dark">Tháng {{ m }}</option>
+                {% endfor %}
+            </select>
+            
+            <div class="vr bg-white opacity-50 my-1"></div>
+            
+            <select name="year" class="form-select form-select-sm border-0 bg-transparent text-white fw-bold shadow-none" style="width: auto; cursor: pointer;" onchange="this.form.submit()">
+                <option value="2025" {% if selected_year == 2025 %}selected{% endif %} class="text-dark">2025</option>
+                <option value="2026" {% if selected_year == 2026 %}selected{% endif %} class="text-dark">2026</option>
+            </select>
+            
+            <div class="vr bg-white opacity-50 my-1 mx-1"></div>
+            
+            {% if is_admin %}
+                <select name="target_user" class="form-select form-select-sm border-0 bg-transparent text-warning fw-bold shadow-none" style="width: 200px; cursor: pointer;" onchange="this.form.submit()">
+                    {% for u in all_users %}
+                    <option value="{{ u.USERCODE }}" {% if u.USERCODE == target_user %}selected{% endif %} class="text-dark">
+                        {{ u.SHORTNAME }} - {{ u.USERCODE }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-light rounded-circle ms-1 d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px; padding: 0;">
+                    <i class="fas fa-search text-primary" style="font-size: 0.9rem;"></i>
+                </button>
+            {% else %}
+                <span class="text-warning fw-bold px-2" style="font-size: 0.875rem;">
+                    {{ target_user }}
+                </span>
+                <input type="hidden" name="target_user" value="{{ target_user }}">
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="container-fluid mt-4 d-flex align-items-center mb-3">
+        <img src="{{ target_avatar }}" 
+             class="user-avatar-xl me-4" 
+             style="object-fit: cover; background: white;"
+             onerror="this.src='/static/img/default-avatar.png'"
+             alt="User Avatar">
+        
+        <div>
+            <h2 class="mb-0 fw-bold text-white" style="text-shadow: 2px 2px 8px rgba(0,0,0,0.6);">{{ user_info.EmployeeName if user_info else target_user }}</h2>
+            <div class="d-flex gap-3 mt-2 text-white">
+                <span class="badge bg-dark bg-opacity-75 border border-white border-opacity-25 rounded-pill px-3 py-2 fw-bold shadow-sm" style="backdrop-filter: blur(5px);">
+                    <i class="fas fa-id-badge me-1 text-warning"></i> {{ user_info.Title if user_info else 'Nhân viên' }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 floating-container">
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="score-summary-card p-4 d-flex flex-column justify-content-center align-items-center text-center">
+                <h6 class="text-muted text-uppercase fw-bold mb-3 small tracking-wide">Tổng Điểm KPI</h6>
+                <div class="position-relative d-inline-block">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                         style="width: 130px; height: 130px; border: 10px solid {% if total_score >= 100 %}#8b5cf6{% elif total_score >= 80 %}#3b82f6{% else %}#f59e0b{% endif %}; background: #fff;">
+                        <span class="display-4 fw-bolder text-dark" style="letter-spacing: -2px;">{{ total_score|round(0)|int }}</span>
+                    </div>
+                </div>
+                <p class="mt-3 mb-0 text-muted small fw-bold">Tháng {{ selected_month }}/{{ selected_year }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="score-summary-card p-4 text-center">
+                <h6 class="text-muted text-uppercase fw-bold mb-2 small tracking-wide">Xếp Hạng Hiệu Suất</h6>
+                <div class="grade-badge grade-{{ grade }} my-1">{{ grade }}</div>
+                
+                <div class="mt-4 px-3">
+                    <div class="d-flex justify-content-between small text-muted mb-1 fw-bold">
+                        <span>Rank Progress</span>
+                        <span>{{ total_score|round(1) }}%</span>
+                    </div>
+                    <div class="custom-progress">
+                        <div class="custom-progress-bar" 
+                             style="width: {{ [total_score, 100]|min }}%; 
+                                    background: {% if total_score >= 100 %}linear-gradient(90deg, #8b5cf6, #d946ef){% elif total_score >= 80 %}linear-gradient(90deg, #3b82f6, #06b6d4){% else %}linear-gradient(90deg, #f59e0b, #ef4444){% endif %};">
+                        </div>
+                    </div>
+                    <small class="text-muted mt-2 d-block">
+                        {% if grade == 'SS' %}🔥 Huyền thoại! (Legendary){% elif grade == 'S' %}🚀 Xuất sắc! (Excellent){% elif grade == 'A' %}⭐ Rất tốt (Very Good){% elif grade == 'B' %}💪 Khá (Good){% else %}📉 Cần nỗ lực (Improve){% endif %}
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="score-summary-card p-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                    <i class="fas fa-gift fa-6x text-warning"></i>
+                </div>
+                <h6 class="text-muted text-uppercase fw-bold mb-4 small tracking-wide">Phần Thưởng Dự Kiến</h6>
+                
+                {% if kpi_results %}
+                <div class="d-flex align-items-center mb-4 ps-2 border-start border-4 border-info">
+                    <div class="ms-3">
+                        <h3 class="mb-0 fw-bolder text-dark">+{{ (total_score * 10)|int }} XP</h3>
+                        <small class="text-muted fw-bold">Điểm kinh nghiệm Rank</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center ps-2 border-start border-4 border-warning">
+                    <div class="ms-3">
+                        <h3 class="mb-0 fw-bolder text-dark">+{{ (total_score * 5)|int }} Coin</h3>
+                        <small class="text-muted fw-bold">Xu đổi quà Titan Shop</small>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-hourglass-half mb-2"></i><br>
+                    Chưa có dữ liệu.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <h5 class="fw-bold text-dark mb-0 ps-2 border-start border-4 border-primary">Chi Tiết Đánh Giá</h5>
+                <span class="badge bg-light text-muted border ms-3 rounded-pill">Total: {{ kpi_results|length }} tiêu chí</span>
+            </div>
+            
+            {% if kpi_results %}
+                {% for row in kpi_results %}
+                <div class="criteria-item p-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+                    style="cursor: pointer;"
+                    onclick='handleKPIClick({{ row|tojson|safe }}, "{{ target_user }}", {{ selected_year }}, {{ selected_month }})'>
+                    
+                    <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <div class="criteria-icon">
+                            {% if row.DataSource == 'ERP Omega' %}<i class="fas fa-database text-primary"></i>
+                            {% elif row.DataSource == 'Titan OS' %}<i class="fas fa-bolt text-info"></i>
+                            {% else %}<i class="fas fa-edit text-secondary"></i>{% endif %}
+                        </div>
+                        <div>
+                            <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.95rem;">
+                                {{ row.CriteriaName }}
+                                <i class="fas fa-question-circle ms-1 text-muted" style="font-size: 0.8rem;"></i>
+                            </h6>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge 
+                                    {% if row.DataSource == 'ERP Omega' %}bg-primary bg-opacity-10 text-primary border-primary
+                                    {% elif row.DataSource == 'Titan OS' %}bg-info bg-opacity-10 text-info border-info
+                                    {% else %}bg-light text-secondary border{% endif %} 
+                                    fw-bold px-2" style="font-size: 0.7rem; border: 1px solid !important;">
+                                    <i class="fas {% if row.DataSource == 'ERP Omega' %}fa-database{% elif row.DataSource == 'Titan OS' %}fa-bolt{% else %}fa-hand-paper{% endif %} me-1"></i>
+                                    {{ row.DataSource if row.DataSource else 'TÍNH TAY' }}
+                                </span>
+                                <span class="text-muted small">Tỷ trọng: <b>{{ (row.Weight|default(0) * 100)|int }}%</b></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-md-center px-4 border-start border-end">
+                        <small class="text-muted d-block text-uppercase small fw-bold mb-1">Thực tế</small>
+                        <div class="fw-bold fs-5 text-dark">
+                            {% if row.ActualValue == 0 and row.CalculationType == 'MANUAL' %}
+                                <span class="text-muted fst-italic">--</span>
+                            {% else %}
+                                {% set display_val = row.ActualValue|default(0)|float %}
+                                {{ "{:,.1f}".format(display_val) }} 
+                                <small class="text-muted fs-6 fw-normal ms-1">{{ row.Unit or '' }}</small>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted" style="font-size: 0.7rem;">
+                            Goal: {{ "{:,.1f}".format(row.Threshold_100|default(0)|float) }} {{ row.Unit or '' }}
+                        </small>
+                    </div>
+
+                    <div class="text-end" style="min-width: 140px;">
+                        <small class="text-muted d-block mb-1 small fw-bold">Điểm thành phần</small>
+                        <div class="d-flex align-items-center justify-content-end gap-2">
+                            <span class="badge rounded-pill fs-6 px-3 py-2 
+                                {% if row.RawScore >= 100 %}bg-success{% elif row.RawScore >= 70 %}bg-primary{% elif row.RawScore >= 50 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ "{:,.1f}".format(row.RawScore|default(0)|float) }} đ
+                            </span>
+                        </div>
+                        <small class="text-success fw-bold d-block mt-1">
+                            +{{ "{:,.1f}".format(row.WeightedScore|default(0)|float) }}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5 bg-white rounded-3 shadow-sm border border-dashed">
+                    <img src="/static/img/no-data.svg" style="width: 120px; opacity: 0.4; margin-bottom: 1rem;" onerror="this.style.display='none'">
+                    <h5 class="text-muted">Chưa có dữ liệu KPI tháng này</h5>
+                    {% if is_admin %}
+                    <p class="text-muted small">Admin vui lòng bấm nút "CHỐT KPI" để tính điểm.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="kpiDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem; background: #f8fafc;">
+            <div class="modal-header text-white" style="border-radius: 1.5rem 1.5rem 0 0; background: var(--primary-gradient); padding: 1.5rem;">
+                <h5 class="modal-title fw-bold" id="kpiDetailModalLabel">Chi tiết tiêu chí</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="kpiDetailSummary" class="alert bg-white mb-4 border-0 shadow-sm text-center fs-5 text-primary" style="border-radius: 1rem;">
+                    Đang tải dữ liệu...
+                </div>
+                
+                <div class="table-responsive bg-white rounded-4 shadow-sm border border-light p-1">
+                    <table class="table table-hover align-middle mb-0" id="kpiDetailTable">
+                        <thead class="table-light text-muted small text-uppercase" style="letter-spacing: 0.5px;">
+                            <tr id="kpiDetailHead"></tr>
+                        </thead>
+                        <tbody id="kpiDetailBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <small class="text-muted" id="pageInfo"></small>
+                    <nav><ul class="pagination pagination-sm mb-0" id="kpiPagination"></ul></nav>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 1.5rem 1.5rem;">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button class="btn btn-warning btn-lg rounded-pill fab-admin fw-bold px-4 d-flex align-items-center gap-2 border border-warning" 
+        onclick="evaluateKPI('{{ target_user }}', {{ selected_year }}, {{ selected_month }})">
+    <i class="fas fa-robot fa-lg"></i>
+    <span>CHỐT KPI</span>
+</button>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    let detailData = [];
+    let detailColumns = [];
+    let currentPage = 1;
+    const rowsPerPage = 20;
+
+    function showKPIDetail(criteriaId, criteriaName, targetUser, year, month) {
+        document.getElementById('kpiDetailModalLabel').innerText = criteriaName;
+        document.getElementById('kpiDetailSummary').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang trích xuất dữ liệu...';
+        
+        var myModal = new bootstrap.Modal(document.getElementById('kpiDetailModal'));
+        myModal.show();
+
+        fetch(`{{ url_for('kpi_evaluation_bp.api_kpi_detail') }}?criteria_id=${criteriaId}&target_user=${targetUser}&year=${year}&month=${month}`)
+            .then(response => response.json())
+            .then(res => {
+                if(res.success && res.data) {
+                    document.getElementById('kpiDetailSummary').innerHTML = res.data.summary || 'Không có bảng kê chi tiết.';
+                    detailColumns = res.data.columns || [];
+                    detailData = res.data.rows || [];
+                    currentPage = 1;
+                    renderTableHeader();
+                    renderTableBody();
+                }
+            })
+            .catch(err => {
+                document.getElementById('kpiDetailSummary').innerHTML = `<span class="text-danger">Lỗi kết nối API.</span>`;
+            });
+    }
+
+    function renderTableHeader() {
+        if (detailColumns.length === 0) return;
+        let theadHtml = '';
+        detailColumns.forEach(col => {
+            let align = (col.type === 'currency' || col.type === 'number') ? 'text-end' : 'text-start';
+            theadHtml += `<th class="${align} py-3 px-3">${col.label}</th>`;
+        });
+        document.getElementById('kpiDetailHead').innerHTML = theadHtml;
+    }
+
+    function renderTableBody() {
+        const tbody = document.getElementById('kpiDetailBody');
+        const totalPages = Math.ceil(detailData.length / rowsPerPage);
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = startIdx + rowsPerPage;
+        const paginatedData = detailData.slice(startIdx, endIdx);
+
+        let tbodyHtml = '';
+        paginatedData.forEach(row => {
+            tbodyHtml += `<tr>`;
+            detailColumns.forEach(col => {
+                let val = row[col.field];
+                let align = 'text-start';
+                
+                if (col.type === 'currency' || col.type === 'number') {
+                    // Phân cách dấu phẩy và 1 số thập phân cho Modal
+                    let numVal = parseFloat(val) || 0;
+                    val = new Intl.NumberFormat('en-US', { 
+                        minimumFractionDigits: 1, 
+                        maximumFractionDigits: 1 
+                    }).format(numVal);
+                    align = 'text-end fw-bold';
+                }
+                tbodyHtml += `<td class="${align} py-3 px-3">${val}</td>`;
+            });
+            tbodyHtml += '</tr>';
+        });
+        tbody.innerHTML = tbodyHtml;
+        document.getElementById('pageInfo').innerText = `Dòng ${startIdx + 1} - ${Math.min(endIdx, detailData.length)} / ${detailData.length}`;
+        
+        let pageHtml = '';
+        if (totalPages > 1) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+            }
+        }
+        document.getElementById('kpiPagination').innerHTML = pageHtml;
+    }
+
+    function changePage(page) { currentPage = page; renderTableBody(); }
+
+    function evaluateKPI(userCode, year, month) {
+        Swal.fire({ title: 'Đang tính toán...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+        fetch('{{ url_for("kpi_evaluation_bp.evaluate_kpi") }}', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_code: userCode, year: year, month: month })
+        })
+        .then(res => res.json()).then(data => {
+            if(data.success) { location.reload(); }
+            else { Swal.fire('Lỗi', data.message, 'error'); }
+        });
+    }
+
+    function handleKPIClick(rowData, targetUser, year, month) {
+        try {
+            const isHigherBetter = rowData.IsHigherBetter;
+            const unit = rowData.Unit || '';
+            const formula = rowData.CalculationFormula || 'Chưa cập nhật hướng dẫn cho tiêu chí này.';
+
+            // Tạo bảng Threshold với style hiện đại hơn
+            let thresholdHtml = `
+                <div class="mt-4 p-3 rounded-4" style="background: #f8f9fa; border: 1px solid #e9ecef;">
+                    <p class="mb-3 fw-bold d-flex align-items-center" style="color: #764ba2;">
+                        <i class="fas fa-bullseye me-2"></i>Định mức đạt điểm (${unit})
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-borderless mb-0" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr class="text-muted border-bottom" style="font-size: 0.75rem;">
+                                    <th class="pb-2">MỨC ĐIỂM</th>
+                                    <th class="pb-2 text-end">ĐIỀU KIỆN</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-dark">
+                                <tr style="border-bottom: 1px dashed #dee2e6;">
+                                    <td class="py-2"><span class="badge rounded-pill bg-success px-3">100đ</span></td>
+                                    <td class="py-2 text-end fw-bold">${isHigherBetter ? '≥' : '≤'} ${rowData.Threshold_100}</td>
+                                </tr>
+                                <tr style="border-bottom: 1px dashed #dee2e6;">
+                                    <td class="py-2"><span class="badge rounded-pill bg-primary px-3">70đ</span></td>
+                                    <td class="py-2 text-end fw-bold">${isHigherBetter ? '≥' : '≤'} ${rowData.Threshold_70}</td>
+                                </tr>
+                                <tr style="border-bottom: 1px dashed #dee2e6;">
+                                    <td class="py-2"><span class="badge rounded-pill bg-warning px-3">50đ</span></td>
+                                    <td class="py-2 text-end fw-bold">${isHigherBetter ? '≥' : '≤'} ${rowData.Threshold_50}</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2"><span class="badge rounded-pill bg-danger px-3">0đ</span></td>
+                                    <td class="py-2 text-end fw-bold">${isHigherBetter ? '<' : '>'} ${rowData.Threshold_0}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+
+            Swal.fire({
+                title: `<div class="mt-2" style="font-size: 1.25rem; color: #2d3748; letter-spacing: -0.5px;">${rowData.CriteriaName}</div>`,
+                html: `
+                    <div class="text-start px-2 py-1" style="line-height: 1.6;">
+                        <div class="mb-4">
+                            <label class="text-uppercase small fw-bold text-muted mb-2 d-block" style="letter-spacing: 1px;">
+                                <i class="fas fa-info-circle me-1"></i> Cách thức tính toán
+                            </label>
+                            <div class="p-3 rounded-4 bg-white shadow-sm border" style="font-size: 0.95rem; color: #4a5568;">
+                                ${formula}
+                            </div>
+                        </div>
+                        ${thresholdHtml}
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-search-plus me-2"></i>Xem dữ liệu chi tiết',
+                cancelButtonText: 'Đóng',
+                buttonsStyling: false,
+                customClass: {
+                    popup: 'rounded-5 shadow-lg border-0',
+                    confirmButton: 'btn btn-primary px-4 py-2 rounded-pill mx-2 shadow-sm',
+                    cancelButton: 'btn btn-light px-4 py-2 rounded-pill mx-2 border'
+                },
+                width: '550px',
+                background: '#ffffff',
+                showClass: { popup: 'animate__animated animate__fadeInUp animate__faster' }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showKPIDetail(rowData.CriteriaID, rowData.CriteriaName, targetUser, year, month);
+                }
+            });
+        } catch (e) {
+            console.error("Lỗi popup:", e);
+            showKPIDetail(rowData.CriteriaID, rowData.CriteriaName, targetUser, year, month);
+        }
+    }
+</script>
+{% endblock %}

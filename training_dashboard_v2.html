@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Học Viện Số STD&D - Titan OS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 1. DARK THEME BASE */
+    :root {
+        --bg-dark: #0f1115;
+        --card-bg: #1c1f26;
+        --text-primary: #ffffff;
+        --text-secondary: #9ca3af;
+        --accent-color: #3b82f6; 
+        --mandatory-color: #ef4444; 
+    }
+
+    body { background-color: var(--bg-dark) !important; color: var(--text-primary) !important; font-family: 'Inter', sans-serif; }
+    
+    /* 2. HERO BANNER */
+    .hero-wrapper {
+        position: relative; padding: 80px 5% 40px;
+        /* FIX TÌM KIẾM BỊ CẮT */
+        overflow: visible; 
+    }
+    
+    .hero-bg {
+        position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.15), transparent 40%),
+                    radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.1), transparent 40%);
+    }
+
+    .hero-content { position: relative; z-index: 10; }
+    .hero-content h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 1rem; }
+    .hero-content p { font-size: 1.1rem; color: var(--text-secondary); max-width: 600px; }
+
+    /* SEARCH BAR GLOW EFFECT */
+    .search-box { position: relative; max-width: 700px; margin-top: 30px; z-index: 50; }
+    .search-input {
+        background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white; height: 55px; border-radius: 16px; padding-left: 50px;
+        backdrop-filter: blur(10px); transition: all 0.3s ease;
+    }
+    .search-input:focus { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-color); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); color: white; }
+    .search-icon { position: absolute; left: 20px; top: 15px; color: var(--text-secondary); font-size: 1.2rem; }
+
+    .search-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: #1c1f26; border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px; margin-top: 10px; z-index: 1000;
+        max-height: 350px; overflow-y: auto; backdrop-filter: blur(15px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .search-dropdown::-webkit-scrollbar { width: 6px; }
+    .search-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    .search-item { transition: background 0.2s; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .search-item:last-child { border-bottom: none; }
+    .search-item:hover { background: rgba(59, 130, 246, 0.1); }
+
+    /* 3. MANDATORY SECTION (ĐÃ KHÔI PHỤC) */
+    .section-header { display: flex; align-items: center; gap: 10px; margin: 40px 5% 20px; }
+    .section-title { font-size: 1.25rem; font-weight: 700; color: white; margin: 0; }
+    .mandatory-badge { background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-weight: 600; }
+
+    .mandatory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 0 5%; }
+    
+    .mandatory-card {
+        background: linear-gradient(145deg, #1c1f26, #232730); border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px;
+        transition: transform 0.2s; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .mandatory-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--mandatory-color); }
+    .mandatory-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.1); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    
+    .m-icon { width: 48px; height: 48px; background: rgba(239, 68, 68, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--mandatory-color); font-size: 1.2rem; }
+
+    /* 4. GIAO DIỆN BENTO BOX CHO CATEGORY */
+    .cat-grid { display: grid; gap: 24px; padding: 0 5% 80px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+
+    .cat-card {
+        position: relative; height: 200px; border-radius: 24px; overflow: hidden;
+        text-decoration: none; display: flex; flex-direction: column; justify-content: flex-end;
+        padding: 24px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; group;
+    }
+    
+    .cat-bg {
+        position: absolute; inset: 0; background-size: cover; background-position: center;
+        opacity: 0.4; transition: transform 0.7s ease, opacity 0.5s ease; z-index: 0; filter: grayscale(30%);
+    }
+    
+    .cat-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(15,17,21,1) 10%, rgba(15,17,21,0.2) 100%); transition: background 0.5s ease; }
+    .cat-content { position: relative; z-index: 2; width: 100%; }
+    
+    .cat-icon-wrapper {
+        position: absolute; top: 20px; right: 20px; z-index: 2; width: 48px; height: 48px; border-radius: 16px;
+        background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; color: white; border: 1px solid rgba(255,255,255,0.1); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .cat-name { font-size: 1.2rem; font-weight: 800; color: white; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s; }
+    .cat-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 5px; }
+
+    .cat-card:hover { transform: translateY(-8px); border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 0 40px rgba(59, 130, 246, 0.1); }
+    .cat-card:hover .cat-bg { transform: scale(1.1); opacity: 0.6; filter: grayscale(0%); }
+    .cat-card:hover .cat-overlay { background: linear-gradient(to top, rgba(15,17,21,0.9) 0%, rgba(59,130,246,0.2) 100%); }
+    .cat-card:hover .cat-icon-wrapper { background: var(--accent-color); color: white; border-color: var(--accent-color); transform: scale(1.1) rotate(5deg); box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4); }
+    .cat-card:hover .cat-count { color: #93c5fd; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div x-data="homeApp()">
+
+    <div class="hero-wrapper">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1>Hệ thống Đào tạo <span class="text-primary">Titan Academy</span></h1>
+            <p>Nâng cao năng lực chuyên môn và kỹ năng quản lý. Truy cập kho tri thức nội bộ mọi lúc, mọi nơi.</p>
+            
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="form-control search-input" 
+                       placeholder="Tìm kiếm khóa học, tài liệu, quy trình..."
+                       x-model="query" @input.debounce.500ms="search()">
+                
+                <div class="search-dropdown" x-show="results.length > 0" x-cloak>
+                    <template x-for="item in results" :key="item.id">
+                        <a :href="'/training/course/' + item.id" target="_blank" class="search-item d-flex align-items-center p-3 text-white text-decoration-none">
+                            <img :src="item.thumbnail || 'https://cdn3d.iconscout.com/3d/premium/thumb/folder-5206733-4352249.png'" width="48" height="48" class="rounded-3 me-3" style="object-fit: contain; background: #2a2d35;">
+                            <div>
+                                <div class="fw-bold mb-1" x-text="item.title"></div>
+                                <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25" x-text="item.category"></span>
+                            </div>
+                        </a>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="mandatoryCourses.length > 0" x-cloak>
+        <div class="section-header">
+            <h2 class="section-title"><i class="fas fa-exclamation-circle text-danger me-2"></i> Nhiệm vụ bắt buộc</h2>
+            <span class="mandatory-badge" x-text="mandatoryCourses.length + ' khóa'"></span>
+        </div>
+        
+        <div class="mandatory-grid">
+            <template x-for="c in mandatoryCourses" :key="c.id">
+                <div class="mandatory-card" @click="window.open('/training/course/' + c.id, '_blank')">
+                    <div class="m-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold text-white text-truncate mb-1" style="max-width: 200px;" x-text="c.title"></div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-secondary" x-text="c.progress + '% hoàn thành'"></small>
+                        </div>
+                        <div class="progress" style="height: 4px; background: rgba(255,255,255,0.1);">
+                            <div class="progress-bar bg-danger" :style="'width: ' + c.progress + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <div class="section-header mt-5">
+        <h2 class="section-title"><i class="fas fa-layer-group text-primary me-2"></i> Danh mục đào tạo</h2>
+    </div>
+    
+    <div class="cat-grid">
+        <template x-for="cat in categories" :key="cat.id">
+            <div class="cat-card" @click="window.location.href = '/training/category/' + encodeURIComponent(cat.name)">
+                <div class="cat-bg" :style="`background-image: url('${cat.bg}')`"></div>
+                <div class="cat-overlay"></div>
+                
+                <div class="cat-icon-wrapper" x-html="cat.icon"></div>
+                
+                <div class="cat-content">
+                    <h3 class="cat-name" x-text="cat.name"></h3>
+                    <div class="cat-count">
+                        <i class="fas fa-book-open"></i> <span x-text="cat.count + ' khóa học'"></span>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+</div>
+
+<script>
+    function homeApp() {
+        return {
+            query: '',
+            results: [],
+            mandatoryCourses: [], // Khôi phục mảng chứa khóa học bắt buộc
+            categories: [
+                { id: 1, name: 'Kiến thức Sản phẩm', icon: '<i class="fas fa-box-open"></i>', bg: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&q=80', count: 0 },
+                { id: 2, name: 'Kỹ thuật chuyên sâu', icon: '<i class="fas fa-microchip"></i>', bg: 'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=500&q=80', count: 0 },
+                { id: 3, name: 'Giới thiệu về STDD và năng lực cung cấp', icon: '<i class="fas fa-building"></i>', bg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80', count: 0 },
+                { id: 4, name: 'Kỹ năng mềm', icon: '<i class="fas fa-users"></i>', bg: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80', count: 0 },
+                { id: 5, name: 'Quy trình & Vận hành', icon: '<i class="fas fa-project-diagram"></i>', bg: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=500&q=80', count: 0 },
+                { id: 6, name: 'Công cụ & Catalogue', icon: '<i class="fas fa-book"></i>', bg: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=500&q=80', count: 0 },
+                { id: 7, name: 'Quy định & chính sách', icon: '<i class="fas fa-balance-scale"></i>', bg: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=500&q=80', count: 0 },
+                { id: 8, name: 'Văn hóa & phát triển cá nhân', icon: '<i class="fas fa-seedling"></i>', bg: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80', count: 0 }
+            ],
+
+            async init() {
+                try {
+                    const res = await fetch('/api/training/dashboard_v2');
+                    const data = await res.json();
+                    
+                    let mandatories = []; // Biến hứng khóa học bắt buộc
+                    this.categories.forEach(c => c.count = 0);
+
+                    for (const [catName, subCats] of Object.entries(data)) {
+                        let totalInCat = 0;
+                        for (const list of Object.values(subCats)) {
+                            totalInCat += list.length;
+                            
+                            // KHÔI PHỤC LOGIC LỌC KHÓA BẮT BUỘC
+                            list.forEach(c => { 
+                                if(c.is_mandatory && !mandatories.some(m => m.id === c.id)) {
+                                    mandatories.push(c);
+                                }
+                            });
+                        }
+                        const target = this.categories.find(c => {
+                            const cleanUI = c.name.toLowerCase().replace(/\s+/g, ' ').trim();
+                            const cleanDB = catName.toLowerCase().replace(/\s+/g, ' ').trim();
+                            return cleanUI === cleanDB || cleanDB.includes(cleanUI) || cleanUI.includes(cleanDB);
+                        });
+                        if(target) target.count = totalInCat;
+                    }
+                    
+                    // Gán mảng vào giao diện
+                    this.mandatoryCourses = mandatories;
+                } catch(e) { console.error("Lỗi tải dashboard:", e); }
+            },
+            
+            async search() {
+                if(this.query.length < 2) { this.results = []; return; }
+                const res = await fetch(`/api/training/search?q=${encodeURIComponent(this.query)}`);
+                this.results = await res.json();
+            }
+        }
+    }
+</script>
+{% endblock %}
