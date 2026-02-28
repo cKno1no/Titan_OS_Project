@@ -352,29 +352,40 @@ def audit_logs_dashboard():
 @user_bp.route('/api/admin/logs/stream', methods=['GET'])
 @login_required
 def api_stream_logs():
-    """API Tra cứu Mắt thần - Chế độ Review (Hỗ trợ lọc thời gian)"""
+    """API Tra cứu Mắt thần - Hỗ trợ phân tách Tab Nghiệp vụ & Hệ thống"""
     if session.get('user_role', '').strip().upper() != config.ROLE_ADMIN:
         return jsonify([]), 403
         
-    # Nâng limit lên 500 vì sếp xem 2-3 ngày/lần
-    limit = int(request.args.get('limit', 500)) 
+    # 1. Lấy tham số lọc từ Frontend
+    tab = request.args.get('tab', 'BUSINESS') # Mặc định là tab Nghiệp vụ
+    limit = int(request.args.get('limit', 1000)) 
     severity_filter = request.args.get('severity', '') 
     user_filter = request.args.get('user', '')
     date_from = request.args.get('date_from', '')
     date_to = request.args.get('date_to', '')
     
+    # 2. Khởi tạo câu truy vấn gốc
     query = "SELECT TOP (?) LogID, UserCode, ActionType, Severity, Details, IPAddress, [Timestamp] AS CreatedAt FROM dbo.AUDIT_LOGS WHERE 1=1 "
     params = [limit]
     
+    # 3. LOGIC PHÂN TÁCH TAB (Đây là phần quan trọng nhất)
+    if tab == 'BUSINESS':
+        # Loại bỏ các log tự động/kỹ thuật của Middleware (AUTO_POST, AUTO_GET...)
+        # Và loại bỏ các log spam tiến độ học tập nếu lỡ còn sót lại
+        query += " AND ActionType NOT LIKE 'AUTO_%' "
+    else:
+        # Chỉ hiển thị các log hệ thống tự động từ Middleware
+        query += " AND ActionType LIKE 'AUTO_%' "
+        
+    # 4. Các bộ lọc bổ sung
     if severity_filter:
         query += " AND Severity = ?"
         params.append(severity_filter)
         
     if user_filter:
-        query += " AND (UserCode LIKE ? OR Details LIKE ?)"
-        params.extend([f"%{user_filter}%", f"%{user_filter}%"])
+        query += " AND (UserCode LIKE ? OR Details LIKE ? OR ActionType LIKE ?)"
+        params.extend([f"%{user_filter}%", f"%{user_filter}%", f"%{user_filter}%"])
         
-    # Thêm bộ lọc Ngày tháng
     if date_from:
         query += " AND CAST([Timestamp] AS DATE) >= ?"
         params.append(date_from)
@@ -384,11 +395,15 @@ def api_stream_logs():
         
     query += " ORDER BY [Timestamp] DESC"
     
-    logs = current_app.db_manager.get_data(query, tuple(params))
-    
-    # Chuẩn hóa ngày tháng
-    for log in logs:
-        if log.get('CreatedAt'):
-            log['CreatedAt'] = log['CreatedAt'].strftime('%H:%M:%S %d/%m/%Y')
-            
-    return jsonify(logs)
+    try:
+        logs = current_app.db_manager.get_data(query, tuple(params))
+        
+        # Chuẩn hóa định dạng ngày tháng hiển thị
+        for log in logs:
+            if log.get('CreatedAt'):
+                log['CreatedAt'] = log['CreatedAt'].strftime('%H:%M:%S %d/%m/%Y')
+                
+        return jsonify(logs)
+    except Exception as e:
+        current_app.logger.error(f"Lỗi API Stream Logs: {e}")
+        return jsonify([]), 500

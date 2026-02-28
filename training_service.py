@@ -14,7 +14,7 @@ class TrainingService:
         self.db = db_manager
         self.gamification = gamification_service
         self.ACTIVITY_CODE_WIN = 'DAILY_QUIZ_WIN'
-
+        self.ai_model_name = 'gemini-2.5-flash'
     # =========================================================================
     # PHẦN 1: GAME & DAILY CHALLENGE
     # =========================================================================
@@ -22,6 +22,15 @@ class TrainingService:
     # 1. TÌM KIẾM KIẾN THỨC (Cho Chatbot)
     def search_knowledge(self, query):
         if not query: return None
+
+        # [BỔ SUNG AUDIT LOG]
+        user_code = session.get('user_code', 'GUEST')
+        self.db.write_audit_log(
+            user_code, 'TRAINING_KNOWLEDGE_SEARCH', 'INFO', 
+            f"Tìm kiếm kiến thức: {query[:100]}", 
+            current_app.config.get('SERVER_IP', '127.0.0.1')
+        )
+
         stop_words = {'là', 'gì', 'của', 'hãy', 'nêu', 'cho', 'biết', 'trong', 'với', 'tại', 'sao', 'như', 'thế', 'nào', 'em', 'anh', 'chị', 'ad', 'bot', 'bạn', 'tôi', 'mình'}
         clean_query = query.lower()
         for char in "?!,.:;\"'()[]{}":
@@ -74,7 +83,22 @@ class TrainingService:
     # =========================================================================
     def distribute_daily_questions(self):
         # Lấy 3 câu hỏi ngẫu nhiên
-        sql_q = "SELECT TOP 3 ID, Content, OptionA, OptionB, OptionC, OptionD FROM TRAINING_QUESTION_BANK WHERE CorrectAnswer IS NOT NULL ORDER BY NEWID()"
+        sql_q = """
+            SELECT TOP 3 Q.ID, Q.Content, Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD, Q.OptionE, Q.OptionF 
+            FROM TRAINING_QUESTION_BANK Q
+            LEFT JOIN TRAINING_MATERIALS M ON Q.SourceMaterialID = M.MaterialID
+            LEFT JOIN TRAINING_COURSES C ON M.CourseID = C.CourseID
+            WHERE Q.CorrectAnswer IS NOT NULL 
+              AND Q.IsActive = 1
+              AND (
+                -- Trường hợp 1: Là Assessment thì phải thuộc khóa học bắt buộc
+                (Q.Category = 'Assessment' AND C.IsMandatory = -1)
+                OR 
+                -- Trường hợp 2: Các loại câu hỏi khác (Kiến thức chung, đố vui...) lấy bình thường
+                (Q.Category != 'Assessment' OR Q.Category IS NULL)
+              )
+            ORDER BY NEWID()
+        """
         questions = self.db.get_data(sql_q)
         if not questions: return []
 
@@ -113,8 +137,12 @@ class TrainingService:
                 # Đánh dấu phiên cũ hết hạn
                 self.db.execute_non_query("UPDATE TRAINING_DAILY_SESSION SET Status='EXPIRED' WHERE UserCode=? AND Status='PENDING'", (user_code,))
                 # Tạo phiên mới (Hạn 10 phút)
-                expired_at = datetime.now() + timedelta(minutes=10)
-                self.db.execute_non_query("INSERT INTO TRAINING_DAILY_SESSION (UserCode, QuestionID, Status, ExpiredAt) VALUES (?, ?, 'PENDING', ?)", (user_code, q_id, expired_at))
+                expired_at = datetime.now() + timedelta(minutes=45)
+                self.db.execute_non_query("""
+                    INSERT INTO TRAINING_DAILY_SESSION 
+                    (UserCode, QuestionID, Status, ExpiredAt, BatchTime) 
+                    VALUES (?, ?, 'PENDING', ?, GETDATE())
+                """, (user_code, q_id, expired_at))
                 # Gửi thông báo
                 self.db.execute_non_query("INSERT INTO TitanOS_Game_Mailbox (UserCode, Title, Content, CreatedTime, IsClaimed) VALUES (?, ?, ?, GETDATE(), 0)", (user_code, mail_title, mail_content))
                 messages_to_send.append({"user_code": user_code})
@@ -127,45 +155,63 @@ class TrainingService:
     def get_current_challenge_status(self, user_code):
         now = datetime.now()
 
-        # [ĐÃ FIX]: Gộp thành 1 truy vấn để lấy phiên MỚI NHẤT
+        # 1. TRUY VẤN LẤY PHIÊN MỚI NHẤT TRONG NGÀY
         try:
-             sql_latest = """
+            sql_latest = """
                 SELECT TOP 1 
-                    S.SessionID, S.Status, S.ExpiredAt, S.AIScore, S.AIFeedback, S.UserAnswerContent, S.EarnedXP,
+                    S.SessionID, S.QuestionID, S.Status, S.ExpiredAt, S.AIScore, S.AIFeedback, S.UserAnswerContent, S.EarnedXP,
                     Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation,
-                    Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD
+                    Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD, Q.OptionE, Q.OptionF
                 FROM TRAINING_DAILY_SESSION S
                 JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
                 WHERE S.UserCode = ? 
                 AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
                 ORDER BY S.SessionID DESC
             """
-             latest = self.db.get_data(sql_latest, (user_code,))
-             has_earned_xp = True
-        except Exception as e:
-             # Fallback nếu DB chưa có cột EarnedXP
-             sql_latest = """
+            latest = self.db.get_data(sql_latest, (user_code,))
+            has_earned_xp = True
+        except Exception:
+            # Fallback nếu DB chưa cập nhật đầy đủ cột
+            sql_latest = """
                 SELECT TOP 1 
-                    S.SessionID, S.Status, S.ExpiredAt, S.AIScore, S.AIFeedback, S.UserAnswerContent,
+                    S.SessionID, S.QuestionID, S.Status, S.ExpiredAt, S.AIScore, S.AIFeedback, S.UserAnswerContent,
                     Q.Content as QuestionContent, Q.CorrectAnswer, Q.Explanation,
-                    Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD
+                    Q.OptionA, Q.OptionB, Q.OptionC, Q.OptionD, Q.OptionE, Q.OptionF
                 FROM TRAINING_DAILY_SESSION S
                 JOIN TRAINING_QUESTION_BANK Q ON S.QuestionID = Q.ID
                 WHERE S.UserCode = ? 
                 AND CAST(S.BatchTime AS DATE) = CAST(GETDATE() AS DATE)
                 ORDER BY S.SessionID DESC
             """
-             latest = self.db.get_data(sql_latest, (user_code,))
-             has_earned_xp = False
+            latest = self.db.get_data(sql_latest, (user_code,))
+            has_earned_xp = False
 
+        # 2. XỬ LÝ LOGIC TRẠNG THÁI
         if latest:
             row = latest[0]
             current_status = row['Status']
 
+            # --- LOGIC GỘP NỘI DUNG CÂU HỎI VÀ CÁC Ý NHỎ (OPTION A-F) ---
+            full_content = row['QuestionContent']
+            options_text = ""
+            # Duyệt qua các cột Option để kiểm tra dữ liệu bổ trợ
+            for char in ['A', 'B', 'C', 'D', 'E', 'F']:
+                col_name = f"Option{char}"
+                if row.get(col_name) and str(row[col_name]).strip():
+                    options_text += f"\n- {char}: {row[col_name]}"
+            
+            if options_text:
+                full_content += "\n\n**Các ý bổ trợ/Lựa chọn:**" + options_text
+
+            # --- ĐƯỜNG DẪN ẢNH (D:\CRM STDD\static\images\N3H) ---
+            # Trỏ URL theo cấu trúc static folder của Flask
+            image_url = f"/static/images/N3H/{row['QuestionID']}.jpg"
+
+            # A. Đã hoàn thành (Chấm điểm xong)
             if current_status == 'COMPLETED':
                 return {
                     'status': 'DONE',
-                    'question': row['QuestionContent'],
+                    'question': {'Content': full_content, 'Image': image_url},
                     'user_answer': row['UserAnswerContent'],
                     'score': row['AIScore'], 
                     'feedback': row['AIFeedback'],
@@ -174,43 +220,43 @@ class TrainingService:
                     'earned_xp': row.get('EarnedXP', 0) if has_earned_xp else 0
                 }
 
+            # B. Đã nộp (Chờ AI quét chấm lúc 9:30, 14:30, 17:45)
             elif current_status == 'SUBMITTED':
                  return {
                      'status': 'SUBMITTED',
-                     'question': row['QuestionContent'],
+                     'question': {'Content': full_content, 'Image': image_url},
                      'user_answer': row['UserAnswerContent']
                  }
 
+            # C. Đang diễn ra (Sẵn sàng làm bài)
             elif current_status == 'PENDING':
                 if row['ExpiredAt'] > now:
-                    seconds_left = (row['ExpiredAt'] - now).total_seconds()
+                    # [QUAN TRỌNG]: Ép cứng 15 phút (900s) cho user khi mở trang
                     return {
                         'status': 'AVAILABLE',
                         'session_id': row['SessionID'],
-                        'question': row['QuestionContent'],
-                        'options': {
-                            'A': row.get('OptionA'),
-                            'B': row.get('OptionB'),
-                            'C': row.get('OptionC'),
-                            'D': row.get('OptionD')
+                        'question': {
+                            'ID': row['QuestionID'],
+                            'Content': full_content,
+                            'Image': image_url
                         },
-                        'seconds_left': int(seconds_left)
+                        'seconds_left': 900,
+                        'next_slot': "" # Placeholder
                     }
                 else:
-                    # Nếu bài mới phát nhưng nhân viên không làm và đã quá hạn
+                    # Tự động đóng phiên nếu quá 45 phút chưa làm
                     self.db.execute_non_query("UPDATE TRAINING_DAILY_SESSION SET Status='EXPIRED' WHERE SessionID=?", (row['SessionID'],))
-                    # Rơi xuống logic WAITING bên dưới
 
-        # TRẠNG THÁI CHỜ PHIÊN TIẾP THEO (WAITING)
+        # 3. TRẠNG THÁI CHỜ PHIÊN TIẾP THEO (CẬP NHẬT MỐC GIỜ MỚI)
         current_time_str = now.strftime("%H:%M")
-        if current_time_str < "08:10":
-            next_slot = "08:10"
-        elif current_time_str < "13:10":
-            next_slot = "13:10"
-        elif current_time_str < "17:10":
-            next_slot = "17:10"
+        if current_time_str < "08:30":
+            next_slot = "08:30"
+        elif current_time_str < "13:30":
+            next_slot = "13:30"
+        elif current_time_str < "16:45":
+            next_slot = "16:45"
         else:
-            next_slot = "08:10 (Sáng mai)"
+            next_slot = "08:30 (Sáng mai)"
 
         return {'status': 'WAITING', 'next_slot': next_slot}
     
@@ -241,6 +287,13 @@ class TrainingService:
             """
             self.db.execute_non_query(sql_update, (user_answer, session_id))
             
+            # [BỔ SUNG AUDIT LOG]
+            self.db.write_audit_log(
+                user_code, 'TRAINING_DAILY_SUBMIT', 'INFO', 
+                f"Nộp bài Daily Challenge (Session: {session_id})", 
+                current_app.config.get('SERVER_IP', '127.0.0.1')
+            )
+
             return {
                 'success': True, 
                 'msg': 'Bài làm đã được ghi nhận. AI sẽ trả lời kết quả sau khi kết thúc thời gian thi (10 phút).'
@@ -422,6 +475,13 @@ class TrainingService:
         if not data: return None
         material = data[0]
         
+        # [BỔ SUNG AUDIT LOG]
+        self.db.write_audit_log(
+            user_code, 'TRAINING_STUDY_START', 'INFO', 
+            f"Bắt đầu học bài: {material.get('FileName')} (ID: {material_id})", 
+            current_app.config.get('SERVER_IP', '127.0.0.1')
+        )
+
         # Lấy tiến độ đọc
         prog = self.db.get_data("SELECT LastPageRead FROM TRAINING_USER_PROGRESS WHERE UserCode=? AND MaterialID=?", (user_code, material_id))
         material['last_page'] = prog[0]['LastPageRead'] if prog else 1
@@ -706,7 +766,17 @@ class TrainingService:
             self.db.execute_non_query("INSERT INTO TRAINING_USER_PROGRESS (UserCode, MaterialID, Status, LastPageRead, LastInteraction) VALUES (?, ?, ?, 1, GETDATE())", (user_code, material_id, new_status))
             
         feedback_msg = "<br>".join(ai_feedback_summary) if ai_feedback_summary else "Xuất sắc! Bạn nắm bài rất tốt."
-            
+
+
+        # [BỔ SUNG AUDIT LOG]
+        log_msg = f"Nộp bài thi Material ID: {material_id}. Kết quả: {score}/{total} ({'ĐẠT' if passed else 'KHÔNG ĐẠT'}). Lần thi: {current_attempt}"
+        self.db.write_audit_log(
+            user_code, 'TRAINING_QUIZ_SUBMIT', 
+            'SUCCESS' if passed else 'WARNING', 
+            log_msg, 
+            current_app.config.get('SERVER_IP', '127.0.0.1')
+        )
+
         return {
             'score': score, 
             'total': total, 
@@ -756,27 +826,32 @@ class TrainingService:
             return {"score": 0, "feedback": "Lỗi kết nối AI chấm điểm. Vui lòng thử lại sau giây lát."}
 
 
+    
     def process_pending_grading(self):
         """
-        Quét và chấm điểm tự động cho các bài Daily Challenge đã hết hạn.
-        Khớp 100% cấu trúc SSMS: TRAINING_DAILY_SESSION & TRAINING_QUESTION_BANK
+        Quét và chấm điểm tự động cho các bài Daily Challenge.
+        Sửa lỗi: Chuyển từ lọc AIScore sang AIFeedback IS NULL.
+        Logic: Chấm ngay bài đã SUBMITTED, bài PENDING thì đợi Expired.
         """
         print(f"🤖 [AI Grading] Bắt đầu quét các bài nộp chưa chấm...")
         
-        # SQL chuẩn hóa theo đúng tên bảng và cột sếp gửi
+        # SQL Cập nhật: Ưu tiên chấm bài đã bấm nộp (SUBMITTED) 
+        # HOẶC bài mở rồi nhưng để hết hạn (PENDING + Expired)
+        # Lọc theo AIFeedback IS NULL để tránh lỗi Default Value của AIScore
         sql_pending = """
             SELECT s.SessionID, s.UserCode, s.UserAnswerContent, 
                    q.Content as QuestionText, q.CorrectAnswer as StandardAnswer
             FROM TRAINING_DAILY_SESSION s
             JOIN TRAINING_QUESTION_BANK q ON s.QuestionID = q.ID
-            WHERE s.Status = 'SUBMITTED' 
-              AND s.AIScore IS NULL
-              AND s.ExpiredAt <= GETDATE()
+            WHERE (
+                    s.Status = 'SUBMITTED' 
+                    OR (s.Status = 'PENDING' AND s.ExpiredAt <= GETDATE())
+                  )
+              AND (s.AIFeedback IS NULL) 
         """
         
         try:
             pending_list = self.db.get_data(sql_pending)
-            
             if not pending_list:
                 print("✅ Không có bài nộp nào cần chấm.")
                 return
@@ -784,64 +859,59 @@ class TrainingService:
             for row in pending_list:
                 sid = row['SessionID']
                 user_code = row['UserCode']
-                user_ans = row['UserAnswerContent']
+                user_ans = row['UserAnswerContent'] or ""
                 question = row['QuestionText']
                 standard_ans = row['StandardAnswer']
 
-                # Nếu user không nhập gì, chấm 0 điểm luôn
-                if not user_ans or len(str(user_ans).strip()) < 2:
-                    self.db.execute_non_query(
-                        "UPDATE TRAINING_DAILY_SESSION SET AIScore=0, AIFeedback=N'Không có nội dung trả lời.', Status='COMPLETED', IsCorrect=0 WHERE SessionID=?", 
-                        (sid,)
-                    )
-                    continue
-
                 try:
-                    print(f"--- Đang chấm cho User: {user_code} (Session: {sid}) ---")
-                    
-                    # Sử dụng logic AI Essay Grade có sẵn trong Service của sếp
-                    grade_result = self._ai_grade_essay(question, standard_ans, user_ans)
-                    
-                    score = grade_result.get('score', 0)
-                    feedback = grade_result.get('feedback', 'Đã chấm điểm tự động.')
+                    # Nếu nội dung quá ngắn -> Mặc định Sai
+                    if len(str(user_ans).strip()) < 5:
+                        score = 0
+                        feedback = "Nội dung trả lời quá ngắn hoặc sếp chưa nhập bài làm."
+                    else:
+                        print(f"--- Đang chấm cho User: {user_code} (Session: {sid}) ---")
+                        grade_result = self._ai_grade_essay(question, standard_ans, user_ans)
+                        score = grade_result.get('score', 0)
+                        feedback = grade_result.get('feedback', 'Đã chấm điểm tự động.')
 
-                    # Phân định thưởng: >= 50đ tính là Đúng (50 XP), ngược lại là Tham gia (10 XP)
-                    # Phân định thưởng: >= 50đ tính là Đúng (50 XP), ngược lại là Tham gia (10 XP)
+                    # Phân định thưởng (20 XP nếu đúng, 5 XP nếu tham gia)
                     is_correct = 1 if score >= 50 else 0
-                    xp_reward = 50 if is_correct else 10
-                    
-                    # CẬP NHẬT DATABASE (Khớp các cột AIScore, AIFeedback, IsCorrect trong SSMS)
-                    # [SỬA]: Thêm cột EarnedXP vào lệnh UPDATE
-                    try:
-                        sql_update = """
-                            UPDATE TRAINING_DAILY_SESSION 
-                            SET AIScore = ?, AIFeedback = ?, Status = 'COMPLETED', IsCorrect = ?, EarnedXP = ?
-                            WHERE SessionID = ?
-                        """
-                        self.db.execute_non_query(sql_update, (score, feedback, is_correct, xp_reward, sid))
-                    except Exception as e:
-                        print(f"⚠️ Chưa tạo cột EarnedXP trong DB. Bỏ qua ghi nhận XP vào Session: {e}")
-                        sql_update = """
-                            UPDATE TRAINING_DAILY_SESSION 
-                            SET AIScore = ?, AIFeedback = ?, Status = 'COMPLETED', IsCorrect = ?
-                            WHERE SessionID = ?
-                        """
-                        self.db.execute_non_query(sql_update, (score, feedback, is_correct, sid))
+                    xp_to_log = 20 if is_correct else 5
+                    activity_code = 'DAILY_CHALLENGE_WIN' if is_correct else 'DAILY_CHALLENGE_PARTICIPATE'
 
-                    # CỘNG XP VÀO HỆ THỐNG GAMIFICATION
-                    self.gamification.add_xp(user_code, xp_reward, f"Hoàn thành Daily Challenge #{sid}")
-                    
-                    # GỬI THÔNG BÁO VÀO HÒM THƯ (MAILBOX)
-                    title = "🎉 Kết quả Thử thách Daily" if is_correct else "📝 Phản hồi Thử thách Daily"
-                    msg = f"Điểm của sếp: <b>{score}/100</b>. <br>Nhận xét từ AI: {feedback}"
-                    
-                    sql_mail = """
-                        INSERT INTO TitanOS_Game_Mailbox (UserCode, Title, Content, Total_XP, IsClaimed, CreatedTime)
-                        VALUES (?, ?, ?, ?, 0, GETDATE())
+                    # Cập nhật kết quả vào phiên thi
+                    sql_update = """
+                        UPDATE TRAINING_DAILY_SESSION 
+                        SET AIScore = ?, AIFeedback = ?, Status = 'COMPLETED', IsCorrect = ?, EarnedXP = ?
+                        WHERE SessionID = ?
                     """
-                    self.db.execute_non_query(sql_mail, (user_code, title, msg, xp_reward))
+                    self.db.execute_non_query(sql_update, (score, feedback, is_correct, xp_to_log, sid))
+
+                    # [BỔ SUNG AUDIT LOG]
+                    self.db.write_audit_log(
+                        'SYSTEM_AI', 'TRAINING_AI_GRADED', 'SUCCESS', 
+                        f"AI chấm bài cho {user_code}: {score}đ. Thưởng: {xp_to_log} XP. (Session: {sid})", 
+                        "INTERNAL"
+                    )
+                    # Ghi log hoạt động để tổng kết XP cuối ngày (Lúc 20:00)
+                    self.gamification.log_activity(user_code, activity_code)
                     
-                    print(f"✅ Session {sid}: {score} điểm -> Thưởng {xp_reward} XP")
+                    # Gửi thư báo kết quả (Không kèm XP trực tiếp)
+                    title = "🎉 Kết quả Thử thách Daily" if is_correct else "📝 Phản hồi Thử thách Daily"
+                    res_text = "ĐÚNG" if is_correct else "CHƯA CHÍNH XÁC"
+                    msg = f"""
+                        <div style='border-left: 4px solid { '#28a745' if is_correct else '#dc3545' }; padding: 10px 15px; background: #f8f9fa;'>
+                            <p style='margin-bottom:5px;'>Kết quả: <b>{res_text} ({score}/100 điểm)</b></p>
+                            <p style='margin-bottom:5px;'>Nhận xét từ AI: <i>{feedback}</i></p>
+                            <p style='font-size: 12px; color: #666; margin-top: 10px;'>
+                                * XP thưởng ({xp_to_log} XP) sẽ được hệ thống tổng kết và gửi vào thư tặng quà cuối ngày.
+                            </p>
+                        </div>
+                    """
+                    sql_mail = "INSERT INTO TitanOS_Game_Mailbox (UserCode, Title, Content, Total_XP, IsClaimed, CreatedTime) VALUES (?, ?, ?, 0, 0, GETDATE())"
+                    self.db.execute_non_query(sql_mail, (user_code, title, msg))
+                    
+                    print(f"✅ Đã chấm xong Session {sid}: {score}đ")
 
                 except Exception as e:
                     print(f"❌ Lỗi AI chấm điểm Session {sid}: {e}")
@@ -880,6 +950,13 @@ class TrainingService:
             """
             request_list = self.db.get_data(query_list, (material_id,)) # Đã có request_list
             total_req = len(request_list)
+            # [BỔ SUNG AUDIT LOG]
+            
+            self.db.write_audit_log(
+                user_code, 'TRAINING_REQUEST_TEACH', 'INFO', 
+                f"Đề nghị dạy trực tiếp bài học ID: {material_id}", 
+                current_app.config.get('SERVER_IP', '127.0.0.1')
+            )
 
             # 4. Logic tạo TASK (Ngưỡng 4 người)
             if total_req > 0 and total_req % 4 == 0:

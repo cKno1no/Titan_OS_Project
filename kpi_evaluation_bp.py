@@ -281,13 +281,10 @@ def get_users_by_dept():
 def submit_peer_review():
     data = request.json
     now = datetime.now()
-    # Mặc định chấm cho tháng hiện tại (hoặc có thể truyền tham số lên)
-
-    # KHAI BÁO CÁC BIẾN TẠI ĐÂY TRƯỚC
     evaluator = session.get('user_code')
     target = data['target_user']
     score = safe_float(data['score'])
-    note = data.get('note', '')
+    note = data.get('note', '').strip() # Đã thêm .strip()
 
     result = current_app.kpi_service.save_peer_review(
         target_user=target,
@@ -298,10 +295,16 @@ def submit_peer_review():
         note=note
     )
 
-    # --- [THÊM LOG Ở ĐÂY] ---
     if result.get('success'):
         ip = get_user_ip()
+        # 1. Ghi Audit Log như cũ
         current_app.db_manager.write_audit_log(evaluator, 'KPI_PEER_REVIEW', 'INFO', f"Đánh giá chéo đồng nghiệp {target} - Cho {score} điểm", ip)
+        
+        # 2. [THÊM MỚI] Ghi nhận Activity để tặng +20 XP nếu có comment chất lượng (>10 ký tự)
+        if len(note) >= 10:
+            # Lưu ý: Gamification thường nằm trong chatbot_service hoặc service riêng tùy cấu hình factory
+            if hasattr(current_app, 'chatbot_service'):
+                current_app.chatbot_service.gamification.log_activity(evaluator, 'PEER_REVIEWER')
 
     return jsonify(result)
 
